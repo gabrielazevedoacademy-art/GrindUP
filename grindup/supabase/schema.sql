@@ -351,6 +351,6 @@ INSERT INTO public.plans
    has_missions, has_weekly_summary, max_themes, has_elite_badge)
 VALUES
   ('free',  'Free',  0,     20,   3,    FALSE, FALSE, 1,    FALSE),
-  ('pro',   'Pro',   19.90, NULL, NULL, TRUE,  TRUE,  5,    FALSE),
-  ('elite', 'Elite', 39.90, NULL, NULL, TRUE,  TRUE,  9999, TRUE )
+  ('pro',   'Pro',    9.90, NULL, NULL, TRUE,  TRUE,  5,    FALSE),
+  ('elite', 'Elite', 19.90, NULL, NULL, TRUE,  TRUE,  9999, TRUE )
 ON CONFLICT (name) DO NOTHING;
