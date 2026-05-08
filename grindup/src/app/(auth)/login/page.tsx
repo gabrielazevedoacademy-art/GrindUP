@@ -65,7 +65,7 @@ export default function LoginPage() {
           Grind<span className="glow-up-text">UP</span>
         </h1>
         <p className="tagline-anim mt-3 text-sm tracking-widest text-gray-500 uppercase">
-          Suba de nível na sua vida
+          Eleve sua vida para outro nível!
         </p>
       </div>
 
