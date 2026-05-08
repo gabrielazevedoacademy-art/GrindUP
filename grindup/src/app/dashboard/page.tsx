@@ -21,233 +21,215 @@ type Profile = {
 const INIT_TEXT = 'SISTEMA INICIALIZANDO...'
 
 function progressLabel(p: number): string {
-  if (p < 30) return 'Carregando perfil...'
-  if (p < 60) return 'Sincronizando dados...'
-  if (p < 95) return 'Ativando gamificação...'
-  return 'COMPLETO!'
+  if (p < 25) return 'Carregando perfil...'
+  if (p < 50) return 'Sincronizando dados...'
+  if (p < 75) return 'Ativando gamificação...'
+  return 'PRONTO'
 }
 
-function InitAnimation({
-  profile,
-  onDone,
-}: {
-  profile: Profile
-  onDone: () => void
-}) {
-  const [phase, setPhase] = useState(1)        // 1=scan 2=typing 3=progress 4=flash 5=welcome 6=stats 7=button
-  const [typed, setTyped] = useState(0)
-  const [progress, setProgress] = useState(0)
+// Phases: 1=black 2=typing 3=progress 4=flash 5=welcome 6=stats 7=button
+function InitAnimation({ profile, onDone }: { profile: Profile; onDone: () => void }) {
+  const [phase, setPhase]           = useState(1)
+  const [typed, setTyped]           = useState(0)
+  const [progress, setProgress]     = useState(0)
   const [shownStats, setShownStats] = useState(0)
-  const [portal, setPortal] = useState(false)
+  const [exiting, setExiting]       = useState(false)
 
-  const name = (profile.full_name || profile.username || 'USUÁRIO').toUpperCase()
+  const name  = (profile.full_name || profile.username || 'USUÁRIO').toUpperCase()
   const stats = [`NÍVEL ${profile.level}`, `${profile.xp} XP`, 'RANK: INICIANTE']
 
   // Master sequencer
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = []
-    t.push(setTimeout(() => setPhase(2), 950))
-    t.push(setTimeout(() => setPhase(3), 2900))
-    t.push(setTimeout(() => setPhase(4), 5100))
-    t.push(setTimeout(() => setPhase(5), 5250))
-    t.push(setTimeout(() => setShownStats(1), 5650))
-    t.push(setTimeout(() => setShownStats(2), 6000))
-    t.push(setTimeout(() => setShownStats(3), 6350))
-    t.push(setTimeout(() => setPhase(7), 6900))
+    t.push(setTimeout(() => setPhase(2), 120))       // start typing
+    t.push(setTimeout(() => setPhase(3), 1600))      // typing → progress
+    t.push(setTimeout(() => setPhase(4), 3900))      // progress → flash
+    t.push(setTimeout(() => setPhase(5), 4020))      // flash → welcome
+    t.push(setTimeout(() => setShownStats(1), 5050)) // stat 1
+    t.push(setTimeout(() => setShownStats(2), 5420)) // stat 2
+    t.push(setTimeout(() => setShownStats(3), 5790)) // stat 3
+    t.push(setTimeout(() => setPhase(7), 6350))      // → button
     return () => t.forEach(clearTimeout)
   }, [])
 
-  // Typing
+  // Typewriter
   useEffect(() => {
     if (phase !== 2 || typed >= INIT_TEXT.length) return
-    const t = setTimeout(() => setTyped((c) => c + 1), 60)
+    const t = setTimeout(() => setTyped((c) => c + 1), 58)
     return () => clearTimeout(t)
   }, [phase, typed])
 
-  // Progress
+  // Progress bar  (100 ticks × 23ms ≈ 2.3s)
   useEffect(() => {
     if (phase !== 3 || progress >= 100) return
-    const t = setTimeout(() => setProgress((p) => Math.min(p + 2, 100)), 44)
+    const t = setTimeout(() => setProgress((p) => Math.min(p + 1, 100)), 23)
     return () => clearTimeout(t)
   }, [phase, progress])
 
   function handleStart() {
-    setPortal(true)
-    setTimeout(onDone, 700)
+    setExiting(true)
+    setTimeout(onDone, 520)
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
       style={{
-        background: '#000009',
-        transformOrigin: 'center center',
-        transition: portal
-          ? 'transform 0.7s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.7s ease-in'
-          : undefined,
-        transform: portal ? 'scale(0.05) rotate(720deg)' : 'scale(1) rotate(0deg)',
-        opacity: portal ? 0 : 1,
+        background: '#00000d',
+        transition: exiting ? 'opacity 0.5s ease' : undefined,
+        opacity: exiting ? 0 : 1,
       }}
     >
       <style>{`
-        @keyframes scanLine {
-          from { top: -4px; } to { top: 100%; }
-        }
-        @keyframes blink {
+        @keyframes cursorBlink {
           0%, 100% { opacity: 1; } 50% { opacity: 0; }
         }
         @keyframes flashWhite {
-          0%   { opacity: 0.9; } 100% { opacity: 0; pointer-events: none; }
+          0%   { opacity: 1; }
+          100% { opacity: 0; pointer-events: none; }
         }
-        @keyframes popIn {
-          0%   { opacity: 0; transform: scale(0.4) translateY(20px); }
-          70%  { transform: scale(1.06) translateY(-4px); }
+        @keyframes welcomeIn {
+          0%   { opacity: 0; transform: scale(0.85) translateY(16px); }
+          60%  { transform: scale(1.03) translateY(-3px); }
           100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes statIn {
-          0%   { opacity: 0; transform: translateY(12px); }
-          100% { opacity: 1; transform: translateY(0); }
+        @keyframes nameGlow {
+          0%, 100% {
+            text-shadow: 0 0 14px rgba(167,139,250,0.9), 0 0 35px rgba(124,58,237,0.6);
+          }
+          50% {
+            text-shadow: 0 0 28px rgba(167,139,250,1), 0 0 70px rgba(124,58,237,0.9),
+                         0 0 100px rgba(79,70,229,0.5);
+          }
         }
-        @keyframes statFlicker {
-          0%, 100% { opacity: 1; } 25% { opacity: 0.2; } 50% { opacity: 1; } 75% { opacity: 0.4; }
+        @keyframes statRegister {
+          0%   { opacity: 0; }
+          18%  { opacity: 1; }
+          36%  { opacity: 0; }
+          54%  { opacity: 1; }
+          72%  { opacity: 0; }
+          100% { opacity: 1; }
         }
-        @keyframes glowPulseBtn {
-          0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.5), 0 0 0 0 rgba(124,58,237,0.3); }
-          50%       { box-shadow: 0 0 40px rgba(124,58,237,0.9), 0 0 0 10px rgba(124,58,237,0); }
+        @keyframes btnGlow {
+          0%, 100% {
+            box-shadow: 0 0 18px rgba(124,58,237,0.5), 0 0 0 0 rgba(124,58,237,0.3);
+          }
+          50% {
+            box-shadow: 0 0 38px rgba(124,58,237,0.95), 0 0 0 10px rgba(124,58,237,0);
+          }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      {/* CRT scan line */}
-      {phase === 1 && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            height: 3,
-            background: 'linear-gradient(90deg, transparent 0%, #00ff88 50%, transparent 100%)',
-            boxShadow: '0 0 16px 4px rgba(0,255,136,0.6)',
-            animation: 'scanLine 0.95s linear infinite',
-          }}
-        />
-      )}
-
-      {/* White flash */}
+      {/* Flash overlay */}
       {phase === 4 && (
         <div
           aria-hidden="true"
           className="absolute inset-0"
-          style={{ background: '#fff', animation: 'flashWhite 0.18s ease-out forwards' }}
+          style={{ background: '#fff', animation: 'flashWhite 0.1s ease-out forwards' }}
         />
       )}
 
-      {/* Main content */}
-      <div className="relative z-10 flex w-full max-w-xl flex-col items-center gap-7 px-8 text-center">
+      <div className="relative z-10 flex w-full max-w-lg flex-col items-center gap-8 px-8 text-center">
 
-        {/* Terminal text */}
+        {/* ── Typewriter ── */}
         {(phase === 2 || phase === 3) && (
-          <p
-            style={{
-              fontFamily: '"Courier New", monospace',
-              color: '#00ff88',
-              fontSize: '1.1rem',
-              letterSpacing: '0.12em',
-              textShadow: '0 0 12px rgba(0,255,136,0.8)',
-            }}
-          >
-            {INIT_TEXT.slice(0, typed)}
-            <span style={{ animation: 'blink 0.65s step-end infinite' }}>█</span>
-          </p>
-        )}
-
-        {/* Progress bar */}
-        {phase === 3 && (
-          <div className="w-full">
-            <div
-              style={{
-                height: 6,
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: 999,
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  height: '100%',
-                  width: `${progress}%`,
-                  background: 'linear-gradient(90deg, #7c3aed, #00ff88)',
-                  borderRadius: 999,
-                  transition: 'width 0.04s linear',
-                }}
-              />
-            </div>
+          <div>
             <p
               style={{
-                fontFamily: '"Courier New", monospace',
-                color: 'rgba(0,255,136,0.65)',
-                fontSize: '0.72rem',
-                marginTop: 8,
-                letterSpacing: '0.1em',
+                fontFamily: '"Courier New", Courier, monospace',
+                color: '#00ff88',
+                fontSize: '1.05rem',
+                letterSpacing: '0.14em',
+                textShadow: '0 0 14px rgba(0,255,136,0.75)',
               }}
             >
-              {progressLabel(progress)}
+              {INIT_TEXT.slice(0, typed)}
+              <span style={{ animation: 'cursorBlink 0.7s step-end infinite' }}>█</span>
             </p>
+
+            {/* Progress bar (only in phase 3) */}
+            {phase === 3 && (
+              <div style={{ marginTop: 28 }}>
+                <div
+                  style={{
+                    height: 5,
+                    background: 'rgba(255,255,255,0.07)',
+                    borderRadius: 999,
+                    overflow: 'hidden',
+                    width: 320,
+                    margin: '0 auto',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${progress}%`,
+                      background: 'linear-gradient(90deg, #7c3aed, #00ff88)',
+                      borderRadius: 999,
+                      transition: 'width 0.02s linear',
+                    }}
+                  />
+                </div>
+                <p
+                  style={{
+                    fontFamily: '"Courier New", Courier, monospace',
+                    color: 'rgba(0,255,136,0.6)',
+                    fontSize: '0.7rem',
+                    marginTop: 10,
+                    letterSpacing: '0.12em',
+                  }}
+                >
+                  {progressLabel(progress)}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Welcome */}
+        {/* ── Welcome ── */}
         {phase >= 5 && (
-          <div style={{ animation: 'popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' }}>
+          <div style={{ animation: 'welcomeIn 0.55s cubic-bezier(0.34,1.4,0.64,1) both' }}>
             <p
               style={{
-                fontFamily: '"Courier New", monospace',
-                color: 'rgba(0,255,136,0.5)',
-                fontSize: '0.75rem',
-                letterSpacing: '0.2em',
-                marginBottom: 10,
+                fontFamily: '"Courier New", Courier, monospace',
+                color: 'rgba(0,255,136,0.45)',
+                fontSize: '0.72rem',
+                letterSpacing: '0.22em',
+                marginBottom: 12,
               }}
             >
-              IDENTIFICAÇÃO CONFIRMADA
+              BEM-VINDO AO GRINDUP
             </p>
             <h1
               style={{
-                fontSize: 'clamp(1.8rem, 5vw, 3.2rem)',
+                fontSize: 'clamp(2rem, 5.5vw, 3.4rem)',
                 fontWeight: 900,
-                lineHeight: 1.1,
-                color: '#ffffff',
+                color: '#a78bfa',
                 letterSpacing: '0.04em',
-                textShadow:
-                  '0 0 30px rgba(124,58,237,0.8), 0 0 70px rgba(124,58,237,0.4)',
+                lineHeight: 1.1,
+                animation: 'nameGlow 1.2s ease-in-out infinite',
               }}
             >
-              BEM-VINDO,
-              <br />
-              <span style={{ color: '#a78bfa' }}>{name}</span>
+              {name}
             </h1>
           </div>
         )}
 
-        {/* Stats */}
+        {/* ── Stats ── */}
         {phase >= 6 && (
           <div className="flex gap-10">
             {stats.map((stat, i) => (
               <span
                 key={stat}
                 style={{
-                  fontFamily: '"Courier New", monospace',
+                  fontFamily: '"Courier New", Courier, monospace',
                   color: '#00ff88',
-                  fontSize: '0.82rem',
-                  letterSpacing: '0.12em',
-                  textShadow: '0 0 10px rgba(0,255,136,0.7)',
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.13em',
+                  textShadow: '0 0 10px rgba(0,255,136,0.65)',
                   opacity: shownStats > i ? 1 : 0,
-                  transform: shownStats > i ? 'translateY(0)' : 'translateY(8px)',
-                  transition: 'opacity 0.25s ease, transform 0.25s ease',
-                  animation:
-                    shownStats === i + 1
-                      ? 'statFlicker 0.35s ease-out'
-                      : undefined,
+                  animation: shownStats === i + 1 ? 'statRegister 0.65s ease-out forwards' : undefined,
                 }}
               >
                 {stat}
@@ -256,25 +238,24 @@ function InitAnimation({
           </div>
         )}
 
-        {/* CTA button */}
+        {/* ── CTA button ── */}
         {phase >= 7 && (
           <button
             onClick={handleStart}
             style={{
-              marginTop: 8,
-              padding: '14px 40px',
+              padding: '13px 38px',
               background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
               border: 'none',
-              borderRadius: 14,
+              borderRadius: 12,
               color: '#fff',
-              fontSize: '0.95rem',
+              fontSize: '0.9rem',
               fontWeight: 700,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.13em',
               cursor: 'pointer',
-              animation: 'glowPulseBtn 1.8s ease-in-out infinite',
+              animation: 'btnGlow 1.6s ease-in-out infinite',
             }}
           >
-            INICIAR JORNADA
+            INICIAR JORNADA →
           </button>
         )}
       </div>
@@ -286,9 +267,9 @@ function InitAnimation({
 // DASHBOARD CONTENT
 // ─────────────────────────────────────────────────────────────
 const PLAN_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  free:  { bg: 'rgba(100,100,110,0.18)', color: '#9ca3af', border: 'rgba(100,100,110,0.3)' },
-  pro:   { bg: 'rgba(124,58,237,0.18)',  color: '#a78bfa', border: 'rgba(124,58,237,0.4)'  },
-  elite: { bg: 'rgba(234,179,8,0.14)',   color: '#fbbf24', border: 'rgba(234,179,8,0.35)'  },
+  free:  { bg: 'rgba(100,100,110,0.18)', color: '#9ca3af', border: 'rgba(100,100,110,0.3)'  },
+  pro:   { bg: 'rgba(124,58,237,0.18)',  color: '#a78bfa', border: 'rgba(124,58,237,0.4)'   },
+  elite: { bg: 'rgba(234,179,8,0.14)',   color: '#fbbf24', border: 'rgba(234,179,8,0.35)'   },
 }
 
 const MODULES = [
@@ -356,12 +337,14 @@ function DashboardContent({ profile }: { profile: Profile }) {
     .join('')
     .toUpperCase()
 
-  const planStyle =
-    PLAN_STYLE[(profile.plan as keyof typeof PLAN_STYLE)] ?? PLAN_STYLE.free
+  const planStyle = PLAN_STYLE[profile.plan as keyof typeof PLAN_STYLE] ?? PLAN_STYLE.free
 
-  const xpForNextLevel = profile.level * 1000
-  const xpInCurrentLevel = profile.xp % xpForNextLevel
-  const xpPct = Math.min((xpInCurrentLevel / xpForNextLevel) * 100, 100)
+  const xpForNextLevel    = profile.level * 1000
+  const xpInCurrentLevel  = profile.xp % xpForNextLevel
+  const xpPct             = Math.min((xpInCurrentLevel / xpForNextLevel) * 100, 100)
+
+  // avatar_url is '' (empty string) when not set by the trigger
+  const hasAvatar = Boolean(profile.avatar_url && profile.avatar_url.trim() !== '')
 
   const gamingStats = [
     {
@@ -410,73 +393,74 @@ function DashboardContent({ profile }: { profile: Profile }) {
 
   return (
     <div className="min-h-screen">
-      {/* ── Cover banner ── */}
+
+      {/* ── Cover banner 160px ── */}
       <div
-        className="relative w-full"
         style={{
-          height: 192,
-          background:
-            'linear-gradient(135deg, #1a0533 0%, #0d0a1e 35%, #0a1230 65%, #1e0a3a 100%)',
+          height: 160,
+          width: '100%',
+          background: 'linear-gradient(135deg, #1a0533 0%, #0d0a1e 30%, #0a1230 60%, #1e0a3a 85%, #12063a 100%)',
           backgroundSize: '200% 200%',
           animation: 'gradientShift 6s ease infinite',
+          position: 'relative',
           overflow: 'hidden',
         }}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            right: 60,
-            top: 30,
-            width: 160,
-            height: 160,
-            borderRadius: '50%',
-            background: 'rgba(124,58,237,0.1)',
-            filter: 'blur(40px)',
-          }}
-        />
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: 100,
-            bottom: 10,
-            width: 100,
-            height: 100,
-            borderRadius: '50%',
-            background: 'rgba(79,70,229,0.12)',
-            filter: 'blur(28px)',
-          }}
-        />
+        {/* Decorative glows */}
+        <div aria-hidden="true" style={{ position: 'absolute', right: 60,  top: 20,  width: 180, height: 180, borderRadius: '50%', background: 'rgba(124,58,237,0.12)', filter: 'blur(50px)' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', left: 80,   bottom: 0, width: 120, height: 120, borderRadius: '50%', background: 'rgba(79,70,229,0.15)',  filter: 'blur(35px)' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', right: 220, top: 10,  width: 80,  height: 80,  borderRadius: '50%', background: 'rgba(167,139,250,0.08)', filter: 'blur(25px)' }} />
       </div>
 
-      <div className="px-8 pb-10" style={{ marginTop: -56 }}>
-        {/* ── Profile info ── */}
+      <div className="px-8 pb-10" style={{ marginTop: -48 }}>
+
+        {/* ── Profile row ── */}
         <div className="mb-8 flex items-end gap-5">
-          {profile.avatar_url ? (
+
+          {/* Avatar — 96px, border + glow */}
+          {hasAvatar ? (
+            // referrerPolicy="no-referrer" is required for Google profile photos
+            // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={profile.avatar_url}
+              src={profile.avatar_url!}
               alt={displayName}
-              className="h-24 w-24 rounded-full object-cover"
+              referrerPolicy="no-referrer"
+              width={96}
+              height={96}
               style={{
-                border: '3px solid rgba(124,58,237,0.7)',
-                boxShadow: '0 0 28px rgba(124,58,237,0.55)',
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                flexShrink: 0,
+                border: '3px solid rgba(124,58,237,0.75)',
+                boxShadow: '0 0 28px rgba(124,58,237,0.6)',
               }}
             />
           ) : (
             <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full text-2xl font-black text-white"
               style={{
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.6rem',
+                fontWeight: 900,
+                color: '#fff',
                 background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
-                border: '3px solid rgba(124,58,237,0.7)',
-                boxShadow: '0 0 28px rgba(124,58,237,0.55)',
+                border: '3px solid rgba(124,58,237,0.75)',
+                boxShadow: '0 0 28px rgba(124,58,237,0.6)',
               }}
             >
               {initials}
             </div>
           )}
 
-          <div className="mb-1.5">
+          {/* Name + badge */}
+          <div style={{ marginBottom: 6 }}>
             <h2 className="mb-2 text-2xl font-black text-white">{displayName}</h2>
             <span
               className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
@@ -491,23 +475,18 @@ function DashboardContent({ profile }: { profile: Profile }) {
           </div>
         </div>
 
-        {/* ── Gamification stats ── */}
+        {/* ── Gamification stat cards ── */}
         <div className="mb-5 grid grid-cols-4 gap-4">
           {gamingStats.map((s) => (
             <div key={s.label} className="stat-card">
               <div style={{ color: s.color, marginBottom: 8 }}>{s.icon}</div>
-              <div
-                className="text-2xl font-black"
-                style={{ color: s.color }}
-              >
-                {s.value}
-              </div>
+              <div className="text-2xl font-black" style={{ color: s.color }}>{s.value}</div>
               <div className="mt-1 text-xs text-gray-500">{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* ── XP progress ── */}
+        {/* ── XP progress bar ── */}
         <div
           className="mb-6 rounded-2xl p-5"
           style={{
@@ -519,48 +498,25 @@ function DashboardContent({ profile }: { profile: Profile }) {
             <span className="text-sm font-medium text-gray-300">
               Progresso para o Nível {profile.level + 1}
             </span>
-            <span className="text-sm font-bold text-violet-400">
-              {xpPct.toFixed(0)}%
-            </span>
+            <span className="text-sm font-bold text-violet-400">{xpPct.toFixed(0)}%</span>
           </div>
-          <div
-            style={{
-              height: 8,
-              background: 'rgba(255,255,255,0.07)',
-              borderRadius: 999,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              className="xp-bar-fill"
-              style={{ width: `${xpPct}%`, transition: 'width 0.6s ease' }}
-            />
+          <div style={{ height: 8, background: 'rgba(255,255,255,0.07)', borderRadius: 999, overflow: 'hidden' }}>
+            <div className="xp-bar-fill" style={{ width: `${xpPct}%`, transition: 'width 0.6s ease' }} />
           </div>
           <div className="mt-2 flex justify-between">
-            <span className="text-xs text-gray-600">
-              {profile.xp.toLocaleString('pt-BR')} XP
-            </span>
-            <span className="text-xs text-gray-600">
-              {xpForNextLevel.toLocaleString('pt-BR')} XP
-            </span>
+            <span className="text-xs text-gray-600">{profile.xp.toLocaleString('pt-BR')} XP</span>
+            <span className="text-xs text-gray-600">{xpForNextLevel.toLocaleString('pt-BR')} XP</span>
           </div>
         </div>
 
-        {/* ── Module grid ── */}
+        {/* ── Module grid 2×2 ── */}
         <div className="grid grid-cols-2 gap-4">
           {MODULES.map((mod) => (
             <Link key={mod.href} href={mod.href} className="module-card">
               <div style={{ color: mod.iconColor, marginBottom: 14 }}>{mod.icon}</div>
               <h3 className="mb-1 text-base font-bold text-white">{mod.title}</h3>
-              <p className="mb-3 text-xs leading-relaxed text-gray-500">
-                {mod.subtitle}
-              </p>
-              <p
-                className="mb-5 text-xs"
-                style={{ color: 'rgba(255,255,255,0.2)' }}
-              >
-                {mod.preview}
-              </p>
+              <p className="mb-3 text-xs leading-relaxed text-gray-500">{mod.subtitle}</p>
+              <p className="mb-5 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>{mod.preview}</p>
               <span
                 className="rounded-lg px-3 py-1.5 text-xs font-semibold"
                 style={{
@@ -583,8 +539,8 @@ function DashboardContent({ profile }: { profile: Profile }) {
 // PAGE
 // ─────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [profile, setProfile]   = useState<Profile | null>(null)
+  const [loading, setLoading]   = useState(true)
   const [showInit, setShowInit] = useState(false)
 
   useEffect(() => {
@@ -596,10 +552,8 @@ export default function DashboardPage() {
         .select('*')
         .eq('id', user.id)
         .single()
-
       setProfile(data)
-      const initialized = localStorage.getItem('grindup_initialized')
-      setShowInit(!initialized)
+      setShowInit(!localStorage.getItem('grindup_initialized'))
       setLoading(false)
     })
   }, [])
@@ -614,9 +568,8 @@ export default function DashboardPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div
           style={{
-            width: 38,
-            height: 38,
-            border: '3px solid rgba(124,58,237,0.25)',
+            width: 36, height: 36,
+            border: '3px solid rgba(124,58,237,0.22)',
             borderTopColor: '#7c3aed',
             borderRadius: '50%',
             animation: 'spin 0.75s linear infinite',
