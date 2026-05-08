@@ -41,8 +41,9 @@ export default function WelcomeAnimation({
 
   // ── Step 1: check localStorage (only on client, inside useEffect) ──
   useEffect(() => {
-    const initialized = localStorage.getItem('grindup_initialized')
-    if (initialized) {
+    const lastAccess = localStorage.getItem('grindup_last_access')
+    const elapsed = lastAccess ? Date.now() - Number(lastAccess) : Infinity
+    if (elapsed < 600000) {
       onCompleteRef.current()
     } else {
       setVisible(true)
@@ -81,7 +82,7 @@ export default function WelcomeAnimation({
 
   function handleStart() {
     setExiting(true)
-    localStorage.setItem('grindup_initialized', 'true')
+    localStorage.setItem('grindup_last_access', String(Date.now()))
     setTimeout(() => {
       setVisible(false)
       onCompleteRef.current()
