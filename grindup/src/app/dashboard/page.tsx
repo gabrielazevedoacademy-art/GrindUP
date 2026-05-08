@@ -121,7 +121,7 @@ function DashboardContent({ profile }: { profile: Profile }) {
     },
     {
       label: 'Streak',
-      value: `${profile.streak_days}d`,
+      value: profile.streak_days > 0 ? `${profile.streak_days}d` : '—',
       color: '#f97316',
       icon: (
         <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
@@ -148,9 +148,7 @@ function DashboardContent({ profile }: { profile: Profile }) {
       <style>{`
         @keyframes bannerShift {
           0%   { background-position: 0% 50%; }
-          25%  { background-position: 100% 50%; }
-          50%  { background-position: 100% 0%; }
-          75%  { background-position: 0% 100%; }
+          50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -164,9 +162,9 @@ function DashboardContent({ profile }: { profile: Profile }) {
           style={{
             height: 180,
             width: '100%',
-            background: 'linear-gradient(135deg, #1e0533, #0d0a1e, #0a1628, #1a0a2e)',
+            background: 'linear-gradient(135deg, #2d1b4e, #1a0a2e, #0d1a3e, #1e0533)',
             backgroundSize: '400% 400%',
-            animation: 'bannerShift 6s ease infinite',
+            animation: 'bannerShift 6s ease-in-out infinite',
             overflow: 'hidden',
           }}
         >
