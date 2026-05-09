@@ -537,8 +537,8 @@ function DeleteConfirmModal({ tx, onConfirm, onCancel, loading }: {
 // ─────────────────────────────────────────────────────────────
 // NEW TRANSACTION MODAL
 // ─────────────────────────────────────────────────────────────
-function NewTransactionModal({ onClose, onSave, saving }: {
-  onClose: () => void; onSave: (form: NewTransactionForm) => Promise<void>; saving: boolean
+function NewTransactionModal({ onClose, onSave, saving, saveError }: {
+  onClose: () => void; onSave: (form: NewTransactionForm) => Promise<void>; saving: boolean; saveError: string | null
 }) {
   const [form, setForm] = useState<NewTransactionForm>({
     title: '', amount: '', type: 'expense',
@@ -704,6 +704,21 @@ function NewTransactionModal({ onClose, onSave, saving }: {
               {saving ? 'Salvando...' : 'Registrar'}
             </button>
           </div>
+
+          {saveError && (
+            <div style={{
+              marginTop: 12, padding: '10px 14px', borderRadius: 10,
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.35)',
+              display: 'flex', alignItems: 'flex-start', gap: 8,
+            }}>
+              <svg style={{ flexShrink: 0, marginTop: 1 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth={2} strokeLinecap="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span style={{ fontSize: '0.8rem', color: '#f87171', lineHeight: 1.5 }}>
+                {saveError}
+              </span>
+            </div>
+          )}
         </form>
       </div>
     </div>
@@ -732,6 +747,7 @@ export default function FinancasPage() {
   // Modals
   const [showModal,     setShowModal]     = useState(false)
   const [saving,        setSaving]        = useState(false)
+  const [saveError,     setSaveError]     = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<Transaction | null>(null)
   const [deleting,      setDeleting]      = useState(false)
   const [markingReceived, setMarkingReceived] = useState<string | null>(null)
@@ -756,23 +772,42 @@ export default function FinancasPage() {
 
   // ── Create ──────────────────────────────────────────────────
   async function handleCreate(form: NewTransactionForm) {
-    if (!userId) return
+    if (!userId) {
+      setSaveError('Usuário não autenticado. Recarregue a página e tente novamente.')
+      return
+    }
     setSaving(true)
+    setSaveError(null)
     const supabase = createClientSupabase()
     const amount = parseFloat(form.amount.replace(',', '.'))
+    // Garantir formato YYYY-MM-DD e que o tipo seja válido no banco
+    const payload = {
+      user_id:  userId,
+      title:    form.title.trim(),
+      amount,
+      type:     form.type,           // 'income' | 'expense' | 'pending'
+      category: form.category,
+      date:     form.date,           // input[type=date] já retorna YYYY-MM-DD
+    }
+    console.log('[handleCreate] payload:', payload)
     const { data, error } = await supabase
       .from('financial_transactions')
-      .insert({ user_id: userId, title: form.title.trim(), amount, type: form.type, category: form.category, date: form.date })
-      .select().single()
+      .insert(payload)
+      .select()
+      .single()
     setSaving(false)
-    if (!error && data) {
-      setTransactions(prev =>
-        [data as Transaction, ...prev].sort((a, b) =>
-          b.date !== a.date ? b.date.localeCompare(a.date) : b.created_at.localeCompare(a.created_at)
-        )
-      )
-      setShowModal(false)
+    if (error) {
+      console.error('[handleCreate] Supabase error:', error)
+      setSaveError(`Erro ao salvar: ${error.message}`)
+      return
     }
+    setTransactions(prev =>
+      [data as Transaction, ...prev].sort((a, b) =>
+        b.date !== a.date ? b.date.localeCompare(a.date) : b.created_at.localeCompare(a.created_at)
+      )
+    )
+    setSaveError(null)
+    setShowModal(false)
   }
 
   // ── Delete ──────────────────────────────────────────────────
@@ -864,7 +899,12 @@ export default function FinancasPage() {
       `}</style>
 
       {showModal && (
-        <NewTransactionModal onClose={() => setShowModal(false)} onSave={handleCreate} saving={saving} />
+        <NewTransactionModal
+          onClose={() => { setShowModal(false); setSaveError(null) }}
+          onSave={handleCreate}
+          saving={saving}
+          saveError={saveError}
+        />
       )}
       {confirmDelete && (
         <DeleteConfirmModal
