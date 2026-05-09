@@ -54,13 +54,6 @@ function getTodayStr(): string {
   return formatLocalDate(new Date())
 }
 
-function getCurrentPeriod(): Period {
-  const h = new Date().getHours()
-  if (h >= 5 && h < 12) return 'morning'
-  if (h >= 12 && h < 18) return 'afternoon'
-  return 'night'
-}
-
 function isPeriodAvailable(period: Period): boolean {
   const h = new Date().getHours()
   if (period === 'morning')   return h >= 5
@@ -445,7 +438,7 @@ function PeriodCard({
               color: 'rgba(255,255,255,0.4)', lineHeight: 1.5,
               fontStyle: 'italic',
             }}>
-              "{checkin.notes}"
+              &ldquo;{checkin.notes}&rdquo;
             </p>
           )}
         </div>
@@ -856,7 +849,7 @@ export default function CheckinPage() {
                       <div style={{ marginTop: 8 }}>
                         {checkins.filter(c => c.notes).map(c => (
                           <p key={c.id} style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.32)', fontStyle: 'italic', lineHeight: 1.5 }}>
-                            {PERIOD_META[c.period ?? 'morning'].icon} "{c.notes}"
+                            {PERIOD_META[c.period ?? 'morning'].icon} &ldquo;{c.notes}&rdquo;
                           </p>
                         ))}
                       </div>
