@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClientSupabase } from '@/lib/supabase'
+import ADMIN_EMAILS from '@/lib/admin'
 
 type Profile = {
   full_name: string | null
@@ -83,11 +84,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const supabase = createClientSupabase()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/login'); return }
+      setIsAdmin(ADMIN_EMAILS.includes(user.email ?? ''))
       supabase
         .from('profiles')
         .select('full_name, username, avatar_url, plan')
@@ -158,6 +161,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
         .dash-logout-btn:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.07); }
         .dash-logout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .dash-admin-link {
+          display: flex; align-items: center; gap: 8px;
+          width: 100%; padding: 8px 12px; border-radius: 10px;
+          font-size: 0.75rem; font-weight: 600;
+          color: rgba(251,146,60,0.65);
+          background: rgba(232,92,13,0.06);
+          border: 1px solid rgba(232,92,13,0.15);
+          text-decoration: none; margin-bottom: 6px;
+          transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .dash-admin-link:hover {
+          color: #fb923c;
+          background: rgba(232,92,13,0.12);
+          border-color: rgba(232,92,13,0.35);
+          box-shadow: 0 0 12px rgba(232,92,13,0.2);
+        }
         .module-card {
           display: block; border-radius: 16px; padding: 24px;
           background: rgba(255,255,255,0.03);
@@ -270,6 +289,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </p>
             </div>
           </div>
+
+          {isAdmin && (
+            <>
+              <div style={{ borderTop: '1px solid rgba(232,92,13,0.15)', marginBottom: 8 }} />
+              <Link href="/admin" className="dash-admin-link">
+                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Painel Admin
+              </Link>
+            </>
+          )}
 
           <button
             onClick={handleLogout}
