@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.financial_transactions (
   user_id    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title      TEXT NOT NULL,
   amount     NUMERIC NOT NULL,
-  type       TEXT NOT NULL CHECK (type IN ('income', 'expense', 'a_receber')),
+  type       TEXT NOT NULL CHECK (type IN ('income', 'expense', 'pending')),
   category   TEXT,
   date       DATE NOT NULL DEFAULT CURRENT_DATE,
   notes      TEXT,

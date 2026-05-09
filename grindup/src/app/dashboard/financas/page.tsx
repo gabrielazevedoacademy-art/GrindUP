@@ -6,7 +6,7 @@ import { createClientSupabase } from '@/lib/supabase'
 // ─────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────
-type TransactionType = 'income' | 'expense' | 'a_receber'
+type TransactionType = 'income' | 'expense' | 'pending'
 type TypeFilter = 'all' | TransactionType
 type PeriodKey = 'current_month' | 'last_month' | 'last_3_months' | 'last_6_months' | 'this_year' | 'custom'
 type SortKey = 'recent' | 'highest' | 'lowest'
@@ -37,7 +37,7 @@ type NewTransactionForm = {
 const CATEGORIES: Record<TransactionType, string[]> = {
   income:    ['Salário', 'Freelance', 'Investimentos', 'Presente', 'Outros'],
   expense:   ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Roupas', 'Assinaturas', 'Outros'],
-  a_receber: ['Salário', 'Freelance', 'Serviço', 'Investimentos', 'Presente', 'Outros'],
+  pending:   ['Salário', 'Freelance', 'Serviço', 'Investimentos', 'Presente', 'Outros'],
 }
 
 const PERIOD_OPTIONS: { key: PeriodKey; label: string }[] = [
@@ -289,7 +289,7 @@ function TransactionCard({
 }) {
   const { type } = transaction
   const isIncome    = type === 'income'
-  const isPending   = type === 'a_receber'
+  const isPending   = type === 'pending'
 
   const iconBg    = isIncome ? 'rgba(74,222,128,0.1)'  : isPending ? 'rgba(251,191,36,0.1)'  : 'rgba(248,113,113,0.1)'
   const iconBdr   = isIncome ? 'rgba(74,222,128,0.25)' : isPending ? 'rgba(251,191,36,0.25)' : 'rgba(248,113,113,0.25)'
@@ -363,7 +363,7 @@ function TransactionCard({
         </span>
       </div>
 
-      {/* Mark as received button (only for a_receber) */}
+      {/* Mark as received button (only for pending) */}
       {isPending && (
         <button
           onClick={() => onMarkReceived(transaction)}
@@ -565,7 +565,7 @@ function NewTransactionModal({ onClose, onSave, saving }: {
   const TYPE_CONFIG: { key: TransactionType; label: string; color: string; activeBg: string; activeBdr: string }[] = [
     { key: 'income',    label: '▲ Receita',    color: '#4ade80', activeBg: 'rgba(74,222,128,0.12)',  activeBdr: 'rgba(74,222,128,0.5)'  },
     { key: 'expense',   label: '▼ Despesa',    color: '#f87171', activeBg: 'rgba(248,113,113,0.12)', activeBdr: 'rgba(248,113,113,0.5)' },
-    { key: 'a_receber', label: '⏳ A Receber', color: '#fbbf24', activeBg: 'rgba(251,191,36,0.12)',  activeBdr: 'rgba(251,191,36,0.5)'  },
+    { key: 'pending',    label: '⏳ A Receber', color: '#fbbf24', activeBg: 'rgba(251,191,36,0.12)',  activeBdr: 'rgba(251,191,36,0.5)'  },
   ]
 
   return (
@@ -634,7 +634,7 @@ function NewTransactionModal({ onClose, onSave, saving }: {
             <input
               type="text" value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              placeholder={form.type === 'income' ? 'Ex: Salário mensal' : form.type === 'a_receber' ? 'Ex: Projeto XYZ' : 'Ex: Conta de luz'}
+              placeholder={form.type === 'income' ? 'Ex: Salário mensal' : form.type === 'pending' ? 'Ex: Projeto XYZ' : 'Ex: Conta de luz'}
               maxLength={120} required style={inputStyle}
             />
           </div>
@@ -802,7 +802,7 @@ export default function FinancasPage() {
 
   const periodIncome  = periodTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const periodExpense = periodTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
-  const periodPending = periodTxs.filter(t => t.type === 'a_receber').reduce((s, t) => s + t.amount, 0)
+  const periodPending = periodTxs.filter(t => t.type === 'pending').reduce((s, t) => s + t.amount, 0)
   const periodBalance = periodIncome - periodExpense
   const balancePos    = periodBalance >= 0
 
@@ -841,6 +841,7 @@ export default function FinancasPage() {
           border-color: rgba(124,58,237,0.6) !important;
           box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
         }
+        select option { background-color: #1a1a2e !important; color: #fff !important; }
       `}</style>
 
       {showModal && (
@@ -904,7 +905,7 @@ export default function FinancasPage() {
         <select
           value={period}
           onChange={e => { setPeriod(e.target.value as PeriodKey); setCustomFrom(''); setCustomTo('') }}
-          style={{ ...inputBase, paddingRight: 28, cursor: 'pointer', minWidth: 180 }}
+          style={{ ...inputBase, background: '#1a1a2e', color: '#fff', border: '1px solid rgba(124,58,237,0.3)', padding: '8px 12px', borderRadius: 8, cursor: 'pointer', minWidth: 180 }}
         >
           {PERIOD_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
         </select>
@@ -1004,7 +1005,7 @@ export default function FinancasPage() {
         <select
           value={sort}
           onChange={e => setSort(e.target.value as SortKey)}
-          style={{ ...inputBase, cursor: 'pointer', flexShrink: 0 }}
+          style={{ ...inputBase, background: '#1a1a2e', color: '#fff', border: '1px solid rgba(124,58,237,0.3)', cursor: 'pointer', flexShrink: 0 }}
         >
           <option value="recent">Mais recentes</option>
           <option value="highest">Maior valor</option>
@@ -1015,7 +1016,7 @@ export default function FinancasPage() {
       {/* ── Type + category filters ──────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 6 }}>
-          {(['all', 'income', 'expense', 'a_receber'] as TypeFilter[]).map(f => (
+          {(['all', 'income', 'expense', 'pending'] as TypeFilter[]).map(f => (
             <FilterChip key={f} active={typeFilter === f} onClick={() => setTypeFilter(f)}>
               {f === 'all' ? 'Todas' : f === 'income' ? '▲ Receitas' : f === 'expense' ? '▼ Despesas' : '⏳ A Receber'}
             </FilterChip>
