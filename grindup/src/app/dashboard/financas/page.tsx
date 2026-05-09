@@ -80,8 +80,13 @@ function getPeriodRange(period: PeriodKey, cFrom: string, cTo: string): { from: 
   const y = now.getFullYear()
   const m = now.getMonth()
   switch (period) {
-    case 'current_month':
-      return { from: `${y}-${String(m+1).padStart(2,'0')}-01`, to: todayISO() }
+    case 'current_month': {
+      const lastDay = new Date(y, m + 1, 0).getDate()
+      return {
+        from: `${y}-${String(m+1).padStart(2,'0')}-01`,
+        to:   `${y}-${String(m+1).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`,
+      }
+    }
     case 'last_month': {
       const lm = m === 0 ? 11 : m - 1
       const ly = m === 0 ? y - 1 : y
@@ -100,7 +105,7 @@ function getPeriodRange(period: PeriodKey, cFrom: string, cTo: string): { from: 
       return { from: `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-01`, to: todayISO() }
     }
     case 'this_year':
-      return { from: `${y}-01-01`, to: todayISO() }
+      return { from: `${y}-01-01`, to: `${y}-12-31` }
     default:
       return { from: cFrom || `${y}-01-01`, to: cTo || todayISO() }
   }
