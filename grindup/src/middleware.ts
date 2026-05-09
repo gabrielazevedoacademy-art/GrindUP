@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import ADMIN_EMAILS from '@/lib/admin'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -39,6 +40,13 @@ export async function middleware(request: NextRequest) {
 
   if (isProtected && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Admin routes: require email in ADMIN_EMAILS
+  if (pathname.startsWith('/admin') && user) {
+    if (!ADMIN_EMAILS.includes(user.email ?? '')) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
   }
 
   if (isAuthPage && user) {
