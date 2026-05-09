@@ -652,9 +652,10 @@ function NewTransactionModal({ onClose, onSave, saving }: {
             <div>
               <label style={labelStyle}>Categoria</label>
               <select
+                className="periodo-select"
                 value={form.category}
                 onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                style={{ ...inputStyle, background: '#120c22', cursor: 'pointer' }}
+                style={{ width: '100%', boxSizing: 'border-box' as React.CSSProperties['boxSizing'] }}
               >
                 {CATEGORIES[form.type].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -842,6 +843,19 @@ export default function FinancasPage() {
           box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
         }
         select option { background-color: #1a1a2e !important; color: #fff !important; }
+        select.periodo-select {
+          background-color: #1a1a2e !important;
+          color: white !important;
+          border: 1px solid rgba(124,58,237,0.3) !important;
+          padding: 8px 16px !important;
+          border-radius: 8px !important;
+          cursor: pointer !important;
+          outline: none !important;
+        }
+        select.periodo-select option {
+          background-color: #1a1a2e !important;
+          color: white !important;
+        }
       `}</style>
 
       {showModal && (
@@ -903,9 +917,10 @@ export default function FinancasPage() {
           </span>
         </div>
         <select
+          className="periodo-select"
           value={period}
           onChange={e => { setPeriod(e.target.value as PeriodKey); setCustomFrom(''); setCustomTo('') }}
-          style={{ ...inputBase, background: '#1a1a2e', color: '#fff', border: '1px solid rgba(124,58,237,0.3)', padding: '8px 12px', borderRadius: 8, cursor: 'pointer', minWidth: 180 }}
+          style={{ minWidth: 180 }}
         >
           {PERIOD_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
         </select>
@@ -1003,9 +1018,10 @@ export default function FinancasPage() {
           />
         </div>
         <select
+          className="periodo-select"
           value={sort}
           onChange={e => setSort(e.target.value as SortKey)}
-          style={{ ...inputBase, background: '#1a1a2e', color: '#fff', border: '1px solid rgba(124,58,237,0.3)', cursor: 'pointer', flexShrink: 0 }}
+          style={{ flexShrink: 0 }}
         >
           <option value="recent">Mais recentes</option>
           <option value="highest">Maior valor</option>
