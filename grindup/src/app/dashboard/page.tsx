@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClientSupabase } from '@/lib/supabase'
 import WelcomeAnimation from '@/components/WelcomeAnimation'
+import CheckinPopup from '@/components/CheckinPopup'
 
 type Profile = {
   id: string
@@ -346,6 +347,7 @@ export default function DashboardPage() {
         onComplete={() => {}}
       />
       <DashboardContent profile={profile} />
+      <CheckinPopup />
     </>
   )
 }
