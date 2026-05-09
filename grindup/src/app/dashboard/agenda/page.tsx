@@ -159,6 +159,136 @@ function EventPill({
 }
 
 // ─────────────────────────────────────────────────────────────
+// DAY EVENTS MODAL
+// ─────────────────────────────────────────────────────────────
+function DayEventsModal({
+  date,
+  events,
+  onClose,
+  onEventClick,
+}: {
+  date: Date
+  events: Event[]
+  onClose: () => void
+  onEventClick: (event: Event) => void
+}) {
+  const title = date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })
+
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16,
+        background: 'rgba(0,0,0,0.65)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        animation: 'fadeIn 0.18s ease',
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        style={{
+          width: '100%', maxWidth: 400, borderRadius: 20,
+          background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
+          border: '1px solid rgba(124,58,237,0.3)',
+          boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
+          padding: '28px 24px',
+          animation: 'slideUp 0.22s ease',
+          maxHeight: '80vh', overflowY: 'auto',
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+              Eventos
+            </h2>
+            <p style={{ fontSize: '0.8rem', color: '#a78bfa', margin: '3px 0 0', fontWeight: 600 }}>
+              {title}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: 32, height: 32, borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(255,255,255,0.5)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Event list */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {events.map(ev => (
+            <button
+              key={ev.id}
+              onClick={() => { onClose(); onEventClick(ev) }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', borderRadius: 12,
+                border: `1px solid ${ev.color}22`,
+                background: `${ev.color}0d`,
+                cursor: 'pointer', textAlign: 'left', width: '100%',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.background = `${ev.color}22`
+                ;(e.currentTarget as HTMLButtonElement).style.borderColor = `${ev.color}55`
+              }}
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.background = `${ev.color}0d`
+                ;(e.currentTarget as HTMLButtonElement).style.borderColor = `${ev.color}22`
+              }}
+            >
+              {/* Color dot */}
+              <div
+                style={{
+                  width: 10, height: 10, borderRadius: '50%',
+                  background: ev.color,
+                  boxShadow: `0 0 8px ${ev.color}99`,
+                  flexShrink: 0,
+                }}
+              />
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#fff',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {ev.title}
+                </p>
+                {ev.description && (
+                  <p style={{
+                    margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {ev.description}
+                  </p>
+                )}
+              </div>
+              {/* Time */}
+              <span style={{
+                flexShrink: 0, fontSize: '0.72rem', fontWeight: 600,
+                color: 'rgba(255,255,255,0.4)',
+              }}>
+                {localTimeStr(ev.start_at)}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
 // CALENDAR CELL
 // ─────────────────────────────────────────────────────────────
 function CalendarCell({
@@ -166,11 +296,13 @@ function CalendarCell({
   events,
   onDayClick,
   onEventClick,
+  onOverflowClick,
 }: {
   day: CalendarDay
   events: Event[]
   onDayClick: (date: Date) => void
   onEventClick: (event: Event, e: React.MouseEvent) => void
+  onOverflowClick: (date: Date, events: Event[], e: React.MouseEvent) => void
 }) {
   const [hovered, setHovered] = useState(false)
   const visible = events.slice(0, 2)
@@ -251,16 +383,32 @@ function CalendarCell({
       ))}
 
       {overflow > 0 && (
-        <span
+        <button
+          onClick={e => { e.stopPropagation(); onOverflowClick(day.date, events, e) }}
           style={{
             fontSize: '0.65rem',
             fontWeight: 700,
-            color: 'rgba(167,139,250,0.7)',
+            color: 'rgba(167,139,250,0.8)',
             paddingLeft: 4,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            textAlign: 'left',
+            padding: '1px 6px',
+            borderRadius: 4,
+            transition: 'color 0.15s ease, background 0.15s ease',
+          }}
+          onMouseEnter={e => {
+            ;(e.currentTarget as HTMLButtonElement).style.color = '#a78bfa'
+            ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.14)'
+          }}
+          onMouseLeave={e => {
+            ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(167,139,250,0.8)'
+            ;(e.currentTarget as HTMLButtonElement).style.background = 'none'
           }}
         >
           +{overflow} mais
-        </span>
+        </button>
       )}
     </div>
   )
@@ -685,6 +833,7 @@ export default function AgendaPage() {
 
   const [detailEvent, setDetailEvent] = useState<Event | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [dayEventsModal, setDayEventsModal] = useState<{ date: Date; events: Event[] } | null>(null)
 
   const calendarDays = buildCalendarDays(viewYear, viewMonth)
 
@@ -807,6 +956,14 @@ export default function AgendaPage() {
           onClose={() => setShowNewModal(false)}
           onSave={handleCreate}
           saving={saving}
+        />
+      )}
+      {dayEventsModal && (
+        <DayEventsModal
+          date={dayEventsModal.date}
+          events={dayEventsModal.events}
+          onClose={() => setDayEventsModal(null)}
+          onEventClick={ev => setDetailEvent(ev)}
         />
       )}
       {detailEvent && (
@@ -985,6 +1142,7 @@ export default function AgendaPage() {
                 events={eventsForDay(events, day.date)}
                 onDayClick={handleDayClick}
                 onEventClick={(ev) => setDetailEvent(ev)}
+                onOverflowClick={(date, evs) => setDayEventsModal({ date, events: evs })}
               />
             ))}
           </div>
