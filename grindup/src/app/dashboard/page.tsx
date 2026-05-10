@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClientSupabase } from '@/lib/supabase'
 import { getXPProgress, MAX_LEVEL } from '@/lib/levels'
@@ -8,7 +8,7 @@ import WelcomeAnimation from '@/components/WelcomeAnimation'
 import CheckinPopup from '@/components/CheckinPopup'
 import CoverSelector from '@/components/CoverSelector'
 import AvatarFrame from '@/components/AvatarFrame'
-import LevelBadge from '@/components/LevelBadge'
+import { getBadgeForLevel } from '@/lib/badges'
 
 type Profile = {
   id: string
@@ -87,6 +87,15 @@ const MODULES = [
   },
 ]
 
+function getLevelCardBorder(level: number): React.CSSProperties {
+  if (level >= 100) return { borderColor: 'rgba(167,139,250,0.6)', animation: 'lc-epic-border 2s ease-in-out infinite' }
+  if (level >= 75)  return { borderColor: 'rgba(251,191,36,0.5)',  animation: 'lc-gold-pulse 1.8s ease-in-out infinite' }
+  if (level >= 50)  return { borderColor: 'rgba(248,113,113,0.4)', animation: 'lc-rainbow-border 3s linear infinite' }
+  if (level >= 30)  return { borderColor: 'rgba(251,191,36,0.25)', boxShadow: '0 0 10px rgba(251,191,36,0.12)' }
+  if (level >= 10)  return { borderColor: 'rgba(96,165,250,0.35)', boxShadow: '0 0 12px rgba(96,165,250,0.18)' }
+  return { borderColor: 'rgba(124,58,237,0.25)', boxShadow: '0 0 10px rgba(124,58,237,0.1)' }
+}
+
 const ACCEPTED_COVER = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_COVER_BYTES = 5 * 1024 * 1024
 
@@ -109,6 +118,7 @@ function DashboardContent({
     .toUpperCase()
 
   const planStyle = PLAN_STYLE[profile.plan as keyof typeof PLAN_STYLE] ?? PLAN_STYLE.free
+  const badge = getBadgeForLevel(profile.level)
 
   const xpProgress     = getXPProgress(profile.xp)
   const xpPct          = xpProgress.percentage
@@ -140,16 +150,6 @@ function DashboardContent({
   }
 
   const gamingStats = [
-    {
-      label: 'Nível',
-      value: profile.level,
-      color: '#a78bfa',
-      icon: (
-        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
-          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-        </svg>
-      ),
-    },
     {
       label: 'XP Total',
       value: profile.xp.toLocaleString('pt-BR'),
@@ -255,13 +255,67 @@ function DashboardContent({
             >
               {profile.plan}
             </span>
-            {/* Level badge */}
-            <LevelBadge level={profile.level} />
           </div>
         </div>
 
         {/* ── Gamification stat cards ── */}
-        <div className="mb-5 grid grid-cols-4 gap-4">
+        {badge.animationCSS && <style>{badge.animationCSS}</style>}
+        <style>{`
+          @keyframes lc-rainbow-border {
+            0%   { border-color: #f87171; box-shadow: 0 0 18px rgba(248,113,113,0.4); }
+            16%  { border-color: #fb923c; box-shadow: 0 0 18px rgba(251,146,60,0.4); }
+            33%  { border-color: #fbbf24; box-shadow: 0 0 18px rgba(251,191,36,0.4); }
+            50%  { border-color: #34d399; box-shadow: 0 0 18px rgba(52,211,153,0.4); }
+            66%  { border-color: #60a5fa; box-shadow: 0 0 18px rgba(96,165,250,0.4); }
+            83%  { border-color: #a78bfa; box-shadow: 0 0 18px rgba(167,139,250,0.4); }
+            100% { border-color: #f87171; box-shadow: 0 0 18px rgba(248,113,113,0.4); }
+          }
+          @keyframes lc-gold-pulse {
+            0%, 100% { border-color: rgba(251,191,36,0.5); box-shadow: 0 0 14px rgba(251,191,36,0.3); }
+            50%       { border-color: rgba(251,191,36,0.9); box-shadow: 0 0 28px rgba(251,191,36,0.6), 0 0 50px rgba(251,191,36,0.2); }
+          }
+          @keyframes lc-epic-border {
+            0%,100% { border-color: rgba(167,139,250,0.6); box-shadow: 0 0 20px rgba(167,139,250,0.5), 0 0 40px rgba(124,58,237,0.3); }
+            33%     { border-color: rgba(251,191,36,0.7); box-shadow: 0 0 20px rgba(251,191,36,0.5), 0 0 40px rgba(251,191,36,0.3); }
+            66%     { border-color: rgba(248,113,113,0.6); box-shadow: 0 0 20px rgba(248,113,113,0.5), 0 0 40px rgba(248,113,113,0.3); }
+          }
+        `}</style>
+        <div className="mb-5" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr 1fr', gap: 16 }}>
+          {/* ── Featured level card ── */}
+          <div style={{
+            borderRadius: 16,
+            padding: '20px 20px 16px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid',
+            ...getLevelCardBorder(profile.level),
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: 4,
+          }}>
+            <div style={{ color: '#a78bfa', marginBottom: 4 }}>
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+              </svg>
+            </div>
+            <div className="text-3xl font-black" style={{ color: '#fff', lineHeight: 1 }}>{profile.level}</div>
+            <div style={{
+              marginTop: 4,
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              ...badge.styles,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              borderRadius: 0,
+            }}>
+              ✦ {badge.title} ✦
+            </div>
+            <div className="mt-1 text-xs text-gray-500">Nível atual</div>
+          </div>
+
+          {/* ── Other stat cards ── */}
           {gamingStats.map((s) => (
             <div key={s.label} className="stat-card">
               <div style={{ color: s.color, marginBottom: 8 }}>{s.icon}</div>
