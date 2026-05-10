@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClientSupabase } from '@/lib/supabase'
 import ADMIN_EMAILS from '@/lib/admin'
+import AvatarFrame from '@/components/AvatarFrame'
 
 type Profile = {
   full_name: string | null
   username: string | null
   avatar_url: string | null
   plan: string
+  level: number
 }
 
 const NAV = [
@@ -93,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setIsAdmin(ADMIN_EMAILS.includes(user.email ?? ''))
       supabase
         .from('profiles')
-        .select('full_name, username, avatar_url, plan')
+        .select('full_name, username, avatar_url, plan, level')
         .eq('id', user.id)
         .single()
         .then(({ data }) => setProfile(data))
@@ -264,24 +266,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           style={{ borderTop: '1px solid rgba(124,58,237,0.1)' }}
         >
           <div className="mb-3 flex items-center gap-3">
-            {profile?.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt={displayName}
-                className="h-9 w-9 rounded-full object-cover"
-                style={{ border: '2px solid rgba(124,58,237,0.5)' }}
-              />
-            ) : (
-              <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{
-                  background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
-                  border: '2px solid rgba(124,58,237,0.5)',
-                }}
-              >
-                {initials}
-              </div>
-            )}
+            <AvatarFrame
+              avatarUrl={profile?.avatar_url ?? null}
+              displayName={displayName}
+              initials={initials}
+              level={profile?.level ?? 1}
+              size={36}
+              selectable={false}
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-white">{displayName}</p>
               <p className="truncate text-xs capitalize text-gray-500">

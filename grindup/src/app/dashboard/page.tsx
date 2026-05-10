@@ -7,7 +7,8 @@ import { getXPProgress, MAX_LEVEL } from '@/lib/levels'
 import WelcomeAnimation from '@/components/WelcomeAnimation'
 import CheckinPopup from '@/components/CheckinPopup'
 import CoverSelector from '@/components/CoverSelector'
-import AvatarUpload from '@/components/AvatarUpload'
+import AvatarFrame from '@/components/AvatarFrame'
+import LevelBadge from '@/components/LevelBadge'
 
 type Profile = {
   id: string
@@ -91,12 +92,10 @@ const MAX_COVER_BYTES = 5 * 1024 * 1024
 
 function DashboardContent({
   profile,
-  onAvatarChange,
   onCoverChange,
 }: {
   profile: Profile
-  onAvatarChange: (url: string) => void
-  onCoverChange:  (url: string) => void
+  onCoverChange: (url: string) => void
 }) {
   const coverInputRef = useRef<HTMLInputElement>(null)
   const [coverError, setCoverError] = useState<string | null>(null)
@@ -212,14 +211,17 @@ function DashboardContent({
           onUploadClick={() => coverInputRef.current?.click()}
         />
 
-        {/* Avatar circle — overlaps the bottom of the banner */}
-        <AvatarUpload
-          userId={profile.id}
-          avatarUrl={profile.avatar_url}
-          displayName={displayName}
-          initials={initials}
-          onAvatarChange={onAvatarChange}
-        />
+        {/* Avatar with frame — overlaps the bottom of the banner */}
+        <div style={{ position: 'absolute', bottom: -48, left: 32 }}>
+          <AvatarFrame
+            avatarUrl={profile.avatar_url}
+            displayName={displayName}
+            initials={initials}
+            level={profile.level}
+            size={96}
+            selectable
+          />
+        </div>
 
         {/* Cover upload error toast */}
         {coverError && (
@@ -238,19 +240,24 @@ function DashboardContent({
 
       <div className="px-8 pb-10">
 
-        {/* ── Name + plan badge ── */}
+        {/* ── Name + badges ── */}
         <div style={{ paddingLeft: 148, paddingBottom: 16 }}>
           <h2 className="mb-2 text-2xl font-black text-white">{displayName}</h2>
-          <span
-            className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
-            style={{
-              background: planStyle.bg,
-              color: planStyle.color,
-              border: `1px solid ${planStyle.border}`,
-            }}
-          >
-            {profile.plan}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {/* Plan badge */}
+            <span
+              className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
+              style={{
+                background: planStyle.bg,
+                color: planStyle.color,
+                border: `1px solid ${planStyle.border}`,
+              }}
+            >
+              {profile.plan}
+            </span>
+            {/* Level badge */}
+            <LevelBadge level={profile.level} />
+          </div>
         </div>
 
         {/* ── Gamification stat cards ── */}
@@ -364,8 +371,7 @@ export default function DashboardPage() {
       />
       <DashboardContent
         profile={profile}
-        onAvatarChange={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
-        onCoverChange={url  => setProfile(p => p ? { ...p, cover_url:  url } : p)}
+        onCoverChange={url => setProfile(p => p ? { ...p, cover_url: url } : p)}
       />
       <CheckinPopup />
     </>
