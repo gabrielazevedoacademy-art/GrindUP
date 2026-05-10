@@ -93,11 +93,14 @@ const MAX_COVER_BYTES = 5 * 1024 * 1024
 function DashboardContent({
   profile,
   onCoverChange,
+  onAvatarChange,
 }: {
   profile: Profile
   onCoverChange: (url: string) => void
+  onAvatarChange: (url: string) => void
 }) {
-  const coverInputRef = useRef<HTMLInputElement>(null)
+  const coverInputRef  = useRef<HTMLInputElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const [coverError, setCoverError] = useState<string | null>(null)
 
   const displayName = profile.full_name || profile.username || 'Usuário'
@@ -140,6 +143,22 @@ function DashboardContent({
     setTimeout(() => setCoverError(null), 100)
   }
 
+  async function handleAvatarFile(file: File) {
+    if (!ACCEPTED_COVER.includes(file.type)) return
+    if (file.size > MAX_COVER_BYTES) return
+    const supabase = createClientSupabase()
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const path = `${profile.id}/avatar.${ext}`
+    const { error: upErr } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: file.type })
+    if (upErr) return
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+    const url = `${publicUrl}?t=${Date.now()}`
+    await supabase.from('profiles').update({ avatar_url: url }).eq('id', profile.id)
+    onAvatarChange(url)
+  }
+
   const gamingStats = [
     {
       label: 'XP Total',
@@ -180,7 +199,7 @@ function DashboardContent({
 
       {/* ── Banner + avatar (editable) ── */}
       <div style={{ position: 'relative', marginBottom: 60 }}>
-        {/* Hidden cover file input (triggered by CoverSelector's upload button) */}
+        {/* Hidden cover file input */}
         <input
           ref={coverInputRef}
           type="file"
@@ -189,6 +208,18 @@ function DashboardContent({
           onChange={e => {
             const f = e.target.files?.[0]
             if (f) handleCoverFile(f)
+            e.target.value = ''
+          }}
+        />
+        {/* Hidden avatar file input */}
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          onChange={e => {
+            const f = e.target.files?.[0]
+            if (f) handleAvatarFile(f)
             e.target.value = ''
           }}
         />
@@ -211,6 +242,7 @@ function DashboardContent({
             level={profile.level}
             size={96}
             selectable
+            onUploadClick={() => avatarInputRef.current?.click()}
           />
         </div>
 
@@ -250,14 +282,20 @@ function DashboardContent({
         </div>
 
         {/* ── Gamification stat cards ── */}
-        {badge.animationCSS && <style>{badge.animationCSS}</style>}
+        <style>{`
+          @keyframes lc-amber-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(245,158,11,0.15), inset 0 0 15px rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.4); }
+            50%       { box-shadow: 0 0 25px rgba(245,158,11,0.28), inset 0 0 20px rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.6); }
+          }
+        `}</style>
         <div className="mb-5 grid grid-cols-4 gap-4">
           {/* ── Level card ── */}
           <div
             className="stat-card"
             style={profile.level >= 90 ? {
-              borderColor: 'rgba(251,191,36,0.3)',
-              boxShadow: '0 0 14px rgba(251,191,36,0.1)',
+              borderColor: 'rgba(245,158,11,0.4)',
+              boxShadow: '0 0 15px rgba(245,158,11,0.15), inset 0 0 15px rgba(245,158,11,0.05)',
+              animation: 'lc-amber-pulse 2.5s ease-in-out infinite',
             } : undefined}
           >
             <div style={{ color: '#a78bfa', marginBottom: 8 }}>
@@ -272,8 +310,7 @@ function DashboardContent({
               fontSize: '0.63rem',
               fontWeight: 700,
               letterSpacing: '0.04em',
-              color: (badge.styles.color as string) || '#a78bfa',
-              animation: badge.styles.animation as string | undefined,
+              color: profile.level >= 90 ? '#f59e0b' : (badge.styles.color as string) || '#a78bfa',
             }}>
               {badge.title}
             </div>
@@ -389,7 +426,8 @@ export default function DashboardPage() {
       />
       <DashboardContent
         profile={profile}
-        onCoverChange={url => setProfile(p => p ? { ...p, cover_url: url } : p)}
+        onCoverChange={url  => setProfile(p => p ? { ...p, cover_url:  url } : p)}
+        onAvatarChange={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
       />
       <CheckinPopup />
     </>
