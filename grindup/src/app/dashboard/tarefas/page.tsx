@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { getLevelFromXP } from '@/lib/levels'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -52,12 +53,6 @@ const PRIORITY_STYLE: Record<string, { bg: string; color: string; border: string
 // ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
-function computeNewLevel(currentLevel: number, newXp: number): number {
-  let level = currentLevel
-  while (newXp >= level * 1000) level++
-  return level
-}
-
 function formatDueDate(iso: string): string {
   const d = new Date(iso)
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -664,7 +659,7 @@ export default function TarefasPage() {
     // Award XP
     if (userProfile) {
       const newXp = userProfile.xp + xpGain
-      const newLevel = computeNewLevel(userProfile.level, newXp)
+      const newLevel = getLevelFromXP(newXp)
 
       await supabase
         .from('profiles')

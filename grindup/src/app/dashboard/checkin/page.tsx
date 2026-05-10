@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { getLevelFromXP } from '@/lib/levels'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -85,12 +86,6 @@ function computeStreak(history: MoodCheckin[]): number {
   }
 
   return streak
-}
-
-function computeNewLevel(currentLevel: number, newXp: number): number {
-  let level = currentLevel
-  while (newXp >= level * 1000) level++
-  return level
 }
 
 function formatDateLabel(dateStr: string): string {
@@ -600,7 +595,7 @@ export default function CheckinPage() {
       // Award XP
       if (userProfile) {
         const newXp = userProfile.xp + 15
-        const newLevel = computeNewLevel(userProfile.level, newXp)
+        const newLevel = getLevelFromXP(newXp)
         await supabase
           .from('profiles')
           .update({ xp: newXp, level: newLevel })

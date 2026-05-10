@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { getLevelFromXP } from '@/lib/levels'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES & CONSTANTS
@@ -29,12 +30,6 @@ function getCurrentPeriod(): Period {
   if (h >= 5 && h < 12) return 'morning'
   if (h >= 12 && h < 18) return 'afternoon'
   return 'night'
-}
-
-function computeNewLevel(currentLevel: number, newXp: number): number {
-  let level = currentLevel
-  while (newXp >= level * 1000) level++
-  return level
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -138,7 +133,7 @@ export default function CheckinPopup() {
 
       if (profile) {
         const newXp = profile.xp + 15
-        const newLevel = computeNewLevel(profile.level, newXp)
+        const newLevel = getLevelFromXP(newXp)
         await supabase
           .from('profiles')
           .update({ xp: newXp, level: newLevel })

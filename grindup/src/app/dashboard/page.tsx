@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClientSupabase } from '@/lib/supabase'
+import { getXPProgress, MAX_LEVEL } from '@/lib/levels'
 import WelcomeAnimation from '@/components/WelcomeAnimation'
 import CheckinPopup from '@/components/CheckinPopup'
 
@@ -93,9 +94,10 @@ function DashboardContent({ profile }: { profile: Profile }) {
 
   const planStyle = PLAN_STYLE[profile.plan as keyof typeof PLAN_STYLE] ?? PLAN_STYLE.free
 
-  const xpForNextLevel   = profile.level * 1000
-  const xpInCurrentLevel = profile.xp % xpForNextLevel
-  const xpPct            = Math.min((xpInCurrentLevel / xpForNextLevel) * 100, 100)
+  const xpProgress    = getXPProgress(profile.xp)
+  const xpPct         = xpProgress.percentage
+  const xpForNextLevel = xpProgress.needed
+  const isMaxLevel    = profile.level >= MAX_LEVEL
 
   const hasAvatar = Boolean(profile.avatar_url && profile.avatar_url.trim() !== '')
 
@@ -258,7 +260,7 @@ function DashboardContent({ profile }: { profile: Profile }) {
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium text-gray-300">
-              Progresso para o Nível {profile.level + 1}
+              {isMaxLevel ? 'Nível máximo atingido!' : `Progresso para o Nível ${profile.level + 1}`}
             </span>
             <span className="text-sm font-bold text-violet-400">{xpPct.toFixed(0)}%</span>
           </div>
@@ -266,8 +268,8 @@ function DashboardContent({ profile }: { profile: Profile }) {
             <div className="xp-bar-fill" style={{ width: `${xpPct}%`, transition: 'width 0.6s ease' }} />
           </div>
           <div className="mt-2 flex justify-between">
-            <span className="text-xs text-gray-600">{profile.xp.toLocaleString('pt-BR')} XP</span>
-            <span className="text-xs text-gray-600">{xpForNextLevel.toLocaleString('pt-BR')} XP</span>
+            <span className="text-xs text-gray-600">{xpProgress.current.toLocaleString('pt-BR')} XP</span>
+            <span className="text-xs text-gray-600">{isMaxLevel ? '—' : xpForNextLevel.toLocaleString('pt-BR') + ' XP'}</span>
           </div>
         </div>
 

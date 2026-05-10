@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { getLevelFromXP } from '@/lib/levels'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -45,12 +46,6 @@ type ProgressForm = {
 // ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
-function computeNewLevel(currentLevel: number, newXp: number): number {
-  let level = currentLevel
-  while (newXp >= level * 1000) level++
-  return level
-}
-
 function getProgress(current: number, target: number): number {
   if (target <= 0) return 100
   return Math.min((current / target) * 100, 100)
@@ -1019,7 +1014,7 @@ export default function MetasPage() {
     if (nowCompleted && !wasCompleted && userProfile) {
       const xpGain = goal.xp_reward
       const newXp = userProfile.xp + xpGain
-      const newLevel = computeNewLevel(userProfile.level, newXp)
+      const newLevel = getLevelFromXP(newXp)
 
       await supabase
         .from('profiles')

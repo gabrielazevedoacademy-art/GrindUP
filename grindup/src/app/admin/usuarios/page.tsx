@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { getLevelFromXP, MAX_LEVEL } from '@/lib/levels'
 
 type AdminUser = {
   id: string
@@ -22,7 +23,6 @@ type EditForm = {
   username: string
   plan: string
   xp: number
-  level: number
   streak_days: number
   is_active: boolean
 }
@@ -50,10 +50,10 @@ function EditProfileModal({
     username:    user.username    ?? '',
     plan:        user.plan,
     xp:          user.xp,
-    level:       user.level,
     streak_days: user.streak_days ?? 0,
     is_active:   user.is_active,
   })
+  const computedLevel = getLevelFromXP(form.xp)
   const [saving, setSaving]   = useState(false)
   const [success, setSuccess] = useState(false)
   const [err, setErr]         = useState<string | null>(null)
@@ -71,7 +71,7 @@ function EditProfileModal({
       const res = await fetch(`/admin/api/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, level: computedLevel }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -79,7 +79,7 @@ function EditProfileModal({
         return
       }
       setSuccess(true)
-      onSaved(form)
+      onSaved({ ...form, level: computedLevel })
     } catch {
       setErr('Erro de rede')
     } finally {
@@ -209,7 +209,7 @@ function EditProfileModal({
             </select>
           </div>
 
-          {/* Row: xp + level + streak */}
+          {/* Row: xp + level (auto) + streak */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
             <div>
               <label style={labelStyle}>XP Total</label>
@@ -218,20 +218,24 @@ function EditProfileModal({
                 type="number"
                 min={0}
                 value={form.xp}
-                onChange={e => set('xp', Number(e.target.value))}
+                onChange={e => set('xp', Math.max(0, Number(e.target.value)))}
                 style={inputStyle}
               />
             </div>
             <div>
-              <label style={labelStyle}>Nível</label>
-              <input
-                className="edit-input"
-                type="number"
-                min={1}
-                value={form.level}
-                onChange={e => set('level', Number(e.target.value))}
-                style={inputStyle}
-              />
+              <label style={labelStyle}>Nível (auto)</label>
+              <div style={{
+                ...inputStyle,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                cursor: 'default',
+                borderColor: 'rgba(139,92,246,0.2)',
+                background: 'rgba(139,92,246,0.03)',
+              }}>
+                <span style={{ fontWeight: 700, color: '#a78bfa' }}>{computedLevel}</span>
+                {computedLevel >= MAX_LEVEL && (
+                  <span style={{ fontSize: '0.65rem', color: '#fbbf24', fontWeight: 700 }}>MAX</span>
+                )}
+              </div>
             </div>
             <div>
               <label style={labelStyle}>Streak (dias)</label>
@@ -240,7 +244,7 @@ function EditProfileModal({
                 type="number"
                 min={0}
                 value={form.streak_days}
-                onChange={e => set('streak_days', Number(e.target.value))}
+                onChange={e => set('streak_days', Math.max(0, Number(e.target.value)))}
                 style={inputStyle}
               />
             </div>
