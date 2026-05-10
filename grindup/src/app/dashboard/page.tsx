@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClientSupabase } from '@/lib/supabase'
 import { getXPProgress, MAX_LEVEL } from '@/lib/levels'
 import WelcomeAnimation from '@/components/WelcomeAnimation'
 import CheckinPopup from '@/components/CheckinPopup'
-import ProfileEditor from '@/components/ProfileEditor'
+import CoverSelector from '@/components/CoverSelector'
+import AvatarUpload from '@/components/AvatarUpload'
 
 type Profile = {
   id: string
@@ -85,6 +86,9 @@ const MODULES = [
   },
 ]
 
+const ACCEPTED_COVER = ['image/jpeg', 'image/png', 'image/webp']
+const MAX_COVER_BYTES = 5 * 1024 * 1024
+
 function DashboardContent({
   profile,
   onAvatarChange,
@@ -94,6 +98,9 @@ function DashboardContent({
   onAvatarChange: (url: string) => void
   onCoverChange:  (url: string) => void
 }) {
+  const coverInputRef = useRef<HTMLInputElement>(null)
+  const [coverError, setCoverError] = useState<string | null>(null)
+
   const displayName = profile.full_name || profile.username || 'Usuário'
   const initials = displayName
     .split(' ')
@@ -108,6 +115,30 @@ function DashboardContent({
   const xpPct          = xpProgress.percentage
   const xpForNextLevel = xpProgress.needed
   const isMaxLevel     = profile.level >= MAX_LEVEL
+
+  async function handleCoverFile(file: File) {
+    setCoverError(null)
+    if (!ACCEPTED_COVER.includes(file.type)) {
+      setCoverError('Formato inválido. Use JPG, PNG ou WEBP')
+      return
+    }
+    if (file.size > MAX_COVER_BYTES) {
+      setCoverError('Arquivo muito grande. Máximo 5MB para capa')
+      return
+    }
+    const supabase = createClientSupabase()
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const path = `${profile.id}/cover.${ext}`
+    const { error: upErr } = await supabase.storage
+      .from('covers')
+      .upload(path, file, { upsert: true, contentType: file.type })
+    if (upErr) { setCoverError(upErr.message); return }
+    const { data: { publicUrl } } = supabase.storage.from('covers').getPublicUrl(path)
+    const url = `${publicUrl}?t=${Date.now()}`
+    await supabase.from('profiles').update({ cover_url: url }).eq('id', profile.id)
+    onCoverChange(url)
+    setTimeout(() => setCoverError(null), 100)
+  }
 
   const gamingStats = [
     {
@@ -158,15 +189,52 @@ function DashboardContent({
     <div className="min-h-screen">
 
       {/* ── Banner + avatar (editable) ── */}
-      <ProfileEditor
-        userId={profile.id}
-        avatarUrl={profile.avatar_url}
-        coverUrl={profile.cover_url}
-        displayName={displayName}
-        initials={initials}
-        onAvatarChange={onAvatarChange}
-        onCoverChange={onCoverChange}
-      />
+      <div style={{ position: 'relative', marginBottom: 60 }}>
+        {/* Hidden cover file input (triggered by CoverSelector's upload button) */}
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          onChange={e => {
+            const f = e.target.files?.[0]
+            if (f) handleCoverFile(f)
+            e.target.value = ''
+          }}
+        />
+
+        {/* Animated/image cover banner */}
+        <CoverSelector
+          userId={profile.id}
+          plan={profile.plan}
+          coverValue={profile.cover_url}
+          onCoverChange={onCoverChange}
+          onUploadClick={() => coverInputRef.current?.click()}
+        />
+
+        {/* Avatar circle — overlaps the bottom of the banner */}
+        <AvatarUpload
+          userId={profile.id}
+          avatarUrl={profile.avatar_url}
+          displayName={displayName}
+          initials={initials}
+          onAvatarChange={onAvatarChange}
+        />
+
+        {/* Cover upload error toast */}
+        {coverError && (
+          <div style={{
+            position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(185,28,28,0.92)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(248,113,113,0.4)',
+            borderRadius: 10, padding: '9px 18px',
+            color: '#fff', fontSize: '0.82rem', fontWeight: 600,
+            zIndex: 20, whiteSpace: 'nowrap',
+          }}>
+            ✕ {coverError}
+          </div>
+        )}
+      </div>
 
       <div className="px-8 pb-10">
 
