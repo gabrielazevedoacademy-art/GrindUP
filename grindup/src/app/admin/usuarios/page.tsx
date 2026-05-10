@@ -11,9 +11,20 @@ type AdminUser = {
   plan: string
   xp: number
   level: number
+  streak_days: number
   is_active: boolean
   last_activity_date: string | null
   auth_created_at: string
+}
+
+type EditForm = {
+  full_name: string
+  username: string
+  plan: string
+  xp: number
+  level: number
+  streak_days: number
+  is_active: boolean
 }
 
 const PLAN_STYLE: Record<string, { bg: string; color: string; border: string }> = {
@@ -24,6 +35,320 @@ const PLAN_STYLE: Record<string, { bg: string; color: string; border: string }> 
 
 const PAGE_SIZE = 20
 
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+function EditProfileModal({
+  user,
+  onClose,
+  onSaved,
+}: {
+  user: AdminUser
+  onClose: () => void
+  onSaved: (updated: Partial<AdminUser>) => void
+}) {
+  const [form, setForm] = useState<EditForm>({
+    full_name:   user.full_name   ?? '',
+    username:    user.username    ?? '',
+    plan:        user.plan,
+    xp:          user.xp,
+    level:       user.level,
+    streak_days: user.streak_days ?? 0,
+    is_active:   user.is_active,
+  })
+  const [saving, setSaving]   = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [err, setErr]         = useState<string | null>(null)
+
+  function set<K extends keyof EditForm>(k: K, v: EditForm[K]) {
+    setForm(prev => ({ ...prev, [k]: v }))
+    setSuccess(false)
+    setErr(null)
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    setErr(null)
+    try {
+      const res = await fetch(`/admin/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        setErr(data.error ?? 'Erro ao salvar')
+        return
+      }
+      setSuccess(true)
+      onSaved(form)
+    } catch {
+      setErr('Erro de rede')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const displayName = user.full_name || user.username || 'Usuário'
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', boxSizing: 'border-box',
+    padding: '10px 14px', borderRadius: 10,
+    border: '1px solid rgba(139,92,246,0.35)',
+    background: 'rgba(139,92,246,0.06)',
+    color: '#fff', fontSize: '0.875rem', outline: 'none',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
+  }
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block', fontSize: '0.72rem', fontWeight: 700,
+    color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase',
+    letterSpacing: '0.06em', marginBottom: 6,
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)',
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <style>{`
+        .edit-input:focus {
+          border-color: rgba(139,92,246,0.7) !important;
+          box-shadow: 0 0 0 3px rgba(139,92,246,0.15) !important;
+        }
+        .edit-input::placeholder { color: rgba(255,255,255,0.2); }
+        .edit-input option { background: #120c1e; color: #fff; }
+        @keyframes modalIn {
+          from { opacity: 0; transform: translateY(12px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+      `}</style>
+
+      <div style={{
+        width: '100%', maxWidth: 520, margin: '0 16px',
+        background: 'linear-gradient(160deg, #0f0a1a 0%, #100c1e 100%)',
+        border: '1px solid rgba(139,92,246,0.4)',
+        borderRadius: 20,
+        boxShadow: '0 0 0 1px rgba(139,92,246,0.1), 0 24px 64px rgba(0,0,0,0.6), 0 0 48px rgba(139,92,246,0.12)',
+        animation: 'modalIn 0.22s ease',
+        overflow: 'hidden',
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: '22px 28px 18px',
+          borderBottom: '1px solid rgba(139,92,246,0.15)',
+          background: 'rgba(139,92,246,0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div>
+            <p style={{ margin: 0, fontSize: '0.68rem', fontWeight: 700, color: 'rgba(139,92,246,0.8)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+              Painel Admin
+            </p>
+            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+              Editar Perfil — <span style={{ color: '#a78bfa' }}>{displayName}</span>
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: 32, height: 32, borderRadius: 8, border: 'none',
+              background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)',
+              fontSize: '1.1rem', cursor: 'pointer', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)' }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Row: full_name + username */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>Nome completo</label>
+              <input
+                className="edit-input"
+                type="text"
+                value={form.full_name}
+                onChange={e => set('full_name', e.target.value)}
+                placeholder="Nome completo"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Username</label>
+              <input
+                className="edit-input"
+                type="text"
+                value={form.username}
+                onChange={e => set('username', e.target.value)}
+                placeholder="username"
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          {/* Row: plan */}
+          <div>
+            <label style={labelStyle}>Plano</label>
+            <select
+              className="edit-input"
+              value={form.plan}
+              onChange={e => set('plan', e.target.value)}
+              style={{ ...inputStyle, cursor: 'pointer' }}
+            >
+              <option value="free">Free</option>
+              <option value="pro">Pro</option>
+              <option value="elite">Elite</option>
+            </select>
+          </div>
+
+          {/* Row: xp + level + streak */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>XP Total</label>
+              <input
+                className="edit-input"
+                type="number"
+                min={0}
+                value={form.xp}
+                onChange={e => set('xp', Number(e.target.value))}
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Nível</label>
+              <input
+                className="edit-input"
+                type="number"
+                min={1}
+                value={form.level}
+                onChange={e => set('level', Number(e.target.value))}
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Streak (dias)</label>
+              <input
+                className="edit-input"
+                type="number"
+                min={0}
+                value={form.streak_days}
+                onChange={e => set('streak_days', Number(e.target.value))}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          {/* Status toggle */}
+          <div>
+            <label style={labelStyle}>Status</label>
+            <button
+              onClick={() => set('is_active', !form.is_active)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
+                border: form.is_active
+                  ? '1px solid rgba(74,222,128,0.35)'
+                  : '1px solid rgba(239,68,68,0.3)',
+                background: form.is_active
+                  ? 'rgba(74,222,128,0.08)'
+                  : 'rgba(239,68,68,0.08)',
+                color: form.is_active ? '#4ade80' : '#f87171',
+                fontSize: '0.85rem', fontWeight: 700,
+                transition: 'all 0.15s ease', width: '100%',
+              }}
+            >
+              {/* pill */}
+              <span style={{
+                width: 36, height: 20, borderRadius: 999, flexShrink: 0,
+                background: form.is_active ? '#4ade80' : 'rgba(255,255,255,0.12)',
+                position: 'relative', transition: 'background 0.2s',
+              }}>
+                <span style={{
+                  position: 'absolute', top: 2,
+                  left: form.is_active ? 18 : 2,
+                  width: 16, height: 16, borderRadius: '50%',
+                  background: '#fff', transition: 'left 0.2s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                }} />
+              </span>
+              {form.is_active ? 'Ativo' : 'Inativo'}
+            </button>
+          </div>
+
+          {/* Feedback */}
+          {success && (
+            <div style={{
+              padding: '10px 14px', borderRadius: 10,
+              background: 'rgba(74,222,128,0.1)',
+              border: '1px solid rgba(74,222,128,0.3)',
+              color: '#4ade80', fontSize: '0.82rem', fontWeight: 600,
+            }}>
+              ✓ Perfil atualizado com sucesso!
+            </div>
+          )}
+          {err && (
+            <div style={{
+              padding: '10px 14px', borderRadius: 10,
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              color: '#f87171', fontSize: '0.82rem',
+            }}>
+              {err}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '16px 28px 24px',
+          display: 'flex', gap: 10, justifyContent: 'flex-end',
+          borderTop: '1px solid rgba(139,92,246,0.1)',
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '10px 20px', borderRadius: 10, cursor: 'pointer',
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(255,255,255,0.55)', fontSize: '0.85rem', fontWeight: 600,
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              padding: '10px 22px', borderRadius: 10,
+              cursor: saving ? 'not-allowed' : 'pointer',
+              border: '1px solid rgba(139,92,246,0.6)',
+              background: saving
+                ? 'rgba(139,92,246,0.2)'
+                : 'linear-gradient(135deg, rgba(139,92,246,0.85), rgba(109,40,217,0.9))',
+              color: '#fff', fontSize: '0.85rem', fontWeight: 700,
+              boxShadow: saving ? 'none' : '0 0 20px rgba(139,92,246,0.4), 0 4px 12px rgba(0,0,0,0.3)',
+              transition: 'all 0.15s ease',
+              opacity: saving ? 0.7 : 1,
+            }}
+          >
+            {saving ? 'Salvando...' : 'Salvar alterações'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function UsuariosPage() {
   const [users, setUsers]           = useState<AdminUser[]>([])
   const [loading, setLoading]       = useState(true)
@@ -33,6 +358,7 @@ export default function UsuariosPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage]             = useState(1)
   const [saving, setSaving]         = useState<string | null>(null)
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
 
   useEffect(() => {
     fetch('/admin/api/users')
@@ -41,7 +367,6 @@ export default function UsuariosPage() {
       .catch(() => { setError('Erro ao carregar usuários'); setLoading(false) })
   }, [])
 
-  // ── Filtered + paginated ──────────────────────────────────
   const filtered = useMemo(() => {
     return users.filter(u => {
       const matchSearch = !search ||
@@ -59,10 +384,8 @@ export default function UsuariosPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const pageUsers  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  // Reset to page 1 on filter change
   useEffect(() => { setPage(1) }, [search, planFilter, statusFilter])
 
-  // ── Mutations ─────────────────────────────────────────────
   async function updateUser(id: string, patch: Partial<AdminUser>) {
     setSaving(id)
     try {
@@ -104,6 +427,17 @@ export default function UsuariosPage() {
         select option { background: #1a0d0d; color: #fff; }
       `}</style>
 
+      {/* Edit modal */}
+      {editingUser && (
+        <EditProfileModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSaved={patch => {
+            setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...patch } : u))
+          }}
+        />
+      )}
+
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: '1.7rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
@@ -116,7 +450,6 @@ export default function UsuariosPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
-        {/* Search */}
         <input
           type="text"
           value={search}
@@ -125,7 +458,6 @@ export default function UsuariosPage() {
           style={{ ...inputBase, minWidth: 260 }}
         />
 
-        {/* Plan filter */}
         <div style={{ display: 'flex', gap: 6 }}>
           {['all', 'free', 'pro', 'elite'].map(p => (
             <button key={p} onClick={() => setPlanFilter(p)} style={filterBtn(planFilter === p)}>
@@ -134,7 +466,6 @@ export default function UsuariosPage() {
           ))}
         </div>
 
-        {/* Status filter */}
         <div style={{ display: 'flex', gap: 6 }}>
           {[
             { v: 'all',      l: 'Todos' },
@@ -287,19 +618,29 @@ export default function UsuariosPage() {
 
                         {/* Actions */}
                         <td style={{ padding: '14px 16px' }}>
-                          <a
-                            href={`/admin/usuarios/${u.id}`}
+                          <button
+                            onClick={() => setEditingUser(u)}
                             style={{
                               padding: '5px 12px', borderRadius: 8,
-                              border: '1px solid rgba(232,92,13,0.3)',
-                              background: 'rgba(232,92,13,0.08)',
-                              color: '#fb923c', fontSize: '0.75rem', fontWeight: 600,
-                              textDecoration: 'none', display: 'inline-block',
+                              border: '1px solid rgba(139,92,246,0.4)',
+                              background: 'rgba(139,92,246,0.1)',
+                              color: '#a78bfa', fontSize: '0.75rem', fontWeight: 600,
+                              cursor: 'pointer',
                               transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={e => {
+                              const b = e.currentTarget as HTMLButtonElement
+                              b.style.background = 'rgba(139,92,246,0.2)'
+                              b.style.boxShadow  = '0 0 12px rgba(139,92,246,0.25)'
+                            }}
+                            onMouseLeave={e => {
+                              const b = e.currentTarget as HTMLButtonElement
+                              b.style.background = 'rgba(139,92,246,0.1)'
+                              b.style.boxShadow  = 'none'
                             }}
                           >
                             Ver perfil
-                          </a>
+                          </button>
                         </td>
                       </tr>
                     )
