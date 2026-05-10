@@ -23,31 +23,16 @@ export interface AvatarFrameProps {
 function RingPreview({ frame, size = 40 }: { frame: FrameDef; size?: number }) {
   const pad = Math.max(2, Math.round(frame.padding * (size / 96)))
   return (
-    <div
-      style={{
-        position: 'relative',
-        width: size + pad * 2,
-        height: size + pad * 2,
-        borderRadius: '50%',
-        flexShrink: 0,
-        ...frame.styles,
-        animation: frame.styles.animation
-          ? `${frame.styles.animation}`
-          : undefined,
-      }}
-    >
+    <div style={{ position: 'relative', width: size + pad * 2, height: size + pad * 2, flexShrink: 0 }}>
       {frame.animationCSS && <style>{frame.animationCSS}</style>}
+      {/* Ring — only this rotates */}
+      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', zIndex: 0, ...frame.styles }} />
+      {/* Dark center — never rotates */}
       <div style={{
-        position: 'absolute',
-        inset: pad,
-        borderRadius: '50%',
-        background: '#100c1e',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: `${size * 0.22}rem`,
-        fontWeight: 900,
-        color: 'rgba(255,255,255,0.25)',
+        position: 'absolute', inset: pad, borderRadius: '50%',
+        background: '#100c1e', zIndex: 1,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: `${size * 0.22}rem`, fontWeight: 900, color: 'rgba(255,255,255,0.25)',
         overflow: 'hidden',
       }}>
         ✦
@@ -155,10 +140,8 @@ function FrameModal({
                   position: 'relative',
                 }}
               >
-                {/* Ring preview */}
                 <RingPreview frame={f} size={44} />
 
-                {/* Frame title */}
                 <span style={{
                   fontSize: '0.68rem',
                   fontWeight: 700,
@@ -168,7 +151,6 @@ function FrameModal({
                   {f.title}
                 </span>
 
-                {/* Level requirement */}
                 <span style={{
                   fontSize: '0.6rem',
                   color: f.unlocked ? 'rgba(255,255,255,0.3)' : 'rgba(255,100,100,0.7)',
@@ -177,15 +159,10 @@ function FrameModal({
                   Nível {f.minLevel}
                 </span>
 
-                {/* Lock icon */}
                 {!f.unlocked && (
-                  <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    fontSize: '0.7rem',
-                  }}>🔒</div>
+                  <div style={{ position: 'absolute', top: 6, right: 6, fontSize: '0.7rem' }}>🔒</div>
                 )}
 
-                {/* Active check */}
                 {isActive && (
                   <div style={{
                     position: 'absolute', top: 6, right: 6,
@@ -227,7 +204,6 @@ export default function AvatarFrame({
   size = 96,
   selectable = true,
 }: AvatarFrameProps) {
-  // Read saved preference from localStorage
   const [selectedMinLevel, setSelectedMinLevel] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(LS_KEY)
@@ -236,11 +212,10 @@ export default function AvatarFrame({
         if (!isNaN(n)) return n
       }
     }
-    return -1  // -1 = use level-based default
+    return -1
   })
   const [modalOpen, setModalOpen] = useState(false)
 
-  // Clamp stored frame to only unlocked levels
   const activeFrame = (() => {
     if (selectedMinLevel >= 1) {
       const frames = getAllUnlockedFrames(level)
@@ -257,19 +232,14 @@ export default function AvatarFrame({
   }
 
   const hasAvatar = Boolean(avatarUrl?.trim())
-  const pad = activeFrame.padding
-
-  // Scale padding for smaller sizes
-  const scaledPad = Math.max(2, Math.round(pad * (size / 96)))
-
-  // Font size for initials
+  const scaledPad = Math.max(2, Math.round(activeFrame.padding * (size / 96)))
   const initialsSize = size * 0.28
 
   return (
     <>
       {activeFrame.animationCSS && <style>{activeFrame.animationCSS}</style>}
 
-      {/* Outer ring wrapper */}
+      {/* Container — never transforms, never rotates */}
       <div
         onClick={selectable ? () => setModalOpen(true) : undefined}
         title={selectable ? 'Alterar moldura' : undefined}
@@ -280,19 +250,36 @@ export default function AvatarFrame({
           borderRadius: '50%',
           flexShrink: 0,
           cursor: selectable ? 'pointer' : 'default',
-          ...activeFrame.styles,
         }}
       >
-        {/* Dark gap + avatar content */}
+        {/* Animated ring — ONLY this element rotates/animates */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          zIndex: 0,
+          ...activeFrame.styles,
+        }} />
+
+        {/* Dark separator — covers center of the ring, never rotates */}
         <div style={{
           position: 'absolute',
           inset: scaledPad,
           borderRadius: '50%',
           background: '#0a0a0f',
+          zIndex: 1,
+        }} />
+
+        {/* Avatar content — never rotates */}
+        <div style={{
+          position: 'absolute',
+          inset: scaledPad + 1,
+          borderRadius: '50%',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          zIndex: 2,
         }}>
           {hasAvatar ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -315,7 +302,7 @@ export default function AvatarFrame({
           )}
         </div>
 
-        {/* Clickable camera hint for selectable */}
+        {/* Hover hint */}
         {selectable && (
           <div
             className="af-hover-hint"
@@ -330,7 +317,7 @@ export default function AvatarFrame({
               opacity: 0,
               transition: 'opacity 0.18s ease',
               fontSize: `${size * 0.16}px`,
-              zIndex: 2,
+              zIndex: 3,
             }}
           >
             🖼
@@ -338,7 +325,6 @@ export default function AvatarFrame({
         )}
       </div>
 
-      {/* CSS for hover hint */}
       {selectable && (
         <style>{`
           .af-hover-hint { opacity: 0 !important; }
@@ -346,7 +332,6 @@ export default function AvatarFrame({
         `}</style>
       )}
 
-      {/* Frame selector modal */}
       {modalOpen && (
         <FrameModal
           level={level}
