@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { getFrameForLevel, getAllUnlockedFrames, type FrameDef } from '@/lib/badges'
 
 const LS_KEY = 'grindup_selected_frame'
@@ -14,12 +14,12 @@ export interface AvatarFrameProps {
   initials:       string
   level:          number
   size?:          number
-  selectable?:    boolean   // shows frame button
-  onUploadClick?: () => void  // shows camera button
+  selectable?:    boolean
+  onUploadClick?: () => void
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SMALL RING PREVIEW (modal)
+// RING PREVIEW (modal)
 // ─────────────────────────────────────────────────────────────────────────────
 function RingPreview({ frame, size = 40 }: { frame: FrameDef; size?: number }) {
   const pad = Math.max(2, Math.round(frame.padding * (size / 96)))
@@ -35,6 +35,50 @@ function RingPreview({ frame, size = 40 }: { frame: FrameDef; size?: number }) {
         overflow: 'hidden',
       }}>
         ✦
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTEXT MENU ITEM
+// ─────────────────────────────────────────────────────────────────────────────
+function MenuItem({
+  icon,
+  label,
+  desc,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  desc: string
+  onClick: () => void
+}) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 11,
+        padding: '9px 14px',
+        cursor: 'pointer',
+        background: hov ? 'rgba(124,58,237,0.14)' : 'transparent',
+        transition: 'background 0.13s ease',
+      }}
+    >
+      <span style={{
+        width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+        background: hov ? 'rgba(124,58,237,0.25)' : 'rgba(255,255,255,0.06)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'background 0.13s ease',
+      }}>
+        {icon}
+      </span>
+      <div>
+        <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: '#fff', lineHeight: 1.3 }}>{label}</p>
+        <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>{desc}</p>
       </div>
     </div>
   )
@@ -71,43 +115,34 @@ function FrameModal({
         border: '1px solid rgba(124,58,237,0.4)',
         borderRadius: 20,
         boxShadow: '0 0 0 1px rgba(124,58,237,0.1), 0 24px 64px rgba(0,0,0,0.6), 0 0 48px rgba(124,58,237,0.12)',
-        overflow: 'hidden',
-        maxHeight: '80vh',
-        display: 'flex',
-        flexDirection: 'column',
+        overflow: 'hidden', maxHeight: '80vh',
+        display: 'flex', flexDirection: 'column',
       }}>
         {/* Header */}
         <div style={{
           padding: '20px 24px 16px',
           borderBottom: '1px solid rgba(124,58,237,0.15)',
           background: 'rgba(124,58,237,0.05)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
         }}>
           <div>
             <p style={{ margin: 0, fontSize: '0.68rem', fontWeight: 700, color: 'rgba(167,139,250,0.8)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>
               Personalizar
             </p>
-            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff' }}>
-              Moldura do Avatar
-            </h3>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff' }}>Moldura do Avatar</h3>
           </div>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 8, border: 'none',
               background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)',
-              fontSize: '1.1rem', cursor: 'pointer', display: 'flex',
-              alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >×</button>
         </div>
 
         {/* Grid */}
-        <div style={{
-          overflowY: 'auto', padding: '20px 20px',
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12,
-        }}>
+        <div style={{ overflowY: 'auto', padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           {frames.map(f => {
             const isActive = f.minLevel === currentMinLevel
             return (
@@ -137,8 +172,7 @@ function FrameModal({
                 {!f.unlocked && <div style={{ position: 'absolute', top: 6, right: 6, fontSize: '0.7rem' }}>🔒</div>}
                 {isActive && (
                   <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    width: 16, height: 16, borderRadius: '50%',
+                    position: 'absolute', top: 6, right: 6, width: 16, height: 16, borderRadius: '50%',
                     background: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '0.55rem', color: '#fff', fontWeight: 900,
                   }}>✓</div>
@@ -156,55 +190,6 @@ function FrameModal({
         </div>
       </div>
     </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ICON BUTTONS
-// ─────────────────────────────────────────────────────────────────────────────
-function IconBtn({
-  onClick,
-  title,
-  children,
-  pos,
-}: {
-  onClick: () => void
-  title: string
-  children: React.ReactNode
-  pos: 'left' | 'right'
-}) {
-  return (
-    <button
-      onClick={e => { e.stopPropagation(); onClick() }}
-      title={title}
-      style={{
-        position: 'absolute',
-        bottom: 2,
-        [pos]: 2,
-        width: 22,
-        height: 22,
-        borderRadius: '50%',
-        background: 'rgba(10,5,20,0.88)',
-        border: '1.5px solid rgba(124,58,237,0.55)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        padding: 0,
-        zIndex: 4,
-        transition: 'border-color 0.15s ease, background 0.15s ease',
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.35)'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(167,139,250,0.8)'
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(10,5,20,0.88)'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(124,58,237,0.55)'
-      }}
-    >
-      {children}
-    </button>
   )
 }
 
@@ -231,7 +216,25 @@ export default function AvatarFrame({
     return -1
   })
   const [modalOpen, setModalOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const menuRef      = useRef<HTMLDivElement>(null)
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return
+    function onDown(e: MouseEvent) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        containerRef.current && !containerRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [menuOpen])
 
   const activeFrame = (() => {
     if (selectedMinLevel >= 1) {
@@ -248,73 +251,162 @@ export default function AvatarFrame({
     setModalOpen(false)
   }
 
-  const hasAvatar   = Boolean(avatarUrl?.trim())
-  const scaledPad   = Math.max(2, Math.round(activeFrame.padding * (size / 96)))
-  const initialsSize = size * 0.28
-  const showButtons  = hovered && (selectable || Boolean(onUploadClick))
+  const hasAvatar      = Boolean(avatarUrl?.trim())
+  const scaledPad      = Math.max(2, Math.round(activeFrame.padding * (size / 96)))
+  const initialsSize   = size * 0.28
+  const interactive    = selectable || Boolean(onUploadClick)
+  const unlockedCount  = getAllUnlockedFrames(level).filter(f => f.unlocked).length
 
   return (
     <>
       {activeFrame.animationCSS && <style>{activeFrame.animationCSS}</style>}
+      <style>{`
+        @keyframes af-menu-in {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-      {/* Container — never transforms */}
-      <div
-        style={{
-          position: 'relative',
-          width: size + scaledPad * 2,
-          height: size + scaledPad * 2,
-          borderRadius: '50%',
-          flexShrink: 0,
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {/* Animated ring — only this rotates/animates */}
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', zIndex: 0, ...activeFrame.styles }} />
+      {/* Wrapper — positions the popover relative to the avatar */}
+      <div style={{ position: 'relative', display: 'inline-block' }}>
 
-        {/* Dark separator */}
-        <div style={{ position: 'absolute', inset: scaledPad, borderRadius: '50%', background: '#0a0a0f', zIndex: 1 }} />
+        {/* Avatar container — never transforms */}
+        <div
+          ref={containerRef}
+          onClick={() => { if (interactive) setMenuOpen(prev => !prev) }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          style={{
+            position: 'relative',
+            width: size + scaledPad * 2,
+            height: size + scaledPad * 2,
+            borderRadius: '50%',
+            flexShrink: 0,
+            cursor: interactive ? 'pointer' : 'default',
+          }}
+        >
+          {/* Animated ring — only this rotates */}
+          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', zIndex: 0, ...activeFrame.styles }} />
 
-        {/* Avatar content */}
-        <div style={{
-          position: 'absolute', inset: scaledPad + 1,
-          borderRadius: '50%', overflow: 'hidden',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2,
-        }}>
-          {hasAvatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl!} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
+          {/* Dark separator */}
+          <div style={{ position: 'absolute', inset: scaledPad, borderRadius: '50%', background: '#0a0a0f', zIndex: 1 }} />
+
+          {/* Avatar content */}
+          <div style={{
+            position: 'absolute', inset: scaledPad + 1,
+            borderRadius: '50%', overflow: 'hidden',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 2,
+          }}>
+            {hasAvatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarUrl!} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{
+                width: '100%', height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: initialsSize, fontWeight: 900, color: '#fff',
+                background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+              }}>
+                {initials}
+              </div>
+            )}
+          </div>
+
+          {/* Camera hover overlay */}
+          {interactive && hovered && !menuOpen && (
             <div style={{
-              width: '100%', height: '100%',
+              position: 'absolute', inset: scaledPad,
+              borderRadius: '50%', background: 'rgba(0,0,0,0.48)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: initialsSize, fontWeight: 900, color: '#fff',
-              background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+              zIndex: 3, pointerEvents: 'none',
             }}>
-              {initials}
+              <svg
+                width={Math.round(size * 0.26)}
+                height={Math.round(size * 0.26)}
+                viewBox="0 0 24 24" fill="none"
+                stroke="rgba(255,255,255,0.9)" strokeWidth={2}
+                strokeLinecap="round" strokeLinejoin="round"
+              >
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
             </div>
           )}
         </div>
 
-        {/* Camera button — bottom-left */}
-        {showButtons && onUploadClick && (
-          <IconBtn onClick={onUploadClick} title="Trocar foto" pos="left">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </IconBtn>
-        )}
+        {/* Context menu popover */}
+        {menuOpen && (
+          <div
+            ref={menuRef}
+            style={{
+              position: 'absolute',
+              top: size + scaledPad * 2 + 8,
+              left: 0,
+              width: 248,
+              background: 'rgba(15, 10, 30, 0.96)',
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              border: '1px solid rgba(124,58,237,0.38)',
+              borderRadius: 14,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.08), 0 0 28px rgba(124,58,237,0.14)',
+              zIndex: 200,
+              overflow: 'hidden',
+              animation: 'af-menu-in 0.18s ease-out forwards',
+            }}
+          >
+            {/* Trocar foto */}
+            {onUploadClick && (
+              <MenuItem
+                icon={
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                }
+                label="Trocar foto de perfil"
+                desc="JPG, PNG ou WEBP • Máx 2MB"
+                onClick={() => { setMenuOpen(false); onUploadClick() }}
+              />
+            )}
 
-        {/* Frame button — bottom-right */}
-        {showButtons && selectable && (
-          <IconBtn onClick={() => setModalOpen(true)} title="Trocar moldura" pos="right">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <rect x="7" y="7" width="10" height="10" rx="1" />
-            </svg>
-          </IconBtn>
+            {/* Trocar moldura */}
+            {selectable && (
+              <MenuItem
+                icon={
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <rect x="7" y="7" width="10" height="10" rx="1" />
+                  </svg>
+                }
+                label="Trocar moldura"
+                desc={`${unlockedCount} moldura${unlockedCount !== 1 ? 's' : ''} desbloqueada${unlockedCount !== 1 ? 's' : ''}`}
+                onClick={() => { setMenuOpen(false); setModalOpen(true) }}
+              />
+            )}
+
+            {/* Separator */}
+            <div style={{ height: 1, background: 'rgba(124,58,237,0.15)', margin: '2px 0' }} />
+
+            {/* Current frame info */}
+            <div style={{ padding: '8px 14px 10px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                background: 'rgba(255,255,255,0.04)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </span>
+              <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(255,255,255,0.32)', lineHeight: 1.4 }}>
+                Moldura atual:{' '}
+                <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>{activeFrame.title}</span>
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
