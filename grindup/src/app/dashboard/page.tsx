@@ -6,12 +6,14 @@ import { createClientSupabase } from '@/lib/supabase'
 import { getXPProgress, MAX_LEVEL } from '@/lib/levels'
 import WelcomeAnimation from '@/components/WelcomeAnimation'
 import CheckinPopup from '@/components/CheckinPopup'
+import ProfileEditor from '@/components/ProfileEditor'
 
 type Profile = {
   id: string
   username: string | null
   full_name: string | null
   avatar_url: string | null
+  cover_url: string | null
   plan: string
   xp: number
   level: number
@@ -83,7 +85,15 @@ const MODULES = [
   },
 ]
 
-function DashboardContent({ profile }: { profile: Profile }) {
+function DashboardContent({
+  profile,
+  onAvatarChange,
+  onCoverChange,
+}: {
+  profile: Profile
+  onAvatarChange: (url: string) => void
+  onCoverChange:  (url: string) => void
+}) {
   const displayName = profile.full_name || profile.username || 'Usuário'
   const initials = displayName
     .split(' ')
@@ -94,12 +104,10 @@ function DashboardContent({ profile }: { profile: Profile }) {
 
   const planStyle = PLAN_STYLE[profile.plan as keyof typeof PLAN_STYLE] ?? PLAN_STYLE.free
 
-  const xpProgress    = getXPProgress(profile.xp)
-  const xpPct         = xpProgress.percentage
+  const xpProgress     = getXPProgress(profile.xp)
+  const xpPct          = xpProgress.percentage
   const xpForNextLevel = xpProgress.needed
-  const isMaxLevel    = profile.level >= MAX_LEVEL
-
-  const hasAvatar = Boolean(profile.avatar_url && profile.avatar_url.trim() !== '')
+  const isMaxLevel     = profile.level >= MAX_LEVEL
 
   const gamingStats = [
     {
@@ -148,79 +156,17 @@ function DashboardContent({ profile }: { profile: Profile }) {
 
   return (
     <div className="min-h-screen">
-      <style>{`
-        @keyframes bannerShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
 
-      {/* ── Banner + avatar wrapper ── */}
-      <div style={{ position: 'relative', marginBottom: 60 }}>
-
-        {/* Banner */}
-        <div
-          style={{
-            height: 180,
-            width: '100%',
-            background: 'linear-gradient(135deg, #2d1b4e, #1a0a2e, #0d1a3e, #1e0533)',
-            backgroundSize: '400% 400%',
-            animation: 'bannerShift 6s ease-in-out infinite',
-            overflow: 'hidden',
-          }}
-        >
-          <div aria-hidden="true" style={{ position: 'absolute', right: 60,  top: 20,  width: 180, height: 180, borderRadius: '50%', background: 'rgba(124,58,237,0.12)', filter: 'blur(50px)' }} />
-          <div aria-hidden="true" style={{ position: 'absolute', left: 80,   bottom: 0, width: 120, height: 120, borderRadius: '50%', background: 'rgba(79,70,229,0.15)',  filter: 'blur(35px)' }} />
-          <div aria-hidden="true" style={{ position: 'absolute', right: 220, top: 10,  width: 80,  height: 80,  borderRadius: '50%', background: 'rgba(167,139,250,0.08)', filter: 'blur(25px)' }} />
-        </div>
-
-        {/* Avatar — overlapping the banner bottom edge */}
-        {hasAvatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={profile.avatar_url!}
-            alt={displayName}
-            referrerPolicy="no-referrer"
-            width={96}
-            height={96}
-            style={{
-              position: 'absolute',
-              bottom: -48,
-              left: 32,
-              width: 96,
-              height: 96,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '3px solid rgba(124,58,237,0.75)',
-              boxShadow: '0 0 28px rgba(124,58,237,0.6)',
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: -48,
-              left: 32,
-              width: 96,
-              height: 96,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.6rem',
-              fontWeight: 900,
-              color: '#fff',
-              background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
-              border: '3px solid rgba(124,58,237,0.75)',
-              boxShadow: '0 0 28px rgba(124,58,237,0.6)',
-            }}
-          >
-            {initials}
-          </div>
-        )}
-      </div>
+      {/* ── Banner + avatar (editable) ── */}
+      <ProfileEditor
+        userId={profile.id}
+        avatarUrl={profile.avatar_url}
+        coverUrl={profile.cover_url}
+        displayName={displayName}
+        initials={initials}
+        onAvatarChange={onAvatarChange}
+        onCoverChange={onCoverChange}
+      />
 
       <div className="px-8 pb-10">
 
@@ -348,7 +294,11 @@ export default function DashboardPage() {
         userXp={profile.xp}
         onComplete={() => {}}
       />
-      <DashboardContent profile={profile} />
+      <DashboardContent
+        profile={profile}
+        onAvatarChange={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
+        onCoverChange={url  => setProfile(p => p ? { ...p, cover_url:  url } : p)}
+      />
       <CheckinPopup />
     </>
   )
