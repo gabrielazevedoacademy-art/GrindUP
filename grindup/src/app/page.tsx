@@ -4,66 +4,141 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClientSupabase } from '@/lib/supabase'
+import CursorTrail from '@/components/CursorTrail'
 
-// ─── StarField ────────────────────────────────────────────────
-function StarField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+// ─── ParallaxLayers ───────────────────────────────────────────
+// Layer 1: small distant stars  (speed 0.10)
+// Layer 2: medium mid stars     (speed 0.25)
+// Layer 3: nebulae blobs        (speed 0.40)
+function ParallaxLayers() {
+  const c1Ref = useRef<HTMLCanvasElement>(null)
+  const c2Ref = useRef<HTMLCanvasElement>(null)
+  const l3Ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const c = canvas
-    const ctx = c.getContext('2d')!
-    let raf: number
+    const c1Raw = c1Ref.current
+    const c2Raw = c2Ref.current
+    const l3Raw = l3Ref.current
+    if (!c1Raw || !c2Raw || !l3Raw) return
+    // Aliases so TypeScript carries the non-null narrowing into closures
+    const c1: HTMLCanvasElement = c1Raw
+    const c2: HTMLCanvasElement = c2Raw
+    const l3: HTMLDivElement = l3Raw
 
-    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight }
+    let drawRaf: number
+    let scrollRafId = 0
+    let ticking = false
+    let sy = 0
+
+    const ctx1 = c1.getContext('2d')!
+    const ctx2 = c2.getContext('2d')!
+
+    const resize = () => {
+      c1.width = window.innerWidth; c1.height = window.innerHeight
+      c2.width = window.innerWidth; c2.height = window.innerHeight
+    }
     resize()
     window.addEventListener('resize', resize)
 
-    const stars = Array.from({ length: 200 }, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      r: Math.random() * 1.4 + 0.2,
+    // Layer 1 — small, dim, 1px
+    const stars1 = Array.from({ length: 150 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
       phase: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.02 + 0.005,
+      spd: Math.random() * 0.012 + 0.003,
+    }))
+
+    // Layer 2 — medium, brighter, 2px
+    const stars2 = Array.from({ length: 70 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      phase: Math.random() * Math.PI * 2,
+      spd: Math.random() * 0.018 + 0.005,
     }))
 
     let t = 0
-    function draw() {
-      ctx.clearRect(0, 0, c.width, c.height)
-      t += 1
-      for (const s of stars) {
-        const opacity = 0.2 + 0.55 * (0.5 + 0.5 * Math.sin(s.phase + t * s.speed))
-        ctx.beginPath()
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200,190,255,${opacity})`
-        ctx.fill()
+    function drawStars() {
+      t++
+      ctx1.clearRect(0, 0, c1.width, c1.height)
+      for (const s of stars1) {
+        const o = 0.1 + 0.3 * (0.5 + 0.5 * Math.sin(s.phase + t * s.spd))
+        ctx1.beginPath()
+        ctx1.arc(s.x, s.y, 0.6, 0, Math.PI * 2)
+        ctx1.fillStyle = `rgba(210,200,255,${o})`
+        ctx1.fill()
       }
-      raf = requestAnimationFrame(draw)
+      ctx2.clearRect(0, 0, c2.width, c2.height)
+      for (const s of stars2) {
+        const o = 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(s.phase + t * s.spd))
+        ctx2.beginPath()
+        ctx2.arc(s.x, s.y, 1.2, 0, Math.PI * 2)
+        ctx2.fillStyle = `rgba(200,190,255,${o})`
+        ctx2.fill()
+      }
+      drawRaf = requestAnimationFrame(drawStars)
     }
-    draw()
+    drawRaf = requestAnimationFrame(drawStars)
 
     const onScroll = () => {
-      c.style.transform = `translateY(${window.scrollY * -0.12}px)`
+      sy = window.scrollY
+      if (!ticking) {
+        scrollRafId = requestAnimationFrame(() => {
+          const m = window.innerWidth < 768 ? 0.5 : 1
+          c1.style.transform = `translateY(${-sy * 0.1 * m}px)`
+          c2.style.transform = `translateY(${-sy * 0.25 * m}px)`
+          l3.style.transform = `translateY(${-sy * 0.4 * m}px)`
+          ticking = false
+        })
+        ticking = true
+      }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
-      cancelAnimationFrame(raf)
+      cancelAnimationFrame(drawRaf)
+      cancelAnimationFrame(scrollRafId)
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', onScroll)
     }
   }, [])
 
+  const base: React.CSSProperties = {
+    position: 'fixed', inset: 0, zIndex: 0,
+    width: '100%', height: '100%',
+    pointerEvents: 'none', willChange: 'transform',
+  }
+
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 0,
-        width: '100%', height: '100%',
-        pointerEvents: 'none', willChange: 'transform',
-      }}
-    />
+    <>
+      <canvas ref={c1Ref} style={base} />
+      <canvas ref={c2Ref} style={base} />
+      <div
+        ref={l3Ref}
+        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', willChange: 'transform' }}
+      >
+        <div style={{
+          position: 'absolute', top: '8%', left: '-12%',
+          width: 650, height: 650, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'nebulaPulse 7s ease-in-out infinite',
+        }} />
+        <div style={{
+          position: 'absolute', top: '45%', right: '-15%',
+          width: 700, height: 700, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 70%)',
+          filter: 'blur(70px)',
+          animation: 'nebulaPulse 9s ease-in-out infinite 2s',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '8%', left: '28%',
+          width: 520, height: 520, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%)',
+          filter: 'blur(55px)',
+          animation: 'nebulaPulse 11s ease-in-out infinite 4s',
+        }} />
+      </div>
+    </>
   )
 }
 
@@ -304,35 +379,9 @@ export default function EntryPage() {
         }
       `}</style>
 
-      {/* Stars */}
-      <StarField />
-
-      {/* Nebulae */}
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden',
-      }}>
-        <div style={{
-          position: 'absolute', top: '10%', left: '-10%',
-          width: 600, height: 600, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-          animation: 'nebulaPulse 7s ease-in-out infinite',
-        }} />
-        <div style={{
-          position: 'absolute', top: '50%', right: '-15%',
-          width: 700, height: 700, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 70%)',
-          filter: 'blur(70px)',
-          animation: 'nebulaPulse 9s ease-in-out infinite 2s',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '5%', left: '30%',
-          width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(167,139,250,0.14) 0%, transparent 70%)',
-          filter: 'blur(55px)',
-          animation: 'nebulaPulse 11s ease-in-out infinite 4s',
-        }} />
-      </div>
+      {/* Background parallax layers + cursor trail */}
+      <CursorTrail />
+      <ParallaxLayers />
 
       {/* ── HERO ── */}
       <section style={{
