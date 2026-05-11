@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClientSupabase } from '@/lib/supabase'
 import CursorTrail from '@/components/CursorTrail'
+import ClickEffect from '@/components/ClickEffect'
 
 // ─── ParallaxLayers ───────────────────────────────────────────
 // Layer 1: small distant stars  (speed 0.10)
@@ -121,7 +122,7 @@ function ParallaxLayers() {
         <div style={{
           position: 'absolute', top: '8%', left: '-12%',
           width: 650, height: 650, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, rgba(2,2,8,0) 70%)',
           filter: 'blur(60px)',
           animation: 'nebulaPulse 7s ease-in-out infinite',
           willChange: 'transform, opacity',
@@ -129,7 +130,7 @@ function ParallaxLayers() {
         <div style={{
           position: 'absolute', top: '45%', right: '-15%',
           width: 700, height: 700, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, rgba(2,2,8,0) 70%)',
           filter: 'blur(70px)',
           animation: 'nebulaPulse 9s ease-in-out infinite 2s',
           willChange: 'transform, opacity',
@@ -137,7 +138,7 @@ function ParallaxLayers() {
         <div style={{
           position: 'absolute', bottom: '8%', left: '28%',
           width: 520, height: 520, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, rgba(2,2,8,0) 70%)',
           filter: 'blur(55px)',
           animation: 'nebulaPulse 11s ease-in-out infinite 4s',
           willChange: 'transform, opacity',
@@ -256,16 +257,17 @@ export default function EntryPage() {
 
   return (
     <div style={{
-      background: 'linear-gradient(180deg, #05050f 0%, #08051a 100%)',
+      background: '#020208',
       color: '#fff',
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      overflowX: 'hidden',
+      minHeight: '100vh',
+      overflow: 'hidden',
       position: 'relative',
       border: 'none',
       outline: 'none',
     }}>
       <style>{`
-        html, body { background: #05050f; margin: 0; padding: 0; }
+        html, body { background: #020208 !important; margin: 0; padding: 0; }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes gradShift {
@@ -408,8 +410,9 @@ export default function EntryPage() {
         }
       `}</style>
 
-      {/* Background parallax layers + cursor trail */}
+      {/* Background parallax layers + cursor trail + click effect */}
       <CursorTrail />
+      <ClickEffect />
       <ParallaxLayers />
 
       {/* ── HERO ── */}
@@ -440,7 +443,7 @@ export default function EntryPage() {
           <div style={{
             position: 'absolute',
             width: 340, height: 340, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, rgba(2,2,8,0) 70%)',
             filter: 'blur(20px)',
           }} />
         </div>
@@ -656,7 +659,7 @@ export default function EntryPage() {
       {/* ── GAMIFICATION ── */}
       <section className="section" style={{
         paddingTop: 60,
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.08) 0%, rgba(5,5,15,0) 70%)',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.08) 0%, rgba(2,2,8,0) 70%)',
       }}>
         <div className="section-inner">
           <Reveal>
@@ -854,7 +857,7 @@ export default function EntryPage() {
             }}>
               <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.2) 0%, transparent 60%)',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.2) 0%, rgba(2,2,8,0) 60%)',
               }} />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{ fontSize: '3rem', marginBottom: 16 }}>🚀</div>
