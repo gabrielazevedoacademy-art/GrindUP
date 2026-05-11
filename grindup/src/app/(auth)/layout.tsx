@@ -137,6 +137,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               '--p-mid': p.o * 0.75,
               '--p-hi': p.o,
               animation: `particleFloat ${p.d} ease-in-out ${p.dl} infinite`,
+              willChange: 'transform',
             } as React.CSSProperties}
           />
         ))}

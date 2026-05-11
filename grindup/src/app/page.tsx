@@ -106,6 +106,7 @@ function ParallaxLayers() {
     position: 'fixed', inset: 0, zIndex: 0,
     width: '100%', height: '100%',
     pointerEvents: 'none', willChange: 'transform',
+    transform: 'translateZ(0)',
   }
 
   return (
@@ -114,7 +115,7 @@ function ParallaxLayers() {
       <canvas ref={c2Ref} style={base} />
       <div
         ref={l3Ref}
-        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', willChange: 'transform' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', willChange: 'transform', transform: 'translateZ(0)' }}
       >
         <div style={{
           position: 'absolute', top: '8%', left: '-12%',
@@ -122,6 +123,7 @@ function ParallaxLayers() {
           background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
           filter: 'blur(60px)',
           animation: 'nebulaPulse 7s ease-in-out infinite',
+          willChange: 'transform, opacity',
         }} />
         <div style={{
           position: 'absolute', top: '45%', right: '-15%',
@@ -129,6 +131,7 @@ function ParallaxLayers() {
           background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 70%)',
           filter: 'blur(70px)',
           animation: 'nebulaPulse 9s ease-in-out infinite 2s',
+          willChange: 'transform, opacity',
         }} />
         <div style={{
           position: 'absolute', bottom: '8%', left: '28%',
@@ -136,6 +139,7 @@ function ParallaxLayers() {
           background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%)',
           filter: 'blur(55px)',
           animation: 'nebulaPulse 11s ease-in-out infinite 4s',
+          willChange: 'transform, opacity',
         }} />
       </div>
     </>
@@ -280,13 +284,17 @@ export default function EntryPage() {
           0%,100% { box-shadow: 0 0 24px rgba(124,58,237,0.55); }
           50%      { box-shadow: 0 0 52px rgba(124,58,237,0.95), 0 0 96px rgba(124,58,237,0.35); }
         }
+        @keyframes btnGlowFilter {
+          0%,100% { filter: drop-shadow(0 0 12px rgba(124,58,237,0.55)); }
+          50%      { filter: drop-shadow(0 0 26px rgba(124,58,237,0.95)); }
+        }
         @keyframes scrollBounce {
           0%,100% { transform: translateY(0); opacity: 0.5; }
           50%      { transform: translateY(8px); opacity: 1; }
         }
         @keyframes ctaGlow {
-          0%,100% { box-shadow: 0 0 40px rgba(124,58,237,0.5), 0 8px 40px rgba(0,0,0,0.6); }
-          50%      { box-shadow: 0 0 80px rgba(124,58,237,0.9), 0 8px 40px rgba(0,0,0,0.6); }
+          0%,100% { filter: drop-shadow(0 0 20px rgba(124,58,237,0.5)); }
+          50%      { filter: drop-shadow(0 0 40px rgba(124,58,237,0.9)); }
         }
         @keyframes nebulaPulse {
           0%,100% { opacity: 0.18; transform: scale(1); }
@@ -309,7 +317,8 @@ export default function EntryPage() {
           color: #fff; font-size: 1.05rem; font-weight: 800;
           text-decoration: none; cursor: pointer; white-space: nowrap;
           animation: btnGlow 2.5s ease-in-out infinite;
-          transition: transform 0.18s ease, filter 0.18s ease;
+          transition: transform 0.18s ease;
+          will-change: transform;
         }
         .btn-cta:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.12); }
         .btn-ghost {
@@ -421,6 +430,7 @@ export default function EntryPage() {
               borderRadius: '50%',
               border: `1px solid rgba(124,58,237,${0.18 - i * 0.04})`,
               animation: `${i % 2 === 0 ? 'ringRotate' : 'ringRotateReverse'} ${22 + i * 8}s linear infinite`,
+              willChange: 'transform',
             }} />
           ))}
           <div style={{

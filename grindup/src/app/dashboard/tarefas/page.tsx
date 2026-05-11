@@ -566,9 +566,15 @@ function FilterChip({
 // ─────────────────────────────────────────────────────────────
 // PAGE
 // ─────────────────────────────────────────────────────────────
+const PAGE_SIZE = 20
+
 export default function TarefasPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
+  const [pendingCount, setPendingCount] = useState(0)
+  const [offset, setOffset] = useState(0)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all')
   const [showModal, setShowModal] = useState(false)
@@ -580,34 +586,76 @@ export default function TarefasPage() {
   const [userProfile, setUserProfile] = useState<{ xp: number; level: number; plan: string } | null>(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
   const popupCounter = useRef(0)
+  const initDone = useRef(false)
 
-  // ── Fetch user + tasks ──────────────────────────────────────
-  const fetchAll = useCallback(async () => {
+  // ── Build and run a server-side filtered paginated query ────
+  const runQuery = useCallback(async (
+    uid: string, sf: StatusFilter, pf: PriorityFilter, from: number
+  ) => {
     const supabase = createClientSupabase()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    setUserId(user.id)
-
-    const [tasksRes, profileRes] = await Promise.all([
-      supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('profiles')
-        .select('xp, level, plan')
-        .eq('id', user.id)
-        .single(),
-    ])
-
-    if (tasksRes.data) setTasks(tasksRes.data as Task[])
-    if (profileRes.data) setUserProfile(profileRes.data)
-    setLoading(false)
+    let q = supabase
+      .from('tasks')
+      .select('*', { count: 'exact' })
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1)
+    if (sf === 'pending')   q = q.eq('is_completed', false)
+    if (sf === 'completed') q = q.eq('is_completed', true)
+    if (pf !== 'all')       q = q.eq('priority', pf)
+    return q
   }, [])
 
-  useEffect(() => { fetchAll() }, [fetchAll])
+  // ── Init: user + profile + pending count + first page ──────
+  useEffect(() => {
+    async function init() {
+      const supabase = createClientSupabase()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUserId(user.id)
+
+      const [profileRes, pendingRes, tasksRes] = await Promise.all([
+        supabase.from('profiles').select('xp, level, plan').eq('id', user.id).single(),
+        supabase.from('tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id).eq('is_completed', false),
+        runQuery(user.id, 'all', 'all', 0),
+      ])
+
+      if (profileRes.data) setUserProfile(profileRes.data)
+      setPendingCount(pendingRes.count ?? 0)
+      if (tasksRes.data) setTasks(tasksRes.data as Task[])
+      setTotalCount(tasksRes.count ?? 0)
+      setOffset(PAGE_SIZE)
+      initDone.current = true
+      setLoading(false)
+    }
+    init()
+  }, [runQuery])
+
+  // ── Filter changes → reload from scratch (server-side) ─────
+  // userId intentionally excluded from deps to avoid double-load on init
+  useEffect(() => {
+    if (!initDone.current || !userId) return
+    setLoading(true)
+    setTasks([])
+    setOffset(0)
+    runQuery(userId, statusFilter, priorityFilter, 0).then(({ data, count }) => {
+      setTasks((data as Task[]) ?? [])
+      setTotalCount(count ?? 0)
+      setOffset(PAGE_SIZE)
+      setLoading(false)
+    })
+  }, [statusFilter, priorityFilter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Load more ───────────────────────────────────────────────
+  async function handleLoadMore() {
+    if (!userId || loadingMore || tasks.length >= totalCount) return
+    setLoadingMore(true)
+    const { data } = await runQuery(userId, statusFilter, priorityFilter, offset)
+    if (data) setTasks(prev => [...prev, ...(data as Task[])])
+    setOffset(prev => prev + PAGE_SIZE)
+    setLoadingMore(false)
+  }
 
   // ── New task gate ────────────────────────────────────────────
   function handleNewTask() {
@@ -645,6 +693,8 @@ export default function TarefasPage() {
     setSaving(false)
     if (!error && data) {
       setTasks(prev => [data as Task, ...prev])
+      setTotalCount(prev => prev + 1)
+      setPendingCount(prev => prev + 1)
       setShowModal(false)
     }
   }
@@ -664,29 +714,27 @@ export default function TarefasPage() {
 
     if (taskError) { setCompleting(null); return }
 
-    // Update local task list immediately
-    setTasks(prev =>
-      prev.map(t =>
-        t.id === task.id
-          ? { ...t, is_completed: true, completed_at: new Date().toISOString() }
-          : t
+    if (statusFilter === 'pending') {
+      setTasks(prev => prev.filter(t => t.id !== task.id))
+      setTotalCount(prev => prev - 1)
+    } else {
+      setTasks(prev =>
+        prev.map(t =>
+          t.id === task.id
+            ? { ...t, is_completed: true, completed_at: new Date().toISOString() }
+            : t
+        )
       )
-    )
+    }
+    setPendingCount(prev => Math.max(0, prev - 1))
 
-    // Award XP
     if (userProfile) {
       const newXp = userProfile.xp + xpGain
       const newLevel = getLevelFromXP(newXp)
-
-      await supabase
-        .from('profiles')
-        .update({ xp: newXp, level: newLevel })
-        .eq('id', userId!)
-
+      await supabase.from('profiles').update({ xp: newXp, level: newLevel }).eq('id', userId!)
       setUserProfile(prev => prev ? { ...prev, xp: newXp, level: newLevel } : prev)
     }
 
-    // Show XP popup
     const key = ++popupCounter.current
     setXpPopups(prev => [...prev, { id: task.id, amount: xpGain, key }])
     setCompleting(null)
@@ -696,28 +744,16 @@ export default function TarefasPage() {
   async function handleDelete(taskId: string) {
     if (deleting) return
     setDeleting(taskId)
-
     const supabase = createClientSupabase()
     const { error } = await supabase.from('tasks').delete().eq('id', taskId)
-
     if (!error) {
+      const target = tasks.find(t => t.id === taskId)
       setTasks(prev => prev.filter(t => t.id !== taskId))
+      setTotalCount(prev => prev - 1)
+      if (target && !target.is_completed) setPendingCount(prev => Math.max(0, prev - 1))
     }
     setDeleting(null)
   }
-
-  // ── Filtered tasks ──────────────────────────────────────────
-  const filtered = tasks.filter(t => {
-    const matchStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'pending' && !t.is_completed) ||
-      (statusFilter === 'completed' && t.is_completed)
-    const matchPriority =
-      priorityFilter === 'all' || t.priority === priorityFilter
-    return matchStatus && matchPriority
-  })
-
-  const pendingCount = tasks.filter(t => !t.is_completed).length
 
   // ── Render ──────────────────────────────────────────────────
   return (
@@ -729,18 +765,10 @@ export default function TarefasPage() {
           60%  { opacity: 1; transform: translateX(-50%) translateY(-60px) scale(1); }
           100% { opacity: 0; transform: translateX(-50%) translateY(-100px) scale(0.85); }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(24px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes taskIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes taskIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin    { to { transform: rotate(360deg); } }
         input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.22); }
         input:focus, textarea:focus, select:focus {
           border-color: rgba(124,58,237,0.6) !important;
@@ -759,11 +787,7 @@ export default function TarefasPage() {
 
       {/* Modals */}
       {showModal && (
-        <NewTaskModal
-          onClose={() => setShowModal(false)}
-          onSave={handleCreate}
-          saving={saving}
-        />
+        <NewTaskModal onClose={() => setShowModal(false)} onSave={handleCreate} saving={saving} />
       )}
       {showLimitModal && (
         <UpgradeModal
@@ -782,7 +806,7 @@ export default function TarefasPage() {
           <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
             {pendingCount > 0
               ? `${pendingCount} ${pendingCount === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`
-              : tasks.length === 0
+              : totalCount === 0
               ? 'Nenhuma tarefa criada ainda'
               : 'Todas as tarefas concluídas!'}
           </p>
@@ -791,18 +815,12 @@ export default function TarefasPage() {
         <button
           onClick={handleNewTask}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '11px 20px',
-            borderRadius: 12,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '11px 20px', borderRadius: 12,
             border: '1px solid rgba(124,58,237,0.5)',
             background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-            color: '#fff',
-            fontSize: '0.875rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 0 20px rgba(124,58,237,0.4)',
+            color: '#fff', fontSize: '0.875rem', fontWeight: 700,
+            cursor: 'pointer', boxShadow: '0 0 20px rgba(124,58,237,0.4)',
             transition: 'box-shadow 0.2s ease, transform 0.15s ease',
           }}
           onMouseEnter={e => {
@@ -830,9 +848,7 @@ export default function TarefasPage() {
             </FilterChip>
           ))}
         </div>
-
         <div style={{ width: 1, height: 22, background: 'rgba(255,255,255,0.08)', margin: '0 4px' }} />
-
         <div style={{ display: 'flex', gap: 6 }}>
           {(['all', 'high', 'medium', 'low'] as PriorityFilter[]).map(f => (
             <FilterChip key={f} active={priorityFilter === f} onClick={() => setPriorityFilter(f)}>
@@ -844,15 +860,11 @@ export default function TarefasPage() {
 
       {/* ── XP summary strip ────────────────────────────────── */}
       {userProfile && (
-        <div
-          style={{
-            padding: '12px 18px',
-            borderRadius: 12,
-            background: 'rgba(124,58,237,0.06)',
-            border: '1px solid rgba(124,58,237,0.14)',
-            marginBottom: 24,
-          }}
-        >
+        <div style={{
+          padding: '12px 18px', borderRadius: 12,
+          background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.14)',
+          marginBottom: 24,
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -877,16 +889,13 @@ export default function TarefasPage() {
             </span>
           </div>
           <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
-            <div
-              style={{
-                height: '100%',
-                borderRadius: 999,
-                background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
-                boxShadow: '0 0 10px rgba(124,58,237,0.6)',
-                width: `${Math.min(((userProfile.xp % (userProfile.level * 1000)) / (userProfile.level * 1000)) * 100, 100)}%`,
-                transition: 'width 0.6s ease',
-              }}
-            />
+            <div style={{
+              height: '100%', borderRadius: 999,
+              background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
+              boxShadow: '0 0 10px rgba(124,58,237,0.6)',
+              width: `${Math.min(((userProfile.xp % (userProfile.level * 1000)) / (userProfile.level * 1000)) * 100, 100)}%`,
+              transition: 'width 0.6s ease',
+            }} />
           </div>
         </div>
       )}
@@ -894,51 +903,68 @@ export default function TarefasPage() {
       {/* ── Task list ───────────────────────────────────────── */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 80 }}>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          <div
-            style={{
-              width: 36, height: 36,
-              border: '3px solid rgba(124,58,237,0.22)',
-              borderTopColor: '#7c3aed',
-              borderRadius: '50%',
-              animation: 'spin 0.75s linear infinite',
-            }}
-          />
+          <div style={{
+            width: 36, height: 36,
+            border: '3px solid rgba(124,58,237,0.22)', borderTopColor: '#7c3aed',
+            borderRadius: '50%', animation: 'spin 0.75s linear infinite',
+          }} />
         </div>
-      ) : filtered.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            paddingTop: 80,
-            paddingBottom: 80,
-          }}
-        >
+      ) : tasks.length === 0 ? (
+        <div style={{ textAlign: 'center', paddingTop: 80, paddingBottom: 80 }}>
           <div style={{ fontSize: '3rem', marginBottom: 16, opacity: 0.3 }}>
-            {tasks.length === 0 ? '📋' : '🔍'}
+            {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all' ? '📋' : '🔍'}
           </div>
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
-            {tasks.length === 0 ? 'Nenhuma tarefa criada ainda' : 'Nenhuma tarefa corresponde aos filtros'}
+            {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all'
+              ? 'Nenhuma tarefa criada ainda'
+              : 'Nenhuma tarefa corresponde aos filtros'}
           </p>
-          {tasks.length === 0 && (
+          {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all' && (
             <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem', margin: 0 }}>
               Crie sua primeira tarefa e comece a ganhar XP!
             </p>
           )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {filtered.map(task => (
-            <div key={task.id} style={{ animation: 'taskIn 0.25s ease' }}>
-              <TaskCard
-                task={task}
-                onToggle={handleToggle}
-                onDelete={handleDelete}
-                completing={completing === task.id}
-                deleting={deleting === task.id}
-              />
-            </div>
-          ))}
-        </div>
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {tasks.map(task => (
+              <div key={task.id} style={{ animation: 'taskIn 0.25s ease' }}>
+                <TaskCard
+                  task={task}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  completing={completing === task.id}
+                  deleting={deleting === task.id}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Counter + Load more */}
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.25)', marginBottom: 12 }}>
+              Mostrando {tasks.length} de {totalCount} {totalCount === 1 ? 'tarefa' : 'tarefas'}
+            </p>
+            {tasks.length < totalCount && (
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                style={{
+                  padding: '10px 28px', borderRadius: 10,
+                  border: '1px solid rgba(124,58,237,0.3)',
+                  background: 'rgba(124,58,237,0.08)',
+                  color: '#a78bfa', fontSize: '0.85rem', fontWeight: 600,
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  opacity: loadingMore ? 0.5 : 1,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {loadingMore ? 'Carregando...' : `Carregar mais ${Math.min(PAGE_SIZE, totalCount - tasks.length)}`}
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

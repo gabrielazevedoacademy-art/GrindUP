@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { isLimitReached } from '@/lib/planLimits'
 import { formatDate } from '@/lib/dateUtils'
@@ -741,6 +741,8 @@ export default function FinancasPage() {
   const [transactions, setTransactions]     = useState<Transaction[]>([])
   const [loading, setLoading]               = useState(true)
   const [userId, setUserId]                 = useState<string | null>(null)
+  const [displayCount, setDisplayCount]     = useState(30)
+  const initDone = useRef(false)
 
   // Period
   const [period, setPeriod]       = useState<PeriodKey>('current_month')
@@ -763,38 +765,62 @@ export default function FinancasPage() {
   const [userProfile, setUserProfile] = useState<{ plan: string } | null>(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
 
-  // ── Fetch ───────────────────────────────────────────────────
-  const fetchTransactions = useCallback(async () => {
-    const supabase = createClientSupabase()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setUserId(user.id)
-    const [txRes, profileRes] = await Promise.all([
-      supabase
-        .from('financial_transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('profiles')
-        .select('plan')
-        .eq('id', user.id)
-        .single(),
-    ])
-    if (txRes.data) setTransactions(txRes.data as Transaction[])
-    if (profileRes.data) setUserProfile(profileRes.data)
-    setLoading(false)
+  // ── Init: get user + profile once ──────────────────────────
+  useEffect(() => {
+    async function init() {
+      const supabase = createClientSupabase()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+      setUserId(user.id)
+      const { data: profile } = await supabase.from('profiles').select('plan').eq('id', user.id).single()
+      if (profile) setUserProfile(profile)
+      initDone.current = true
+    }
+    init()
   }, [])
 
-  useEffect(() => { fetchTransactions() }, [fetchTransactions])
+  // ── Reload on period change (server-side date filter) ───────
+  useEffect(() => {
+    if (!userId) return
+    if (period === 'custom' && (!customFrom || !customTo)) return
+    const supabase = createClientSupabase()
+    const range = getPeriodRange(period, customFrom, customTo)
+    setLoading(true)
+    supabase
+      .from('financial_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('date', range.from)
+      .lte('date', range.to)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setTransactions((data as Transaction[]) ?? [])
+        setDisplayCount(30)
+        setLoading(false)
+      })
+  }, [userId, period, customFrom, customTo]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── New transaction gate ────────────────────────────────────
-  function handleNewTransaction() {
-    if (userProfile) {
-      const monthPrefix = new Date().toISOString().slice(0, 7)
-      const monthlyCount = transactions.filter(t => t.created_at.startsWith(monthPrefix)).length
-      if (isLimitReached(userProfile.plan, 'maxMonthlyTransactions', monthlyCount)) {
+  // ── Reset display count on client-side filter changes ───────
+  useEffect(() => {
+    setDisplayCount(30)
+  }, [typeFilter, categoryFilter, search, sort])
+
+  // ── New transaction gate (live COUNT to avoid stale data) ──
+  async function handleNewTransaction() {
+    if (userProfile && userId) {
+      const supabase = createClientSupabase()
+      const now = new Date()
+      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
+      const nextMonth = new Date(now.getFullYear(), now.getMonth()+1, 1)
+      const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth()+1).padStart(2,'0')}-01`
+      const { count } = await supabase
+        .from('financial_transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', monthStart)
+        .lt('created_at', monthEnd)
+      if (isLimitReached(userProfile.plan, 'maxMonthlyTransactions', count ?? 0)) {
         setShowLimitModal(true)
         return
       }
@@ -1169,7 +1195,7 @@ export default function FinancasPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {filtered.map(tx => (
+          {filtered.slice(0, displayCount).map(tx => (
             <div key={tx.id} style={{ animation: 'txIn 0.22s ease' }}>
               <TransactionCard
                 transaction={tx}
@@ -1182,8 +1208,23 @@ export default function FinancasPage() {
           ))}
           {filtered.length > 0 && (
             <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(255,255,255,0.18)', marginTop: 8 }}>
-              {filtered.length} {filtered.length === 1 ? 'transação' : 'transações'}
+              Mostrando {Math.min(displayCount, filtered.length)} de {filtered.length} {filtered.length === 1 ? 'transação' : 'transações'}
             </p>
+          )}
+          {displayCount < filtered.length && (
+            <button
+              onClick={() => setDisplayCount(c => c + 30)}
+              style={{
+                marginTop: 4, padding: '10px 0', borderRadius: 10, width: '100%',
+                border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(124,58,237,0.08)',
+                color: '#a78bfa', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.background='rgba(124,58,237,0.16)'; b.style.borderColor='rgba(124,58,237,0.5)' }}
+              onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.background='rgba(124,58,237,0.08)'; b.style.borderColor='rgba(124,58,237,0.3)' }}
+            >
+              Carregar mais ({filtered.length - displayCount} restantes)
+            </button>
           )}
         </div>
       )}
