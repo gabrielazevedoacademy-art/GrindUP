@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { getLevelFromXP } from '@/lib/levels'
+import { isLimitReached } from '@/lib/planLimits'
+import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -579,7 +581,8 @@ export default function TarefasPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [xpPopups, setXpPopups] = useState<XpPopup[]>([])
   const [userId, setUserId] = useState<string | null>(null)
-  const [userProfile, setUserProfile] = useState<{ xp: number; level: number } | null>(null)
+  const [userProfile, setUserProfile] = useState<{ xp: number; level: number; plan: string } | null>(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
   const popupCounter = useRef(0)
 
   // ── Fetch user + tasks ──────────────────────────────────────
@@ -598,7 +601,7 @@ export default function TarefasPage() {
         .order('created_at', { ascending: false }),
       supabase
         .from('profiles')
-        .select('xp, level')
+        .select('xp, level, plan')
         .eq('id', user.id)
         .single(),
     ])
@@ -609,6 +612,19 @@ export default function TarefasPage() {
   }, [])
 
   useEffect(() => { fetchAll() }, [fetchAll])
+
+  // ── New task gate ────────────────────────────────────────────
+  function handleNewTask() {
+    if (userProfile) {
+      const todayPrefix = new Date().toISOString().slice(0, 10)
+      const todayCount = tasks.filter(t => t.created_at.startsWith(todayPrefix)).length
+      if (isLimitReached(userProfile.plan, 'maxTasksPerDay', todayCount)) {
+        setShowLimitModal(true)
+        return
+      }
+    }
+    setShowModal(true)
+  }
 
   // ── Create task ─────────────────────────────────────────────
   async function handleCreate(form: NewTaskForm) {
@@ -671,7 +687,7 @@ export default function TarefasPage() {
         .update({ xp: newXp, level: newLevel })
         .eq('id', userId!)
 
-      setUserProfile({ xp: newXp, level: newLevel })
+      setUserProfile(prev => prev ? { ...prev, xp: newXp, level: newLevel } : prev)
     }
 
     // Show XP popup
@@ -745,12 +761,19 @@ export default function TarefasPage() {
         />
       ))}
 
-      {/* Modal */}
+      {/* Modals */}
       {showModal && (
         <NewTaskModal
           onClose={() => setShowModal(false)}
           onSave={handleCreate}
           saving={saving}
+        />
+      )}
+      {showLimitModal && (
+        <UpgradeModal
+          title="Limite diário atingido"
+          message="No plano Free você pode criar até 5 tarefas por dia. Faça upgrade para criar tarefas ilimitadas."
+          onClose={() => setShowLimitModal(false)}
         />
       )}
 
@@ -770,7 +793,7 @@ export default function TarefasPage() {
         </div>
 
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleNewTask}
           style={{
             display: 'flex',
             alignItems: 'center',

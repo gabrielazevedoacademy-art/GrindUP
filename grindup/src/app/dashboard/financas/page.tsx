@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { isLimitReached } from '@/lib/planLimits'
+import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -762,6 +764,8 @@ export default function FinancasPage() {
   const [confirmDelete, setConfirmDelete] = useState<Transaction | null>(null)
   const [deleting,      setDeleting]      = useState(false)
   const [markingReceived, setMarkingReceived] = useState<string | null>(null)
+  const [userProfile, setUserProfile] = useState<{ plan: string } | null>(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
 
   // ── Fetch ───────────────────────────────────────────────────
   const fetchTransactions = useCallback(async () => {
@@ -769,17 +773,38 @@ export default function FinancasPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     setUserId(user.id)
-    const { data } = await supabase
-      .from('financial_transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
-    if (data) setTransactions(data as Transaction[])
+    const [txRes, profileRes] = await Promise.all([
+      supabase
+        .from('financial_transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single(),
+    ])
+    if (txRes.data) setTransactions(txRes.data as Transaction[])
+    if (profileRes.data) setUserProfile(profileRes.data)
     setLoading(false)
   }, [])
 
   useEffect(() => { fetchTransactions() }, [fetchTransactions])
+
+  // ── New transaction gate ────────────────────────────────────
+  function handleNewTransaction() {
+    if (userProfile) {
+      const monthPrefix = new Date().toISOString().slice(0, 7)
+      const monthlyCount = transactions.filter(t => t.created_at.startsWith(monthPrefix)).length
+      if (isLimitReached(userProfile.plan, 'maxMonthlyTransactions', monthlyCount)) {
+        setShowLimitModal(true)
+        return
+      }
+    }
+    setShowModal(true)
+  }
 
   // ── Create ──────────────────────────────────────────────────
   async function handleCreate(form: NewTransactionForm) {
@@ -917,6 +942,13 @@ export default function FinancasPage() {
         }
       `}</style>
 
+      {showLimitModal && (
+        <UpgradeModal
+          title="Limite mensal atingido"
+          message="Você atingiu o limite de 20 transações mensais do plano Free. Faça upgrade para transações ilimitadas!"
+          onClose={() => setShowLimitModal(false)}
+        />
+      )}
       {showModal && (
         <NewTransactionModal
           onClose={() => { setShowModal(false); setSaveError(null) }}
@@ -945,7 +977,7 @@ export default function FinancasPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleNewTransaction}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '11px 20px', borderRadius: 12,

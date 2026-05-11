@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { getLevelFromXP } from '@/lib/levels'
+import { isLimitReached } from '@/lib/planLimits'
+import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -930,7 +932,8 @@ export default function MetasPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [xpPopups, setXpPopups] = useState<XpPopup[]>([])
   const [userId, setUserId] = useState<string | null>(null)
-  const [userProfile, setUserProfile] = useState<{ xp: number; level: number } | null>(null)
+  const [userProfile, setUserProfile] = useState<{ xp: number; level: number; plan: string } | null>(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
   const popupCounter = useRef(0)
 
   // ── Fetch ───────────────────────────────────────────────────
@@ -949,7 +952,7 @@ export default function MetasPage() {
         .order('created_at', { ascending: false }),
       supabase
         .from('profiles')
-        .select('xp, level')
+        .select('xp, level, plan')
         .eq('id', user.id)
         .single(),
     ])
@@ -960,6 +963,18 @@ export default function MetasPage() {
   }, [])
 
   useEffect(() => { fetchAll() }, [fetchAll])
+
+  // ── New goal gate ─────────────────────────────────────────────
+  function handleNewGoal() {
+    if (userProfile) {
+      const active = goals.filter(g => !g.is_completed).length
+      if (isLimitReached(userProfile.plan, 'maxActiveGoals', active)) {
+        setShowLimitModal(true)
+        return
+      }
+    }
+    setShowNewModal(true)
+  }
 
   // ── Create goal ─────────────────────────────────────────────
   async function handleCreate(form: NewGoalForm) {
@@ -1032,7 +1047,7 @@ export default function MetasPage() {
         .update({ xp: newXp, level: newLevel })
         .eq('id', userId)
 
-      setUserProfile({ xp: newXp, level: newLevel })
+      setUserProfile(prev => prev ? { ...prev, xp: newXp, level: newLevel } : prev)
 
       const key = ++popupCounter.current
       setXpPopups(prev => [...prev, { id: goalId, amount: xpGain, key }])
@@ -1126,6 +1141,13 @@ export default function MetasPage() {
       ))}
 
       {/* Modals */}
+      {showLimitModal && (
+        <UpgradeModal
+          title="Limite de metas atingido"
+          message="No plano Free você pode ter até 3 metas ativas simultaneamente. Faça upgrade para criar metas ilimitadas."
+          onClose={() => setShowLimitModal(false)}
+        />
+      )}
       {showNewModal && (
         <NewGoalModal
           onClose={() => setShowNewModal(false)}
@@ -1156,7 +1178,7 @@ export default function MetasPage() {
         </div>
 
         <button
-          onClick={() => setShowNewModal(true)}
+          onClick={handleNewGoal}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '11px 20px', borderRadius: 12,
