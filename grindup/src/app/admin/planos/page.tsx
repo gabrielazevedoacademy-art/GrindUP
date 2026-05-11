@@ -84,18 +84,12 @@ export default function PlanosPage() {
   }
 
   return (
-    <div className="planos-page" style={{ minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh', padding: '24px 16px' }} className="planos-page">
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         input::placeholder { color: rgba(255,255,255,0.22); }
         input:focus { border-color: rgba(232,92,13,0.55) !important; box-shadow: 0 0 0 3px rgba(232,92,13,0.1); }
-        .planos-page { padding: 20px 16px; }
-        .planos-header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .planos-features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; }
-        @media (min-width: 768px) {
-          .planos-page { padding: 40px 36px; }
-          .planos-features-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-        }
+        @media (min-width: 768px) { .planos-page { padding: 40px 36px !important; } }
       `}</style>
 
       {/* Header */}
@@ -143,14 +137,17 @@ export default function PlanosPage() {
                 }}
               >
                 {/* Plan header */}
-                <div className="planos-header-row" style={{
+                <div style={{
                   padding: '16px 20px',
                   borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  background: `${colors.glow}`,
+                  background: colors.glow,
+                  display: 'flex', alignItems: 'center',
+                  justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    {/* Plan name badge */}
                     <div style={{
-                      padding: '6px 16px', borderRadius: 999,
+                      padding: '5px 16px', borderRadius: 999,
                       background: colors.primary + '22',
                       border: `1px solid ${colors.primary}55`,
                       color: colors.primary,
@@ -161,70 +158,68 @@ export default function PlanosPage() {
                     </div>
 
                     {/* Price editor */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {isEditing ? (
-                        <>
-                          <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)' }}>R$</span>
-                          <input
-                            type="number"
-                            value={editPrice}
-                            onChange={e => setEditPrice(e.target.value)}
-                            min={0}
-                            step="0.01"
-                            autoFocus
-                            style={{
-                              width: 90, padding: '6px 10px', borderRadius: 8,
-                              border: '1px solid rgba(232,92,13,0.4)',
-                              background: 'rgba(232,92,13,0.08)',
-                              color: '#fff', fontSize: '0.9rem', fontWeight: 700, outline: 'none',
-                            }}
-                          />
-                          <button
-                            onClick={() => confirmEdit(plan)}
-                            disabled={isSaving}
-                            style={{
-                              padding: '6px 12px', borderRadius: 8, cursor: 'pointer',
-                              border: '1px solid rgba(74,222,128,0.4)',
-                              background: 'rgba(74,222,128,0.1)',
-                              color: '#4ade80', fontSize: '0.78rem', fontWeight: 700,
-                            }}
-                          >
-                            Salvar
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            style={{
-                              padding: '6px 10px', borderRadius: 8, cursor: 'pointer',
-                              border: '1px solid rgba(255,255,255,0.1)',
-                              background: 'rgba(255,255,255,0.04)',
-                              color: 'rgba(255,255,255,0.5)', fontSize: '0.78rem', fontWeight: 600,
-                            }}
-                          >
-                            Cancelar
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <span style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff' }}>
-                            {plan.price === 0
-                              ? 'Grátis'
-                              : `R$ ${plan.price.toFixed(2).replace('.', ',')}/mês`}
-                          </span>
-                          <button
-                            onClick={() => startEdit(plan)}
-                            style={{
-                              padding: '4px 10px', borderRadius: 7, cursor: 'pointer',
-                              border: '1px solid rgba(232,92,13,0.3)',
-                              background: 'rgba(232,92,13,0.08)',
-                              color: '#fb923c', fontSize: '0.72rem', fontWeight: 700,
-                              transition: 'all 0.15s ease',
-                            }}
-                          >
-                            Editar preço
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    {isEditing ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)' }}>R$</span>
+                        <input
+                          type="number"
+                          value={editPrice}
+                          onChange={e => setEditPrice(e.target.value)}
+                          min={0}
+                          step="0.01"
+                          autoFocus
+                          style={{
+                            width: 90, padding: '6px 10px', borderRadius: 8,
+                            border: '1px solid rgba(232,92,13,0.4)',
+                            background: 'rgba(232,92,13,0.08)',
+                            color: '#fff', fontSize: '0.9rem', fontWeight: 700, outline: 'none',
+                          }}
+                        />
+                        <button
+                          onClick={() => confirmEdit(plan)}
+                          disabled={isSaving}
+                          style={{
+                            padding: '6px 12px', borderRadius: 8, cursor: 'pointer',
+                            border: '1px solid rgba(74,222,128,0.4)',
+                            background: 'rgba(74,222,128,0.1)',
+                            color: '#4ade80', fontSize: '0.78rem', fontWeight: 700,
+                          }}
+                        >
+                          Salvar
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          style={{
+                            padding: '6px 10px', borderRadius: 8, cursor: 'pointer',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            background: 'rgba(255,255,255,0.04)',
+                            color: 'rgba(255,255,255,0.5)', fontSize: '0.78rem', fontWeight: 600,
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                          {plan.price === 0
+                            ? 'Grátis'
+                            : `R$ ${plan.price.toFixed(2).replace('.', ',')}/mês`}
+                        </span>
+                        <button
+                          onClick={() => startEdit(plan)}
+                          style={{
+                            padding: '4px 10px', borderRadius: 7, cursor: 'pointer',
+                            border: '1px solid rgba(232,92,13,0.3)',
+                            background: 'rgba(232,92,13,0.08)',
+                            color: '#fb923c', fontSize: '0.72rem', fontWeight: 700,
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          Editar preço
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Active toggle */}
@@ -247,32 +242,36 @@ export default function PlanosPage() {
                   </button>
                 </div>
 
-                {/* Plan features grid */}
-                <div className="planos-features-grid">
+                {/* Plan features — vertical list */}
+                <div>
                   {[
-                    { label: 'Tarefas/mês',     value: plan.max_tasks_per_month ?? '∞' },
-                    { label: 'Metas ativas',     value: plan.max_active_goals    ?? '∞' },
-                    { label: 'Temas',            value: plan.max_themes >= 9999 ? '∞' : plan.max_themes },
-                    { label: 'Missões diárias',  value: <BoolBadge value={plan.has_missions} /> },
-                    { label: 'Resumo semanal',   value: <BoolBadge value={plan.has_weekly_summary} /> },
-                    { label: 'Badge Elite',      value: <BoolBadge value={plan.has_elite_badge} /> },
+                    { label: 'Tarefas/mês',    value: plan.max_tasks_per_month ?? '∞' },
+                    { label: 'Metas ativas',   value: plan.max_active_goals    ?? '∞' },
+                    { label: 'Temas',          value: plan.max_themes >= 9999 ? '∞' : plan.max_themes },
+                    { label: 'Missões diárias', value: <BoolBadge value={plan.has_missions} /> },
+                    { label: 'Resumo semanal', value: <BoolBadge value={plan.has_weekly_summary} /> },
+                    { label: 'Badge Elite',    value: <BoolBadge value={plan.has_elite_badge} /> },
                   ].map(({ label, value }, idx, arr) => (
                     <div
                       key={label}
                       style={{
-                        padding: '16px 24px',
-                        borderBottom: Math.floor(idx / Math.ceil(arr.length / 2)) < 1
+                        display: 'flex', alignItems: 'center',
+                        justifyContent: 'space-between', gap: 12,
+                        padding: '13px 24px',
+                        borderBottom: idx < arr.length - 1
                           ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                        borderRight: (idx + 1) % 3 !== 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                       }}
                     >
-                      <p style={{ margin: '0 0 6px', fontSize: '0.68rem', fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      <span style={{
+                        fontSize: '0.82rem', fontWeight: 500,
+                        color: 'rgba(255,255,255,0.5)',
+                      }}>
                         {label}
-                      </p>
+                      </span>
                       {typeof value === 'object' ? value : (
-                        <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff' }}>
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff' }}>
                           {value}
-                        </p>
+                        </span>
                       )}
                     </div>
                   ))}
