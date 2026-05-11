@@ -67,7 +67,7 @@ function formatBRL(v: number) {
 function formatDate(iso: string) {
   const [year, month, day] = iso.split('-').map(Number)
   const abbr = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
-  return `${String(day).padStart(2,'0')} de ${abbr[month - 1]}. ${year}`
+  return `${String(day).padStart(2,'0')} ${abbr[month - 1]}. ${year}`
 }
 
 function todayISO() {
@@ -153,17 +153,18 @@ function SummaryCard({ label, value, icon, color, borderColor, bgColor, prefix =
 }) {
   return (
     <div style={{
-      flex: 1, borderRadius: 16, padding: '18px 20px',
+      borderRadius: 16, padding: '18px 20px',
       background: bgColor, border: `1px solid ${borderColor}`,
       boxShadow: `0 0 18px ${borderColor}50`,
+      minWidth: 0,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <div style={{ color }}>{icon}</div>
+        <div style={{ color, flexShrink: 0 }}>{icon}</div>
         <span style={{ fontSize: '0.73rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
           {label}
         </span>
       </div>
-      <div style={{ fontSize: '1.35rem', fontWeight: 900, color, letterSpacing: '-0.5px' }}>
+      <div style={{ fontSize: 'clamp(0.95rem, 3vw, 1.35rem)', fontWeight: 900, color, letterSpacing: '-0.5px', wordBreak: 'break-word' }}>
         {prefix}{formatBRL(value)}
       </div>
     </div>
@@ -335,7 +336,7 @@ function TransactionCard({
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', wordBreak: 'break-word' }}>
             {transaction.title}
           </span>
           {transaction.category && (
@@ -460,6 +461,11 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
 function DeleteConfirmModal({ tx, onConfirm, onCancel, loading }: {
   tx: Transaction; onConfirm: () => void; onCancel: () => void; loading: boolean
 }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   return (
     <div
       style={{
@@ -544,6 +550,11 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
     title: '', amount: '', type: 'expense',
     category: CATEGORIES.expense[0], date: todayISO(),
   })
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   function setType(t: TransactionType) {
     setForm(f => ({ ...f, type: t, category: CATEGORIES[t][0] }))
@@ -869,7 +880,7 @@ export default function FinancasPage() {
   }
 
   return (
-    <div className="min-h-screen px-8 pb-12 pt-10">
+    <div className="min-h-screen px-4 pb-12 pt-10 md:px-8">
       <style>{`
         @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(22px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -895,6 +906,14 @@ export default function FinancasPage() {
         select.periodo-select option {
           background-color: #1a1a2e !important;
           color: white !important;
+        }
+        .fin-summary-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        @media (min-width: 768px) {
+          .fin-summary-grid { grid-template-columns: repeat(4, 1fr); }
         }
       `}</style>
 
@@ -993,7 +1012,7 @@ export default function FinancasPage() {
       </div>
 
       {/* ── Summary cards ───────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div className="fin-summary-grid" style={{ marginBottom: 16 }}>
         <SummaryCard
           label="Receitas" value={periodIncome}
           color="#4ade80" borderColor="rgba(74,222,128,0.28)" bgColor="rgba(74,222,128,0.06)"

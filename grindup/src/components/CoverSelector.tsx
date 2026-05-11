@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { COVERS, ALL_COVERS_CSS, getCoverById, type CoverDef } from '@/lib/covers'
 
@@ -108,6 +108,11 @@ export default function CoverSelector({
     if (e.target === e.currentTarget) setModalOpen(false)
   }, [])
 
+  useEffect(() => {
+    document.body.style.overflow = modalOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [modalOpen])
+
   // ─────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────
@@ -199,16 +204,37 @@ export default function CoverSelector({
                 flexShrink: 0,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                Escolha sua capa
-              </h2>
-              <p style={{
-                margin: '4px 0 0', fontSize: '0.78rem',
-                color: 'rgba(167,139,250,0.75)',
-                fontWeight: 500,
-              }}>
-                Capas animadas em tempo real
-              </p>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+                    Escolha sua capa
+                  </h2>
+                  <p style={{
+                    margin: '4px 0 0', fontSize: '0.78rem',
+                    color: 'rgba(167,139,250,0.75)',
+                    fontWeight: 500,
+                  }}>
+                    Capas animadas em tempo real
+                  </p>
+                </div>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  aria-label="Fechar"
+                  style={{
+                    flexShrink: 0,
+                    width: 36, height: 36,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: 8,
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Locked message toast */}

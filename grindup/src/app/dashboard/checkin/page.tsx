@@ -151,6 +151,11 @@ function CheckinModal({
   const meta = PERIOD_META[period]
   const canSave = mood !== null && energy !== null && !saving
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   return (
     <div
       style={{
@@ -641,7 +646,7 @@ export default function CheckinPage() {
 
   // ── Render ────────────────────────────────────────────────
   return (
-    <div className="min-h-screen px-8 pb-12 pt-10">
+    <div className="min-h-screen px-4 pb-12 pt-10 md:px-8" style={{ overflowX: 'hidden' }}>
       <style>{`
         @keyframes xpFloat {
           0%   { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.8); }
@@ -657,6 +662,20 @@ export default function CheckinPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
         textarea::placeholder { color: rgba(255,255,255,0.22); }
         textarea:focus { border-color: rgba(124,58,237,0.6) !important; box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+        .ci-periods-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        .ci-stats-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        @media (min-width: 768px) {
+          .ci-periods-grid { grid-template-columns: repeat(3, 1fr); }
+          .ci-stats-grid   { grid-template-columns: repeat(4, 1fr); }
+        }
       `}</style>
 
       {showXp && <XpPopup onDone={() => setShowXp(false)} />}
@@ -700,7 +719,7 @@ export default function CheckinPage() {
             <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 14px' }}>
               Turnos de hoje
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <div className="ci-periods-grid">
               {PERIODS.map(p => (
                 <PeriodCard
                   key={p}
@@ -715,7 +734,7 @@ export default function CheckinPage() {
 
           {/* ── Stats strip ─────────────────────────────────── */}
           <section style={{ marginBottom: 32 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            <div className="ci-stats-grid">
               {[
                 {
                   label: 'Humor médio',

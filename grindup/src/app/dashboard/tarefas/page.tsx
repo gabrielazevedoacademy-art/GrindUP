@@ -305,6 +305,11 @@ function NewTaskModal({
 
   const xpPreview = XP_BY_PRIORITY[form.priority]
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.title.trim()) return
@@ -704,7 +709,7 @@ export default function TarefasPage() {
 
   // ── Render ──────────────────────────────────────────────────
   return (
-    <div className="min-h-screen px-8 pb-12 pt-10">
+    <div className="min-h-screen px-4 pb-12 pt-10 md:px-8">
       <style>{`
         @keyframes xpFloat {
           0%   { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.8); }
@@ -822,9 +827,6 @@ export default function TarefasPage() {
       {userProfile && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 20,
             padding: '12px 18px',
             borderRadius: 12,
             background: 'rgba(124,58,237,0.06)',
@@ -832,39 +834,41 @@ export default function TarefasPage() {
             marginBottom: 24,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#a78bfa">
-              <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-            </svg>
-            <span style={{ fontSize: '0.82rem', color: '#a78bfa', fontWeight: 700 }}>
-              Nível {userProfile.level}
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#60a5fa">
-              <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" />
-            </svg>
-            <span style={{ fontSize: '0.82rem', color: '#60a5fa', fontWeight: 700 }}>
-              {userProfile.xp.toLocaleString('pt-BR')} XP total
-            </span>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
-              <div
-                style={{
-                  height: '100%',
-                  borderRadius: 999,
-                  background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
-                  boxShadow: '0 0 10px rgba(124,58,237,0.6)',
-                  width: `${Math.min(((userProfile.xp % (userProfile.level * 1000)) / (userProfile.level * 1000)) * 100, 100)}%`,
-                  transition: 'width 0.6s ease',
-                }}
-              />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#a78bfa">
+                  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                </svg>
+                <span style={{ fontSize: '0.82rem', color: '#a78bfa', fontWeight: 700 }}>
+                  Nível {userProfile.level}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#60a5fa">
+                  <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" />
+                </svg>
+                <span style={{ fontSize: '0.82rem', color: '#60a5fa', fontWeight: 700 }}>
+                  {userProfile.xp.toLocaleString('pt-BR')} XP total
+                </span>
+              </div>
             </div>
+            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+              {(userProfile.level * 1000).toLocaleString('pt-BR')} XP p/ nível {userProfile.level + 1}
+            </span>
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
-            {(userProfile.level * 1000).toLocaleString('pt-BR')} XP p/ nível {userProfile.level + 1}
-          </span>
+          <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '100%',
+                borderRadius: 999,
+                background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
+                boxShadow: '0 0 10px rgba(124,58,237,0.6)',
+                width: `${Math.min(((userProfile.xp % (userProfile.level * 1000)) / (userProfile.level * 1000)) * 100, 100)}%`,
+                transition: 'width 0.6s ease',
+              }}
+            />
+          </div>
         </div>
       )}
 

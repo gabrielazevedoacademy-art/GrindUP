@@ -174,6 +174,11 @@ function DayEventsModal({
 }) {
   const title = date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   return (
     <div
       style={{
@@ -444,6 +449,11 @@ function NewEventModal({
     await onSave(form)
   }
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   return (
     <div
       style={{
@@ -650,6 +660,11 @@ function EventDetailModal({
 }) {
   const [confirm, setConfirm] = useState(false)
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   return (
     <div
       style={{
@@ -834,6 +849,7 @@ export default function AgendaPage() {
   const [detailEvent, setDetailEvent] = useState<Event | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [dayEventsModal, setDayEventsModal] = useState<{ date: Date; events: Event[] } | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const calendarDays = buildCalendarDays(viewYear, viewMonth)
 
@@ -930,8 +946,46 @@ export default function AgendaPage() {
   }).length
 
   // ── Render ──────────────────────────────────────────────────
+  // ── List view: events grouped by day for current month ──────
+  const listGroups = (() => {
+    const monthEvents = events
+      .filter(e => {
+        const d = new Date(e.start_at)
+        return d.getFullYear() === viewYear && d.getMonth() === viewMonth
+      })
+      .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
+
+    const groups: { dateStr: string; date: Date; events: Event[] }[] = []
+    for (const ev of monthEvents) {
+      const d = new Date(ev.start_at)
+      const dateStr = isoDateStr(d)
+      const last = groups[groups.length - 1]
+      if (last && last.dateStr === dateStr) {
+        last.events.push(ev)
+      } else {
+        groups.push({ dateStr, date: d, events: [ev] })
+      }
+    }
+    return groups
+  })()
+
+  function formatListDayLabel(d: Date): string {
+    const todayStr = isoDateStr(new Date())
+    const str = isoDateStr(d)
+    if (str === todayStr) {
+      return `Hoje — ${d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}`
+    }
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    if (str === isoDateStr(yesterday)) {
+      return `Ontem — ${d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}`
+    }
+    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })
+      .replace(/^\w/, c => c.toUpperCase())
+  }
+
   return (
-    <div className="min-h-screen px-8 pb-12 pt-10">
+    <div className="min-h-screen px-4 pb-12 pt-10 md:px-8">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -947,6 +1001,8 @@ export default function AgendaPage() {
           border-color: rgba(124,58,237,0.6) !important;
           box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
         }
+        .ag-view-toggle { display: flex; }
+        @media (min-width: 768px) { .ag-view-toggle { display: none; } }
       `}</style>
 
       {/* Modals */}
@@ -988,7 +1044,41 @@ export default function AgendaPage() {
           </p>
         </div>
 
-        <button
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Mobile list/grid toggle */}
+          <div className="ag-view-toggle" style={{ gap: 4 }}>
+            <button
+              onClick={() => setViewMode('grid')}
+              title="Calendário"
+              style={{
+                width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: viewMode === 'grid' ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
+                background: viewMode === 'grid' ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.04)',
+                color: viewMode === 'grid' ? '#a78bfa' : 'rgba(255,255,255,0.4)', cursor: 'pointer',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              title="Lista"
+              style={{
+                width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: viewMode === 'list' ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
+                background: viewMode === 'list' ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.04)',
+                color: viewMode === 'list' ? '#a78bfa' : 'rgba(255,255,255,0.4)', cursor: 'pointer',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <button
           onClick={() => { setNewModalDate(isoDateStr(today)); setShowNewModal(true) }}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
@@ -1014,9 +1104,76 @@ export default function AgendaPage() {
           </svg>
           Novo Evento
         </button>
+        </div>
       </div>
 
+      {/* ── Mobile list view ────────────────────────────────── */}
+      {viewMode === 'list' && (
+        <div>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 60 }}>
+              <div style={{ width: 36, height: 36, border: '3px solid rgba(124,58,237,0.22)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.75s linear infinite' }} />
+            </div>
+          ) : listGroups.length === 0 ? (
+            <div style={{ textAlign: 'center', paddingTop: 60, paddingBottom: 60 }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: 12, opacity: 0.25 }}>📅</div>
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.9rem', margin: 0 }}>
+                Nenhum evento em {MONTH_NAMES[viewMonth]}
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {listGroups.map(group => (
+                <div key={group.dateStr}>
+                  <p style={{
+                    margin: '0 0 8px',
+                    fontSize: '0.75rem', fontWeight: 700,
+                    color: 'rgba(167,139,250,0.7)',
+                    textTransform: 'capitalize',
+                    letterSpacing: '0.04em',
+                  }}>
+                    {formatListDayLabel(group.date)}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {group.events.map(ev => (
+                      <button
+                        key={ev.id}
+                        onClick={() => setDetailEvent(ev)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '12px 14px', borderRadius: 12,
+                          border: `1px solid ${ev.color}22`,
+                          background: `${ev.color}0d`,
+                          cursor: 'pointer', textAlign: 'left', width: '100%',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: ev.color, boxShadow: `0 0 8px ${ev.color}99`, flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {ev.title}
+                          </p>
+                          {ev.description && (
+                            <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {ev.description}
+                            </p>
+                          )}
+                        </div>
+                        <span style={{ flexShrink: 0, fontSize: '0.72rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                          {localTimeStr(ev.start_at)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Calendar card ───────────────────────────────────── */}
+      {viewMode === 'grid' && (
       <div
         style={{
           borderRadius: 20,
@@ -1148,6 +1305,7 @@ export default function AgendaPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* ── Upcoming events list ─────────────────────────────── */}
       {!loading && monthEventCount > 0 && (

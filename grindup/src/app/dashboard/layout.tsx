@@ -103,6 +103,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     })
   }, [router])
 
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [sidebarOpen])
+
   async function handleLogout() {
     setLoggingOut(true)
     const supabase = createClientSupabase()
@@ -225,6 +230,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           .dash-sidebar { transform: translateX(0); }
           .dash-mobile-header { display: none; }
           .dash-overlay { display: none; }
+          .dash-sidebar-close { display: none !important; }
         }
       `}</style>
 
@@ -284,7 +290,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo */}
         <div
           className="px-6 py-5"
-          style={{ borderBottom: '1px solid rgba(124,58,237,0.1)' }}
+          style={{ borderBottom: '1px solid rgba(124,58,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           <h1 className="text-2xl font-black tracking-tight text-white">
             Grind
@@ -298,6 +304,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               UP
             </span>
           </h1>
+          <button
+            className="dash-sidebar-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Fechar menu"
+            style={{
+              width: 44, height: 44,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'rgba(255,255,255,0.6)', fontSize: '1.2rem',
+              borderRadius: 8,
+            }}
+          >
+            ✕
+          </button>
         </div>
 
         {/* Navigation */}
