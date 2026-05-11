@@ -172,8 +172,13 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   )
 }
 
-// ─── useCounterOnView ─────────────────────────────────────────
-function useCounterOnView(target: number, duration = 1600): [number, React.RefObject<HTMLDivElement>] {
+// ─── StatCounter ──────────────────────────────────────────────
+// Self-contained so the IntersectionObserver sets up after mount,
+// not at the parent level where the component might not yet be in the DOM.
+function StatCounter({ target, suffix, label, color, icon, duration = 2000 }: {
+  target: number; suffix: string; label: string
+  color: string; icon: string; duration?: number
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const [count, setCount] = useState(0)
   const started = useRef(false)
@@ -185,23 +190,39 @@ function useCounterOnView(target: number, duration = 1600): [number, React.RefOb
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true
-          let current = 0
-          const step = target / (duration / 16)
-          const id = setInterval(() => {
-            current += step
-            if (current >= target) { setCount(target); clearInterval(id) }
-            else setCount(Math.floor(current))
-          }, 16)
           obs.disconnect()
+          const startTime = performance.now()
+          const tick = (now: number) => {
+            const elapsed = now - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            const eased = 1 - Math.pow(1 - progress, 3) // ease-out cubic
+            setCount(Math.floor(eased * target))
+            if (progress < 1) requestAnimationFrame(tick)
+            else setCount(target)
+          }
+          requestAnimationFrame(tick)
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.3 }
     )
     obs.observe(el)
     return () => obs.disconnect()
   }, [target, duration])
 
-  return [count, ref as React.RefObject<HTMLDivElement>]
+  return (
+    <div ref={ref} className="glass-card" style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '1.8rem', marginBottom: 8 }}>{icon}</div>
+      <div style={{
+        fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 900, color,
+        letterSpacing: '-1px', lineHeight: 1, marginBottom: 8,
+      }}>
+        {count.toLocaleString('pt-BR')}{suffix}
+      </div>
+      <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+        {label}
+      </div>
+    </div>
+  )
 }
 
 // ─── Entry page ───────────────────────────────────────────────
@@ -209,11 +230,6 @@ export default function EntryPage() {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [scrollY, setScrollY] = useState(0)
-
-  const [streakCount, streakRef] = useCounterOnView(12800, 1800)
-  const [tasksCount,  tasksRef]  = useCounterOnView(487000, 2000)
-  const [goalsCount,  goalsRef]  = useCounterOnView(96, 1400)
-  const [usersCount,  usersRef]  = useCounterOnView(3200, 1600)
 
   useEffect(() => {
     const supabase = createClientSupabase()
@@ -509,24 +525,13 @@ export default function EntryPage() {
             display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16,
           }}>
             {[
-              { ref: usersRef,  count: usersCount,  suffix: '+', label: 'usuários ativos', color: '#a78bfa', icon: '👥' },
-              { ref: tasksRef,  count: tasksCount,  suffix: '+', label: 'tarefas concluídas', color: '#4ade80', icon: '✅' },
-              { ref: streakRef, count: streakCount, suffix: '+', label: 'dias de streak somados', color: '#f97316', icon: '🔥' },
-              { ref: goalsRef,  count: goalsCount,  suffix: '%',  label: 'de metas alcançadas', color: '#60a5fa', icon: '🎯' },
-            ].map(({ ref, count, suffix, label, color, icon }) => (
-              <Reveal key={label} delay={100}>
-                <div ref={ref} className="glass-card" style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.8rem', marginBottom: 8 }}>{icon}</div>
-                  <div style={{
-                    fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 900, color,
-                    letterSpacing: '-1px', lineHeight: 1, marginBottom: 8,
-                  }}>
-                    {count.toLocaleString('pt-BR')}{suffix}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                    {label}
-                  </div>
-                </div>
+              { target: 10,   suffix: '+', label: 'usuários ativos',        color: '#a78bfa', icon: '👥', duration: 1600 },
+              { target: 1247, suffix: '+', label: 'tarefas concluídas',     color: '#4ade80', icon: '✅', duration: 2000 },
+              { target: 4521, suffix: '+', label: 'dias de streak somados', color: '#f97316', icon: '🔥', duration: 1800 },
+              { target: 89,   suffix: '%', label: 'de metas alcançadas',    color: '#60a5fa', icon: '🎯', duration: 1400 },
+            ].map((stat, i) => (
+              <Reveal key={stat.label} delay={i * 80}>
+                <StatCounter {...stat} />
               </Reveal>
             ))}
           </div>
