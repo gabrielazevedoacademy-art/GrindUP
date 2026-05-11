@@ -107,6 +107,7 @@ function ParallaxLayers() {
     width: '100%', height: '100%',
     pointerEvents: 'none', willChange: 'transform',
     transform: 'translateZ(0)',
+    border: 'none', outline: 'none',
   }
 
   return (
@@ -115,7 +116,7 @@ function ParallaxLayers() {
       <canvas ref={c2Ref} style={base} />
       <div
         ref={l3Ref}
-        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', willChange: 'transform', transform: 'translateZ(0)' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', willChange: 'transform', transform: 'translateZ(0)', border: 'none', outline: 'none' }}
       >
         <div style={{
           position: 'absolute', top: '8%', left: '-12%',
@@ -255,13 +256,16 @@ export default function EntryPage() {
 
   return (
     <div style={{
-      background: 'linear-gradient(180deg, #05050f 0%, #0a0520 40%, #0d0a1e 70%, #05050f 100%)',
+      background: 'linear-gradient(180deg, #05050f 0%, #08051a 100%)',
       color: '#fff',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       overflowX: 'hidden',
       position: 'relative',
+      border: 'none',
+      outline: 'none',
     }}>
       <style>{`
+        html, body { background: #05050f; margin: 0; padding: 0; }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes gradShift {
@@ -652,7 +656,7 @@ export default function EntryPage() {
       {/* ── GAMIFICATION ── */}
       <section className="section" style={{
         paddingTop: 60,
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.08) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.08) 0%, rgba(5,5,15,0) 70%)',
       }}>
         <div className="section-inner">
           <Reveal>
