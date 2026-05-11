@@ -1,9 +1,9 @@
 export function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return ''
   try {
-    const date = dateString.includes('T')
-      ? new Date(dateString)
-      : new Date(dateString + 'T12:00:00')
+    const datePart = dateString.split('T')[0]
+    const [year, month, day] = datePart.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     if (isNaN(date.getTime())) return ''
     return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -18,9 +18,9 @@ export function formatDate(dateString: string | null | undefined): string {
 export function formatDateShort(dateString: string | null | undefined): string {
   if (!dateString) return ''
   try {
-    const date = dateString.includes('T')
-      ? new Date(dateString)
-      : new Date(dateString + 'T12:00:00')
+    const datePart = dateString.split('T')[0]
+    const [year, month, day] = datePart.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     if (isNaN(date.getTime())) return ''
     return date.toLocaleDateString('pt-BR', {
       day: '2-digit',
