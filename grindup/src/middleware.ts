@@ -34,8 +34,8 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = pathname === '/login' || pathname === '/cadastro'
 
   if (isRoot) {
-    const dest = user ? '/dashboard' : '/login'
-    return NextResponse.redirect(new URL(dest, request.url))
+    if (user) return NextResponse.redirect(new URL('/dashboard', request.url))
+    return supabaseResponse
   }
 
   if (isProtected && !user) {
