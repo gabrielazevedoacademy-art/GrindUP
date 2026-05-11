@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
+import { formatDate, formatDateShort } from '@/lib/dateUtils'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -84,10 +85,6 @@ function isoDateStr(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function localDateStr(isoString: string): string {
-  const d = new Date(isoString)
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
-}
 
 function localTimeStr(isoString: string): string {
   const d = new Date(isoString)
@@ -625,8 +622,8 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
               <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
             </svg>
             <div>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', margin: 0, fontWeight: 600 }}>{localDateStr(event.start_at)}, {localTimeStr(event.start_at)}</p>
-              {event.end_at && <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', margin: '2px 0 0' }}>até {localDateStr(event.end_at)}, {localTimeStr(event.end_at)}</p>}
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', margin: 0, fontWeight: 600 }}>{formatDate(event.start_at)}, {localTimeStr(event.start_at)}</p>
+              {event.end_at && <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', margin: '2px 0 0' }}>até {formatDate(event.end_at)}, {localTimeStr(event.end_at)}</p>}
             </div>
           </div>
           {event.description && (
@@ -1100,7 +1097,7 @@ export default function AgendaPage() {
                   </div>
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
                     <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
-                      {new Date(ev.start_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                      {formatDateShort(ev.start_at)}
                     </p>
                     <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'rgba(255,255,255,0.28)' }}>{localTimeStr(ev.start_at)}</p>
                   </div>

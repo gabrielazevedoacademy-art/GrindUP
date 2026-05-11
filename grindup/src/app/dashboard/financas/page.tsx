@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { isLimitReached } from '@/lib/planLimits'
+import { formatDate } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
@@ -66,11 +67,6 @@ function formatBRL(v: number) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function formatDate(iso: string) {
-  const [year, month, day] = iso.split('-').map(Number)
-  const abbr = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
-  return `${String(day).padStart(2,'0')} ${abbr[month - 1]}. ${year}`
-}
 
 function todayISO() {
   const d = new Date()

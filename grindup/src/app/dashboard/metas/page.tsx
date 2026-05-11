@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { getLevelFromXP } from '@/lib/levels'
 import { isLimitReached } from '@/lib/planLimits'
+import { formatDateShort } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
@@ -73,8 +74,7 @@ function getDeadlineStatus(deadline: string | null): { label: string; color: str
   if (diffDays <= 7) {
     return { label: `${diffDays}d restantes`, color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.3)' }
   }
-  const formatted = dl.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-  return { label: formatted, color: '#4ade80', bg: 'rgba(74,222,128,0.08)', border: 'rgba(74,222,128,0.2)' }
+  return { label: formatDateShort(deadline), color: '#4ade80', bg: 'rgba(74,222,128,0.08)', border: 'rgba(74,222,128,0.2)' }
 }
 
 const UNIT_SUGGESTIONS = ['R$', 'km', 'livros', 'horas', 'kg', 'páginas', 'dias', '%']

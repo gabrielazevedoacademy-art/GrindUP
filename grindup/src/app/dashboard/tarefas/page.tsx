@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { getLevelFromXP } from '@/lib/levels'
 import { isLimitReached } from '@/lib/planLimits'
+import { formatDate } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
 
 // ─────────────────────────────────────────────────────────────
@@ -55,11 +56,6 @@ const PRIORITY_STYLE: Record<string, { bg: string; color: string; border: string
 // ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
-function formatDueDate(iso: string): string {
-  const d = new Date(iso + 'T12:00:00')
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
 // ─────────────────────────────────────────────────────────────
 // SUB-COMPONENTS
 // ─────────────────────────────────────────────────────────────
@@ -230,7 +226,7 @@ function TaskCard({
                 <line x1="8" y1="2" x2="8" y2="6" />
                 <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
-              {formatDueDate(task.due_date)}
+              {formatDate(task.due_date)}
             </span>
           )}
         </div>
