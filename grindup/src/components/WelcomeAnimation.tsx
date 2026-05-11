@@ -35,6 +35,14 @@ export default function WelcomeAnimation({
   const [progress, setProgress]     = useState(0)
   const [shownStats, setShownStats] = useState(0)
   const [exiting, setExiting]       = useState(false)
+  const [isMobile, setIsMobile]     = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const name  = (userName || 'USUÁRIO').toUpperCase()
   const stats = [`NÍVEL ${userLevel}`, `${userXp} XP`, 'RANK: INICIANTE']
@@ -146,6 +154,13 @@ export default function WelcomeAnimation({
             box-shadow: 0 0 40px rgba(124,58,237,0.95), 0 0 0 12px rgba(124,58,237,0);
           }
         }
+        @media (max-width: 767px) {
+          .wa-typewriter { font-size: 0.82rem !important; letter-spacing: 0.1em !important; }
+          .wa-progress-bar { width: 90% !important; max-width: 280px; }
+          .wa-stats { gap: 20px !important; }
+          .wa-btn { width: 90% !important; padding: 13px 0 !important; }
+          .wa-sub { font-size: 0.62rem !important; }
+        }
       `}</style>
 
       {/* White flash */}
@@ -199,7 +214,7 @@ export default function WelcomeAnimation({
                     background: 'rgba(255,255,255,0.07)',
                     borderRadius: 999,
                     overflow: 'hidden',
-                    width: 320,
+                    width: isMobile ? '100%' : 320,
                     margin: '0 auto',
                   }}
                 >
@@ -260,7 +275,7 @@ export default function WelcomeAnimation({
 
         {/* ── Stats ── */}
         {phase >= 6 && (
-          <div style={{ display: 'flex', gap: 40 }}>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 40, flexWrap: 'wrap', justifyContent: 'center' }}>
             {stats.map((stat, i) => (
               <span
                 key={stat}
@@ -289,11 +304,13 @@ export default function WelcomeAnimation({
             onClick={handleStart}
             style={{
               padding: '13px 38px',
+              width: isMobile ? '90%' : 'auto',
+              minHeight: 48,
               background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
               border: 'none',
               borderRadius: 12,
               color: '#fff',
-              fontSize: '0.9rem',
+              fontSize: isMobile ? '0.82rem' : '0.9rem',
               fontWeight: 700,
               letterSpacing: '0.13em',
               cursor: 'pointer',

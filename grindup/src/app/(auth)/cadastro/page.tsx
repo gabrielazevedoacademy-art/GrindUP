@@ -70,8 +70,8 @@ export default function CadastroPage() {
             Grind<span className="glow-up-text">UP</span>
           </h1>
         </div>
-        <div className="auth-card-border w-full max-w-md">
-          <div className="auth-card-inner w-full px-8 py-10 text-center">
+        <div className="auth-card-border w-[95%] max-w-md">
+          <div className="auth-card-inner w-full px-4 py-8 text-center sm:px-8 sm:py-10">
             <div
               className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full"
               style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)' }}
@@ -112,8 +112,8 @@ export default function CadastroPage() {
       </div>
 
       {/* Card com borda gradiente */}
-      <div className="auth-card-border w-full max-w-md">
-        <div className="auth-card-inner w-full px-8 py-8">
+      <div className="auth-card-border w-[95%] max-w-md">
+        <div className="auth-card-inner w-full px-4 py-6 sm:px-8 sm:py-8">
           <h2 className="mb-6 text-lg font-semibold text-white">Criar conta grátis</h2>
 
           {/* Google */}
@@ -121,7 +121,8 @@ export default function CadastroPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={googleLoading}
-            className="btn-google mb-6 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-medium text-gray-900"
+            className="btn-google mb-6 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 text-sm font-medium text-gray-900"
+            style={{ minHeight: 44 }}
           >
             <GoogleIcon />
             {googleLoading ? 'Redirecionando...' : 'Continuar com Google'}
@@ -196,7 +197,8 @@ export default function CadastroPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-violet-glow mt-1 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white"
+              className="btn-violet-glow mt-1 w-full rounded-xl px-4 text-sm font-semibold text-white"
+              style={{ minHeight: 44 }}
             >
               {loading ? 'Criando conta...' : 'Criar conta'}
             </button>

@@ -102,6 +102,14 @@ function DashboardContent({
   const coverInputRef  = useRef<HTMLInputElement>(null)
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [coverError, setCoverError] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const displayName = profile.full_name || profile.username || 'Usuário'
   const initials = displayName
@@ -198,7 +206,7 @@ function DashboardContent({
     <div className="min-h-screen">
 
       {/* ── Banner + avatar (editable) ── */}
-      <div style={{ position: 'relative', marginBottom: 60 }}>
+      <div style={{ position: 'relative', marginBottom: isMobile ? 48 : 60 }}>
         {/* Hidden cover file input */}
         <input
           ref={coverInputRef}
@@ -234,13 +242,13 @@ function DashboardContent({
         />
 
         {/* Avatar with frame — overlaps the bottom of the banner */}
-        <div style={{ position: 'absolute', bottom: -48, left: 32 }}>
+        <div style={{ position: 'absolute', bottom: isMobile ? -36 : -48, left: isMobile ? 16 : 32 }}>
           <AvatarFrame
             avatarUrl={profile.avatar_url}
             displayName={displayName}
             initials={initials}
             level={profile.level}
-            size={96}
+            size={isMobile ? 72 : 96}
             selectable
             onUploadClick={() => avatarInputRef.current?.click()}
           />
@@ -261,11 +269,11 @@ function DashboardContent({
         )}
       </div>
 
-      <div className="px-8 pb-10">
+      <div className="px-4 pb-10 md:px-8">
 
         {/* ── Name + badges ── */}
-        <div style={{ paddingLeft: 148, paddingBottom: 16 }}>
-          <h2 className="mb-2 text-2xl font-black text-white">{displayName}</h2>
+        <div style={{ paddingLeft: isMobile ? 104 : 148, paddingBottom: 16 }}>
+          <h2 className="mb-2 font-black text-white" style={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }}>{displayName}</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             {/* Plan badge */}
             <span
@@ -288,7 +296,7 @@ function DashboardContent({
             50%       { box-shadow: 0 0 25px rgba(245,158,11,0.28), inset 0 0 20px rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.6); }
           }
         `}</style>
-        <div className="mb-5 grid grid-cols-4 gap-4">
+        <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {/* ── Level card ── */}
           <div
             className="stat-card"
@@ -350,7 +358,7 @@ function DashboardContent({
         </div>
 
         {/* ── Module grid 2×2 ── */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {MODULES.map((mod) => (
             <Link key={mod.href} href={mod.href} className="module-card">
               <div style={{ color: mod.iconColor, marginBottom: 14 }}>{mod.icon}</div>

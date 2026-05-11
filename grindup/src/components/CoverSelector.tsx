@@ -115,9 +115,10 @@ export default function CoverSelector({
     <>
       {/* Inject all cover animations globally once */}
       <style>{ALL_COVERS_CSS}</style>
+      <style>{`.cover-banner{height:180px}@media(max-width:767px){.cover-banner{height:120px}}`}</style>
 
       {/* ── Banner preview ────────────────────────────────── */}
-      <div style={{ position: 'relative', height: 180, overflow: 'hidden' }}>
+      <div className="cover-banner" style={{ position: 'relative', overflow: 'hidden' }}>
 
         {/* Cover layer */}
         {showPreset ? (
@@ -178,7 +179,7 @@ export default function CoverSelector({
         >
           <div
             style={{
-              width: '100%', maxWidth: 540,
+              width: '100%', maxWidth: 'min(540px, 95vw)',
               maxHeight: '90vh',
               display: 'flex', flexDirection: 'column',
               background: 'linear-gradient(160deg, #0f0a1a 0%, #100c1e 100%)',

@@ -110,7 +110,7 @@ function FrameModal({
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{
-        width: '90%', maxWidth: 480,
+        width: '95%', maxWidth: 480,
         background: 'linear-gradient(160deg, #0f0a1a 0%, #100c1e 100%)',
         border: '1px solid rgba(124,58,237,0.4)',
         borderRadius: 20,
@@ -340,10 +340,19 @@ export default function AvatarFrame({
           <div
             ref={menuRef}
             style={{
-              position: 'absolute',
-              top: size + scaledPad * 2 + 8,
-              left: 0,
-              width: 248,
+              position: 'fixed',
+              top: (() => {
+                if (typeof window === 'undefined' || !containerRef.current) return 0
+                const r = containerRef.current.getBoundingClientRect()
+                return r.bottom + 8
+              })(),
+              left: (() => {
+                if (typeof window === 'undefined' || !containerRef.current) return 0
+                const r = containerRef.current.getBoundingClientRect()
+                const menuW = Math.min(248, window.innerWidth - 16)
+                return Math.min(r.left, window.innerWidth - menuW - 8)
+              })(),
+              width: typeof window !== 'undefined' ? Math.min(248, window.innerWidth - 16) : 248,
               background: 'rgba(15, 10, 30, 0.96)',
               backdropFilter: 'blur(18px)',
               WebkitBackdropFilter: 'blur(18px)',

@@ -87,6 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loggingOut, setLoggingOut] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const supabase = createClientSupabase()
@@ -160,6 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           background: rgba(255,255,255,0.04);
           border: none; cursor: pointer;
           transition: color 0.2s ease, background 0.2s ease;
+          min-height: 44px;
         }
         .dash-logout-btn:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.07); }
         .dash-logout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -208,11 +210,69 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           0%, 100% { box-shadow: 0 0 10px rgba(124,58,237,0.5); }
           50%       { box-shadow: 0 0 22px rgba(124,58,237,0.9), 0 0 40px rgba(124,58,237,0.3); }
         }
+        .dash-sidebar {
+          width: 256px;
+          transform: translateX(-100%);
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dash-sidebar.open { transform: translateX(0); }
+        @media (max-width: 767px) {
+          .dash-sidebar { width: 80%; max-width: 280px; }
+          .stat-card { padding: 14px; }
+          .module-card { padding: 16px; }
+        }
+        @media (min-width: 768px) {
+          .dash-sidebar { transform: translateX(0); }
+          .dash-mobile-header { display: none; }
+          .dash-overlay { display: none; }
+        }
       `}</style>
+
+      {/* ── Mobile Header ── */}
+      <header
+        className="dash-mobile-header fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-4"
+        style={{
+          height: 56,
+          background: 'rgba(10,10,15,0.96)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(124,58,237,0.18)',
+        }}
+      >
+        <button
+          onClick={() => setSidebarOpen(prev => !prev)}
+          style={{
+            width: 44, height: 44,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'rgba(255,255,255,0.75)', fontSize: '1.4rem',
+            borderRadius: 8,
+          }}
+          aria-label="Abrir menu"
+        >
+          ☰
+        </button>
+        <h1 className="text-xl font-black tracking-tight text-white">
+          Grind
+          <span style={{ color: '#a78bfa', textShadow: '0 0 10px rgba(167,139,250,0.8), 0 0 25px rgba(124,58,237,0.5)' }}>
+            UP
+          </span>
+        </h1>
+        <div style={{ width: 44 }} />
+      </header>
+
+      {/* ── Overlay ── */}
+      {sidebarOpen && (
+        <div
+          className="dash-overlay fixed inset-0 z-40"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* ── Sidebar ── */}
       <aside
-        className="fixed left-0 top-0 z-40 flex h-full w-64 flex-col"
+        className={`dash-sidebar${sidebarOpen ? ' open' : ''} fixed left-0 top-0 z-50 flex h-full flex-col`}
         style={{
           background: 'rgba(255,255,255,0.025)',
           backdropFilter: 'blur(24px)',
@@ -252,6 +312,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.href}
                 href={item.href}
                 className={`dash-nav-link${isActive ? ' active' : ''}`}
+                onClick={() => setSidebarOpen(false)}
               >
                 {item.icon}
                 {item.label}
@@ -285,7 +346,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {isAdmin && (
             <>
               <div style={{ borderTop: '1px solid rgba(232,92,13,0.15)', marginBottom: 8 }} />
-              <Link href="/admin" className="dash-admin-link">
+              <Link href="/admin" className="dash-admin-link" onClick={() => setSidebarOpen(false)}>
                 <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
@@ -308,7 +369,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* ── Main content ── */}
-      <main className="ml-64 min-h-screen flex-1 overflow-y-auto">
+      <main className="min-h-screen flex-1 overflow-y-auto pt-14 md:ml-64 md:pt-0">
         {children}
       </main>
     </div>
