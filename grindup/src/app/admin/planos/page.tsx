@@ -84,11 +84,18 @@ export default function PlanosPage() {
   }
 
   return (
-    <div style={{ padding: '40px 36px', minHeight: '100vh' }}>
+    <div className="planos-page" style={{ minHeight: '100vh' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         input::placeholder { color: rgba(255,255,255,0.22); }
         input:focus { border-color: rgba(232,92,13,0.55) !important; box-shadow: 0 0 0 3px rgba(232,92,13,0.1); }
+        .planos-page { padding: 20px 16px; }
+        .planos-header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .planos-features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; }
+        @media (min-width: 768px) {
+          .planos-page { padding: 40px 36px; }
+          .planos-features-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
       `}</style>
 
       {/* Header */}
@@ -136,9 +143,8 @@ export default function PlanosPage() {
                 }}
               >
                 {/* Plan header */}
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '20px 24px',
+                <div className="planos-header-row" style={{
+                  padding: '16px 20px',
                   borderBottom: '1px solid rgba(255,255,255,0.05)',
                   background: `${colors.glow}`,
                 }}>
@@ -242,10 +248,7 @@ export default function PlanosPage() {
                 </div>
 
                 {/* Plan features grid */}
-                <div style={{
-                  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                  gap: 0,
-                }}>
+                <div className="planos-features-grid">
                   {[
                     { label: 'Tarefas/mês',     value: plan.max_tasks_per_month ?? '∞' },
                     { label: 'Metas ativas',     value: plan.max_active_goals    ?? '∞' },

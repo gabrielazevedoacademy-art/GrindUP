@@ -74,6 +74,12 @@ export default function CheckinPopup() {
   const config = PERIOD_CONFIG[period]
 
   useEffect(() => {
+    if (!visible) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [visible])
+
+  useEffect(() => {
     // Don't show if user already dismissed this period today in this session
     const sessionKey = `checkin_dismissed_${period}_${getTodayLocalDate()}`
     if (sessionStorage.getItem(sessionKey)) return
@@ -176,6 +182,10 @@ export default function CheckinPopup() {
         }
         .checkin-emoji-btn:hover { transform: scale(1.15) !important; }
         .checkin-energy-btn:hover { border-color: rgba(251,191,36,0.5) !important; background: rgba(251,191,36,0.1) !important; }
+        @media (max-width: 767px) {
+          .checkin-emoji-btn { font-size: 1.5rem !important; padding: 5px 6px !important; }
+          .checkin-energy-btn { width: 36px !important; height: 36px !important; font-size: 0.95rem !important; }
+        }
       `}</style>
 
       {showXp && <XpAnim onDone={() => {}} />}
@@ -195,11 +205,12 @@ export default function CheckinPopup() {
         {/* Card */}
         <div
           style={{
-            width: '100%', maxWidth: 420, borderRadius: 24,
+            width: '100%', maxWidth: 'min(420px, 95vw)', borderRadius: 24,
             background: 'linear-gradient(145deg, #140d26, #0d0a1e)',
             border: '1px solid rgba(124,58,237,0.35)',
             boxShadow: '0 0 80px rgba(124,58,237,0.3), 0 32px 80px rgba(0,0,0,0.7)',
-            padding: '32px 28px',
+            padding: '28px 20px',
+            maxHeight: '90vh', overflowY: 'auto',
             animation: 'checkinSlideUp 0.28s ease',
           }}
         >

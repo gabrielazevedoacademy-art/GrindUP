@@ -70,8 +70,20 @@ export default function AdminPage() {
   }, [])
 
   return (
-    <div style={{ padding: '40px 36px', minHeight: '100vh' }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <div style={{ padding: '24px 16px', minHeight: '100vh' }} className="adm-page">
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .adm-page { padding: 24px 16px; }
+        .adm-metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px; }
+        .adm-table-view  { display: none; }
+        .adm-cards-view  { display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 768px) {
+          .adm-page { padding: 40px 36px; }
+          .adm-metrics-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+          .adm-table-view { display: block; }
+          .adm-cards-view { display: none; }
+        }
+      `}</style>
 
       {/* Header */}
       <div style={{ marginBottom: 36 }}>
@@ -106,7 +118,7 @@ export default function AdminPage() {
       ) : stats && (
         <>
           {/* Metric cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 36 }}>
+          <div className="adm-metrics-grid">
             <MetricCard
               label="Total de usuários"
               value={stats.total}
@@ -149,7 +161,7 @@ export default function AdminPage() {
                 Usuários mais recentes
               </h2>
             </div>
-            <div style={{ overflowX: 'auto' }}>
+            <div className="adm-table-view" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -207,6 +219,45 @@ export default function AdminPage() {
                   })}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="adm-cards-view" style={{ padding: '12px' }}>
+              {stats.recent.map(u => {
+                const ps = PLAN_STYLE[u.plan] ?? PLAN_STYLE.free
+                const name = u.full_name || u.username || '—'
+                const initials = name !== '—' ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?'
+                return (
+                  <div key={u.id} style={{
+                    padding: '14px', borderRadius: 12,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(232,92,13,0.1)',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #e85c0d, #dc2626)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.75rem', fontWeight: 800, color: '#fff', flexShrink: 0,
+                        }}>{initials}</div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ margin: 0, fontWeight: 700, color: '#fff', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</p>
+                          <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</p>
+                        </div>
+                      </div>
+                      <span style={{
+                        fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase',
+                        letterSpacing: '0.06em', padding: '3px 10px', borderRadius: 999, flexShrink: 0,
+                        background: ps.bg, color: ps.color, border: `1px solid ${ps.border}`,
+                      }}>{u.plan}</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.72rem', color: 'rgba(255,255,255,0.28)' }}>
+                      {new Date(u.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </>

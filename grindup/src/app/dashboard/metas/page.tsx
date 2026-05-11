@@ -439,6 +439,11 @@ function NewGoalModal({
     deadline: '',
   })
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.title.trim() || !form.targetValue) return
@@ -465,12 +470,12 @@ function NewGoalModal({
       <div
         style={{
           width: '100%',
-          maxWidth: 520,
+          maxWidth: 'min(520px, 95vw)',
           borderRadius: 20,
           background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
           border: '1px solid rgba(124,58,237,0.3)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
-          padding: '32px 28px',
+          padding: '28px 20px',
           animation: 'slideUp 0.22s ease',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -725,6 +730,11 @@ function ProgressModal({
 }) {
   const [form, setForm] = useState<ProgressForm>({ mode: 'add', value: '' })
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
   const previewValue = (() => {
     const n = parseFloat(form.value)
     if (isNaN(n)) return goal.current_value
@@ -756,12 +766,13 @@ function ProgressModal({
     >
       <div
         style={{
-          width: '100%', maxWidth: 440, borderRadius: 20,
+          width: '100%', maxWidth: 'min(440px, 95vw)', borderRadius: 20,
           background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
           border: '1px solid rgba(124,58,237,0.3)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
-          padding: '32px 28px',
+          padding: '28px 20px',
           animation: 'slideUp 0.22s ease',
+          maxHeight: '90vh', overflowY: 'auto',
         }}
       >
         {/* Header */}
@@ -1053,7 +1064,7 @@ export default function MetasPage() {
 
   // ── Render ──────────────────────────────────────────────────
   return (
-    <div className="min-h-screen px-8 pb-12 pt-10">
+    <div className="min-h-screen px-4 md:px-8 pb-12 pt-10" style={{ overflowX: 'hidden' }}>
       <style>{`
         @keyframes xpFloat {
           0%   { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.8); }
@@ -1085,6 +1096,24 @@ export default function MetasPage() {
         }
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button { opacity: 0.4; }
+        .mt-goals-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .mt-filters {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          padding-bottom: 2px;
+        }
+        .mt-filters::-webkit-scrollbar { display: none; }
+        @media (min-width: 768px) {
+          .mt-goals-grid { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+        }
       `}</style>
 
       {/* XP popups */}
@@ -1114,7 +1143,7 @@ export default function MetasPage() {
       )}
 
       {/* ── Page header ─────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
             Metas
@@ -1155,7 +1184,7 @@ export default function MetasPage() {
       </div>
 
       {/* ── Filters ─────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 24 }}>
+      <div className="mt-filters" style={{ marginBottom: 24 }}>
         {(['all', 'active', 'completed'] as StatusFilter[]).map(f => (
           <FilterChip key={f} active={filter === f} onClick={() => setFilter(f)}>
             {f === 'all' ? `Todas (${goals.length})` : f === 'active' ? `Em andamento (${activeCount})` : `Concluídas (${completedCount})`}
@@ -1167,8 +1196,8 @@ export default function MetasPage() {
       {userProfile && (
         <div
           style={{
-            display: 'flex', alignItems: 'center', gap: 20,
-            padding: '12px 18px', borderRadius: 12,
+            display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+            padding: '12px 14px', borderRadius: 12,
             background: 'rgba(124,58,237,0.06)',
             border: '1px solid rgba(124,58,237,0.14)',
             marginBottom: 28,
@@ -1237,13 +1266,7 @@ export default function MetasPage() {
           )}
         </div>
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-            gap: 16,
-          }}
-        >
+        <div className="mt-goals-grid">
           {filtered.map(goal => (
             <GoalCard
               key={goal.id}

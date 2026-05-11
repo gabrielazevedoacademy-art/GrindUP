@@ -171,11 +171,12 @@ function CheckinModal({
     >
       <div
         style={{
-          width: '100%', maxWidth: 420, borderRadius: 22,
+          width: '100%', maxWidth: 'min(420px, 95vw)', borderRadius: 22,
           background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
           border: '1px solid rgba(124,58,237,0.3)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
-          padding: '30px 26px',
+          padding: '26px 20px',
+          maxHeight: '90vh', overflowY: 'auto',
           animation: 'slideUp 0.22s ease',
         }}
       >

@@ -275,7 +275,7 @@ export default function WelcomeAnimation({
 
         {/* ── Stats ── */}
         {phase >= 6 && (
-          <div style={{ display: 'flex', gap: isMobile ? 16 : 40, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 10 : 40, alignItems: 'center', justifyContent: 'center' }}>
             {stats.map((stat, i) => (
               <span
                 key={stat}

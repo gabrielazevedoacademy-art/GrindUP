@@ -120,7 +120,7 @@ export default function CoverSelector({
     <>
       {/* Inject all cover animations globally once */}
       <style>{ALL_COVERS_CSS}</style>
-      <style>{`.cover-banner{height:180px}@media(max-width:767px){.cover-banner{height:120px}}`}</style>
+      <style>{`.cover-banner{height:180px}@media(max-width:767px){.cover-banner{height:120px}}.cs-mini-h{height:72px}@media(max-width:767px){.cs-mini-h{height:80px}}`}</style>
 
       {/* ── Banner preview ────────────────────────────────── */}
       <div className="cover-banner" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -311,10 +311,7 @@ export default function CoverSelector({
                     }}
                   >
                     {/* Miniature animated banner */}
-                    <div
-                      className={cover.className}
-                      style={{ height: 72, display: 'block' }}
-                    />
+                    <div className={`${cover.className} cs-mini-h`} style={{ display: 'block' }} />
 
                     {/* Cover name + badges */}
                     <div

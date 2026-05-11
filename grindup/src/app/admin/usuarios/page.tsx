@@ -127,13 +127,15 @@ function EditProfileModal({
       `}</style>
 
       <div style={{
-        width: '100%', maxWidth: 520, margin: '0 16px',
+        width: '100%', maxWidth: 'min(520px, 95vw)',
         background: 'linear-gradient(160deg, #0f0a1a 0%, #100c1e 100%)',
         border: '1px solid rgba(139,92,246,0.4)',
         borderRadius: 20,
         boxShadow: '0 0 0 1px rgba(139,92,246,0.1), 0 24px 64px rgba(0,0,0,0.6), 0 0 48px rgba(139,92,246,0.12)',
         animation: 'modalIn 0.22s ease',
         overflow: 'hidden',
+        maxHeight: '90vh',
+        overflowY: 'auto',
       }}>
         {/* Header */}
         <div style={{
@@ -210,7 +212,7 @@ function EditProfileModal({
           </div>
 
           {/* Row: xp + level (auto) + streak */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             <div>
               <label style={labelStyle}>XP Total</label>
               <input
@@ -423,12 +425,23 @@ export default function UsuariosPage() {
   })
 
   return (
-    <div style={{ padding: '40px 36px', minHeight: '100vh' }}>
+    <div className="usr-page" style={{ minHeight: '100vh' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         input::placeholder { color: rgba(255,255,255,0.22); }
         input:focus { border-color: rgba(232,92,13,0.55) !important; box-shadow: 0 0 0 3px rgba(232,92,13,0.1); }
         select option { background: #1a0d0d; color: #fff; }
+        .usr-page { padding: 20px 16px; }
+        .usr-table-view { display: none; }
+        .usr-cards-view { display: flex; flex-direction: column; gap: 10px; }
+        .usr-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+        .usr-filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        @media (min-width: 768px) {
+          .usr-page { padding: 40px 36px; }
+          .usr-table-view { display: block; }
+          .usr-cards-view { display: none; }
+          .usr-filter-group { flex-wrap: nowrap; }
+        }
       `}</style>
 
       {/* Edit modal */}
@@ -453,24 +466,24 @@ export default function UsuariosPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="usr-filters" style={{ marginBottom: 24 }}>
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar por nome ou email..."
-          style={{ ...inputBase, minWidth: 260 }}
+          style={{ ...inputBase, flex: 1, minWidth: 200 }}
         />
 
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div className="usr-filter-group">
           {['all', 'free', 'pro', 'elite'].map(p => (
             <button key={p} onClick={() => setPlanFilter(p)} style={filterBtn(planFilter === p)}>
-              {p === 'all' ? 'Todos os planos' : p.charAt(0).toUpperCase() + p.slice(1)}
+              {p === 'all' ? 'Todos' : p.charAt(0).toUpperCase() + p.slice(1)}
             </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div className="usr-filter-group">
           {[
             { v: 'all',      l: 'Todos' },
             { v: 'active',   l: 'Ativos' },
@@ -498,8 +511,8 @@ export default function UsuariosPage() {
         </div>
       ) : (
         <>
-          {/* Table */}
-          <div style={{ borderRadius: 18, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(232,92,13,0.12)', overflow: 'hidden', marginBottom: 20 }}>
+          {/* Table (desktop) */}
+          <div className="usr-table-view" style={{ borderRadius: 18, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(232,92,13,0.12)', overflow: 'hidden', marginBottom: 20 }}>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
                 <thead>
@@ -654,9 +667,101 @@ export default function UsuariosPage() {
             </div>
           </div>
 
+          {/* Mobile cards */}
+          <div className="usr-cards-view" style={{ marginBottom: 20 }}>
+            {pageUsers.length === 0 ? (
+              <div style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '0.9rem' }}>
+                Nenhum usuário encontrado
+              </div>
+            ) : pageUsers.map(u => {
+              const ps = PLAN_STYLE[u.plan] ?? PLAN_STYLE.free
+              const name = u.full_name || u.username || '—'
+              const initials = name !== '—' ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?'
+              const isSaving = saving === u.id
+              return (
+                <div key={u.id} style={{
+                  padding: '14px', borderRadius: 14,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(232,92,13,0.1)',
+                  opacity: isSaving ? 0.6 : 1,
+                  transition: 'opacity 0.15s ease',
+                  display: 'flex', flexDirection: 'column', gap: 10,
+                }}>
+                  {/* Row 1: avatar + name + plan */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg, #e85c0d, #dc2626)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.75rem', fontWeight: 800, color: '#fff',
+                    }}>{initials}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontWeight: 700, color: '#fff', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.38)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</p>
+                    </div>
+                    <span style={{
+                      fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase',
+                      letterSpacing: '0.05em', padding: '3px 9px', borderRadius: 999, flexShrink: 0,
+                      background: ps.bg, color: ps.color, border: `1px solid ${ps.border}`,
+                    }}>{u.plan}</span>
+                  </div>
+                  {/* Row 2: XP + status */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                    <span style={{ fontSize: '0.8rem', color: '#a78bfa', fontWeight: 700 }}>
+                      {u.xp.toLocaleString('pt-BR')} XP · Nível {u.level}
+                    </span>
+                    <button
+                      onClick={() => updateUser(u.id, { is_active: !u.is_active })}
+                      disabled={isSaving}
+                      style={{
+                        padding: '4px 12px', borderRadius: 999, cursor: isSaving ? 'not-allowed' : 'pointer',
+                        border: u.is_active ? '1px solid rgba(74,222,128,0.4)' : '1px solid rgba(239,68,68,0.35)',
+                        background: u.is_active ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)',
+                        color: u.is_active ? '#4ade80' : '#f87171',
+                        fontSize: '0.72rem', fontWeight: 700, transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {u.is_active ? '✓ Ativo' : '✗ Inativo'}
+                    </button>
+                  </div>
+                  {/* Row 3: plan select + edit button */}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <select
+                      value={u.plan}
+                      disabled={isSaving}
+                      onChange={e => updateUser(u.id, { plan: e.target.value })}
+                      style={{
+                        flex: 1, padding: '7px 10px', borderRadius: 8,
+                        border: `1px solid ${ps.border}`,
+                        background: ps.bg, color: ps.color,
+                        fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', outline: 'none',
+                      }}
+                    >
+                      <option value="free">Free</option>
+                      <option value="pro">Pro</option>
+                      <option value="elite">Elite</option>
+                    </select>
+                    <button
+                      onClick={() => setEditingUser(u)}
+                      style={{
+                        flex: 1, padding: '7px 12px', borderRadius: 8,
+                        border: '1px solid rgba(139,92,246,0.4)',
+                        background: 'rgba(139,92,246,0.1)',
+                        color: '#a78bfa', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      Ver perfil
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>
                 Página {page} de {totalPages} &middot; {filtered.length} usuários
               </p>

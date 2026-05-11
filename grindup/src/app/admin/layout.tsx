@@ -86,10 +86,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
         .admin-nav-link:hover { color: rgba(255,255,255,0.8); background: rgba(232,92,13,0.08); }
         .admin-nav-link.active { color: #fb923c; background: rgba(232,92,13,0.14); box-shadow: 0 0 12px rgba(232,92,13,0.15); }
+        @media (max-width: 767px) {
+          .admin-sidebar { display: none !important; }
+          .admin-main { margin-left: 0 !important; }
+          .admin-mobile-nav { display: flex !important; }
+        }
+        .admin-mobile-nav { display: none; }
       `}</style>
 
       {/* Sidebar */}
       <aside
+        className="admin-sidebar"
         style={{
           position: 'fixed', left: 0, top: 0, zIndex: 40,
           width: 240, height: '100%',
@@ -196,7 +203,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main */}
-      <main style={{ marginLeft: 240, flex: 1, minHeight: '100vh', overflowY: 'auto' }}>
+      <main className="admin-main" style={{ marginLeft: 240, flex: 1, minHeight: '100vh', overflowY: 'auto', overflowX: 'hidden' }}>
+        {/* Mobile top nav */}
+        <div
+          className="admin-mobile-nav"
+          style={{
+            alignItems: 'center', gap: 12, flexWrap: 'wrap',
+            padding: '12px 16px', borderBottom: '1px solid rgba(232,92,13,0.15)',
+            background: 'rgba(0,0,0,0.3)',
+          }}
+        >
+          <span style={{ fontSize: '1rem', fontWeight: 900, color: '#fb923c' }}>GrindUP Admin</span>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {NAV.map(item => (
+              <Link key={item.href} href={item.href} style={{
+                padding: '5px 12px', borderRadius: 8,
+                fontSize: '0.8rem', fontWeight: 600,
+                background: 'rgba(232,92,13,0.12)',
+                border: '1px solid rgba(232,92,13,0.25)',
+                color: '#fb923c', textDecoration: 'none',
+              }}>{item.label}</Link>
+            ))}
+            <Link href="/dashboard" style={{
+              padding: '5px 12px', borderRadius: 8,
+              fontSize: '0.8rem', fontWeight: 600,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.5)', textDecoration: 'none',
+            }}>← App</Link>
+          </div>
+        </div>
         {children}
       </main>
     </div>
