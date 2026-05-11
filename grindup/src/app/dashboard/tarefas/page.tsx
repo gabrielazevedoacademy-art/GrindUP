@@ -56,7 +56,7 @@ const PRIORITY_STYLE: Record<string, { bg: string; color: string; border: string
 // HELPERS
 // ─────────────────────────────────────────────────────────────
 function formatDueDate(iso: string): string {
-  const d = new Date(iso)
+  const d = new Date(iso + 'T12:00:00')
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 

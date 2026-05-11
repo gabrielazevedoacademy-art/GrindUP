@@ -63,8 +63,8 @@ function formatValue(value: number, unit: string | null): string {
 function getDeadlineStatus(deadline: string | null): { label: string; color: string; bg: string; border: string } | null {
   if (!deadline) return null
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const dl = new Date(deadline + 'T00:00:00')
+  today.setHours(12, 0, 0, 0)
+  const dl = new Date(deadline + 'T12:00:00')
   const diffDays = Math.ceil((dl.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
