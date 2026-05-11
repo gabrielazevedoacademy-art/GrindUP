@@ -900,7 +900,8 @@ export default function EntryPage() {
           <div style={{ display: 'flex', gap: 28, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 28 }}>
             {[
               { label: 'Entrar', href: '/login' },
-              { label: 'Criar conta', href: '/login' },
+              { label: 'Criar conta', href: '/cadastro' },
+              { label: 'Planos', href: '/planos' },
             ].map(link => (
               <Link key={link.label} href={link.href} style={{
                 color: 'rgba(255,255,255,0.35)', fontSize: '0.85rem',
