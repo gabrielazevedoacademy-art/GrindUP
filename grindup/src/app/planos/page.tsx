@@ -203,7 +203,7 @@ function brl(v: number) {
 // ─────────────────────────────────────────────────────────────
 // REVEAL ON SCROLL
 // ─────────────────────────────────────────────────────────────
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Reveal({ children, delay = 0, stretch = false }: { children: React.ReactNode; delay?: number; stretch?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const [vis, setVis] = useState(false)
   useEffect(() => {
@@ -220,6 +220,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
       opacity:    vis ? 1 : 0,
       transform:  vis ? 'translateY(0)' : 'translateY(26px)',
       transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+      ...(stretch ? { height: '100%', display: 'flex', flexDirection: 'column' } : {}),
     }}>
       {children}
     </div>
@@ -314,7 +315,7 @@ function PlanCardInner({
       borderRadius: 22, padding: '32px 26px',
       background: plan.bgColor,
       border: plan.id === 'elite' ? 'none' : `1px solid ${plan.borderColor}`,
-      display: 'flex', flexDirection: 'column',
+      display: 'flex', flexDirection: 'column', height: '100%',
     }}>
       {/* Badge */}
       <div style={{ marginBottom: 18 }}>
@@ -479,9 +480,24 @@ export default function PlanosPage() {
   const [openFaq,    setOpenFaq]    = useState<number | null>(null)
   const [showModal,  setShowModal]  = useState(false)
   const [backUrl,    setBackUrl]    = useState('/')
+  const [dbPrices,   setDbPrices]   = useState<Record<string, number>>({})
 
   useEffect(() => {
     const supabase = createClientSupabase()
+
+    // Fetch prices from DB — fallback to hardcoded values if unavailable
+    supabase
+      .from('plans')
+      .select('name, price')
+      .eq('is_active', true)
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, number> = {}
+          data.forEach((p: { name: string; price: number }) => { map[p.name] = p.price })
+          setDbPrices(map)
+        }
+      })
+
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         setLoggedIn(true)
@@ -517,7 +533,7 @@ export default function PlanosPage() {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
           gap: 20px;
-          align-items: start;
+          align-items: stretch;
         }
         @media (max-width: 860px) {
           .plans-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
@@ -644,15 +660,16 @@ export default function PlanosPage() {
       <section style={{ position:'relative', zIndex:2, padding:'0 24px 80px' }}>
         <div className="plans-grid" style={{ maxWidth:1060, margin:'0 auto' }}>
           {PLANS.map((plan, i) => {
-            const price   = billing === 'annual' ? plan.priceAnnual : plan.priceMonthly
+            const baseMonthly = dbPrices[plan.name] ?? plan.priceMonthly
+            const price       = billing === 'annual' ? plan.priceAnnual : baseMonthly
             const btn     = getBtn(plan.id, loggedIn, userPlan)
             const isCur   = loggedIn && userPlan === plan.id
             const isElite = plan.id === 'elite'
             const isPro   = plan.id === 'pro'
 
             return (
-              <Reveal key={plan.id} delay={i * 90}>
-                <div style={{ position:'relative' }}>
+              <Reveal key={plan.id} delay={i * 90} stretch>
+                <div style={{ position:'relative', flex: 1 }}>
                   {/* "Seu plano atual" pill */}
                   {isCur && (
                     <div style={{
@@ -678,11 +695,12 @@ export default function PlanosPage() {
                       backgroundSize:'300% 300%', animation:'goldShimmer 4s ease infinite',
                       borderRadius:22, padding:1,
                       boxShadow:'0 0 48px rgba(251,191,36,0.15), 0 20px 50px rgba(0,0,0,0.45)',
+                      height: '100%',
                     }}>
                       <PlanCardInner plan={plan} price={price} billing={billing} btn={btn} onModal={() => setShowModal(true)} />
                     </div>
                   ) : isPro ? (
-                    <div style={{ animation:'proGlow 3s ease-in-out infinite', borderRadius:22 }}>
+                    <div style={{ animation:'proGlow 3s ease-in-out infinite', borderRadius:22, height: '100%' }}>
                       <PlanCardInner plan={plan} price={price} billing={billing} btn={btn} onModal={() => setShowModal(true)} />
                     </div>
                   ) : (
