@@ -481,23 +481,9 @@ export default function PlanosPage() {
   const [openFaq,    setOpenFaq]    = useState<number | null>(null)
   const [showModal,  setShowModal]  = useState(false)
   const [backUrl,    setBackUrl]    = useState('/')
-  const [dbPrices,   setDbPrices]   = useState<Record<string, number>>({})
 
   useEffect(() => {
     const supabase = createClientSupabase()
-
-    // Fetch prices from DB — fallback to hardcoded values if unavailable
-    supabase
-      .from('plans')
-      .select('name, price')
-      .eq('is_active', true)
-      .then(({ data }) => {
-        if (data) {
-          const map: Record<string, number> = {}
-          data.forEach((p: { name: string; price: number }) => { map[p.name] = p.price })
-          setDbPrices(map)
-        }
-      })
 
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
@@ -661,8 +647,7 @@ export default function PlanosPage() {
       <section style={{ position:'relative', zIndex:2, padding:'0 24px 80px' }}>
         <div className="plans-grid" style={{ maxWidth:1060, margin:'0 auto' }}>
           {PLANS.map((plan, i) => {
-            const baseMonthly = dbPrices[plan.name] ?? plan.priceMonthly
-            const price       = billing === 'annual' ? plan.priceAnnual : baseMonthly
+            const price = billing === 'annual' ? plan.priceAnnual : plan.priceMonthly
             const btn     = getBtn(plan.id, loggedIn, userPlan)
             const isCur   = loggedIn && userPlan === plan.id
             const isElite = plan.id === 'elite'
