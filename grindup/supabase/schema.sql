@@ -112,14 +112,18 @@ CREATE TABLE IF NOT EXISTS public.mood_checkins (
 CREATE TABLE IF NOT EXISTS public.daily_missions (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  date         DATE NOT NULL DEFAULT CURRENT_DATE,
+  mission_type TEXT NOT NULL,
   title        TEXT NOT NULL,
   description  TEXT,
-  xp_reward    INTEGER NOT NULL DEFAULT 50,
+  xp_reward    INTEGER NOT NULL DEFAULT 0,
   is_completed BOOLEAN NOT NULL DEFAULT FALSE,
   completed_at TIMESTAMPTZ,
-  expires_at   TIMESTAMPTZ,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, date, mission_type)
 );
+
+CREATE INDEX IF NOT EXISTS daily_missions_user_date ON public.daily_missions(user_id, date);
 
 -- -------------------------------------------------------------
 -- 8. plans

@@ -151,13 +151,14 @@ export async function checkAndGenerateMissions(
   const supabase = createClientSupabase()
   const today = getTodayStr()
 
-  const { data: existing } = await supabase
+  const { data: existing, error: selectError } = await supabase
     .from('daily_missions')
     .select('*')
     .eq('user_id', userId)
     .eq('date', today)
     .order('created_at', { ascending: true })
 
+  if (selectError) console.error('[missions] select error:', selectError)
   if (existing && existing.length > 0) return existing as DailyMission[]
 
   const defs = MISSION_DEFS.filter(d => planAllowed(plan, d.minPlan))
@@ -170,12 +171,13 @@ export async function checkAndGenerateMissions(
     xp_reward: d.xp_reward,
   }))
 
-  const { data: inserted } = await supabase
+  const { data: inserted, error: insertError } = await supabase
     .from('daily_missions')
     .insert(rows)
     .select()
     .order('created_at', { ascending: true })
 
+  if (insertError) console.error('[missions] insert error:', insertError)
   return (inserted ?? []) as DailyMission[]
 }
 

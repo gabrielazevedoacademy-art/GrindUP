@@ -451,7 +451,9 @@ export default function DashboardPage() {
       if (profileRes.data) {
         const plan = (profileRes.data as Profile).plan ?? 'free'
         const generated = await checkAndGenerateMissions(user.id, plan)
+        console.log('[missions] generated:', generated.length, generated)
         const visitResults = await checkMissionCompletion(user.id, 'dashboard_visited')
+        console.log('[missions] visitResults:', visitResults)
         const completedIds = new Set(visitResults.map(r => r.missionId))
         setMissions(generated.map((m: DailyMission) =>
           completedIds.has(m.id)
