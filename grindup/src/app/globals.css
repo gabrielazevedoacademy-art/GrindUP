@@ -5,6 +5,10 @@
 :root {
   --background: #020208;
   --foreground: #ededed;
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #0d0a1e;
+  --text-primary: #ffffff;
+  --accent: #7c3aed;
 }
 
 html,
@@ -14,6 +18,39 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ── Light theme overrides ──────────────────────────────── */
+[data-theme="light"] body {
+  background: #f0f0f8;
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .dash-nav-link {
+  color: rgba(26, 26, 46, 0.55) !important;
+}
+[data-theme="light"] .dash-nav-link:hover {
+  color: #1a1a2e !important;
+  background: rgba(124, 58, 237, 0.1) !important;
+}
+[data-theme="light"] .dash-nav-link.active {
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.14) !important;
+}
+
+[data-theme="light"] .stat-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(124, 58, 237, 0.18) !important;
+}
+[data-theme="light"] .module-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(124, 58, 237, 0.18) !important;
+}
+
+/* ── Dark theme overrides ───────────────────────────────── */
+[data-theme="dark"] body {
+  background: #000000;
+  color: #ffffff;
 }
 
 @layer utilities {

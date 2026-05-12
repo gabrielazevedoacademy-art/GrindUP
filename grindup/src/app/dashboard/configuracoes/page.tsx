@@ -147,8 +147,10 @@ export default function ConfiguracoesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user?.email) return
     const { error } = await supabase.auth.resetPasswordForEmail(user.email)
-    setPasswordMsg(error ? 'Erro ao enviar email.' : 'Email de redefinição enviado! Verifique sua caixa de entrada.')
-    setTimeout(() => setPasswordMsg(null), 6000)
+    setPasswordMsg(error
+      ? 'Erro ao enviar email. Tente novamente.'
+      : `Email enviado para ${user.email}. Verifique sua caixa de entrada.`)
+    setTimeout(() => setPasswordMsg(null), 8000)
   }
 
   async function handleDeleteAccount() {
@@ -168,11 +170,12 @@ export default function ConfiguracoesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setExporting(false); return }
 
-    const [profileRes, tasksRes, goalsRes, txRes] = await Promise.all([
+    const [profileRes, tasksRes, goalsRes, txRes, checkinsRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('tasks').select('*').eq('user_id', user.id),
       supabase.from('goals').select('*').eq('user_id', user.id),
       supabase.from('financial_transactions').select('*').eq('user_id', user.id),
+      supabase.from('checkins').select('*').eq('user_id', user.id),
     ])
 
     const blob = new Blob([JSON.stringify({
@@ -180,14 +183,18 @@ export default function ConfiguracoesPage() {
       tasks: tasksRes.data,
       goals: goalsRes.data,
       transactions: txRes.data,
+      checkins: checkinsRes.data ?? [],
       exportedAt: new Date().toISOString(),
     }, null, 2)], { type: 'application/json' })
 
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
+    a.style.display = 'none'
     a.download = `grindup-dados-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
     setExporting(false)
   }

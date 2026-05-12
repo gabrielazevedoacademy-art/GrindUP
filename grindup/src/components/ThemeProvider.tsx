@@ -28,10 +28,8 @@ const FONT_SIZES: Record<string, string> = {
 }
 
 function applyFontSize(size: string) {
-  document.documentElement.style.setProperty(
-    '--font-size-base',
-    FONT_SIZES[size] || '16px'
-  )
+  // Set directly on <html> so all rem-based sizes respond immediately
+  document.documentElement.style.fontSize = FONT_SIZES[size] || '16px'
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {

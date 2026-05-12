@@ -219,8 +219,8 @@ const FRAME_TIERS: FrameDef[] = [
     animationCSS: `
 @keyframes af-spin  { to { transform: rotate(360deg); } }
 @keyframes af-epic-glow {
-  0%,100% { filter: brightness(1.2) drop-shadow(0 0 8px rgba(255,100,200,0.9)); }
-  50%     { filter: brightness(1.6) drop-shadow(0 0 20px rgba(100,200,255,1)); }
+  0%,100% { filter: brightness(1.1) drop-shadow(0 0 4px rgba(255,100,200,0.45)); }
+  50%     { filter: brightness(1.3) drop-shadow(0 0 8px rgba(100,200,255,0.5)); }
 }`,
   },
 
@@ -230,7 +230,7 @@ const FRAME_TIERS: FrameDef[] = [
     styles: {
       background: 'conic-gradient(#7c3aed,#fff,#7c3aed,#4f46e5,#fff,#7c3aed)',
       animation: 'af-portal 0.8s linear infinite',
-      filter: 'drop-shadow(0 0 12px rgba(124,58,237,0.9))',
+      filter: 'drop-shadow(0 0 4px rgba(124,58,237,0.45))',
     },
     animationCSS: `
 @keyframes af-portal { to { transform: rotate(360deg); } }`,
@@ -242,12 +242,12 @@ const FRAME_TIERS: FrameDef[] = [
     styles: {
       background: 'linear-gradient(135deg,#94a3b8,#e2e8f0,#64748b,#e2e8f0)',
       animation: 'af-silver-aura 2s ease-in-out infinite',
-      filter: 'drop-shadow(0 0 8px rgba(226,232,240,0.7))',
+      filter: 'drop-shadow(0 0 3px rgba(226,232,240,0.35))',
     },
     animationCSS: `
 @keyframes af-silver-aura {
-  0%,100% { filter: drop-shadow(0 0 6px  rgba(226,232,240,0.6)); }
-  50%     { filter: drop-shadow(0 0 18px rgba(226,232,240,1)) drop-shadow(0 0 32px rgba(148,163,184,0.6)); }
+  0%,100% { filter: drop-shadow(0 0 3px rgba(226,232,240,0.3)); }
+  50%     { filter: drop-shadow(0 0 6px rgba(226,232,240,0.5)) drop-shadow(0 0 3px rgba(148,163,184,0.3)); }
 }`,
   },
 
@@ -260,11 +260,11 @@ const FRAME_TIERS: FrameDef[] = [
     },
     animationCSS: `
 @keyframes af-electric {
-  0%,100% { filter: drop-shadow(0 0 4px  rgba(59,130,246,0.6)); background: #1d4ed8; }
-  15%     { filter: drop-shadow(0 0 18px rgba(147,197,253,1));  background: #93c5fd; }
-  17%     { filter: drop-shadow(0 0 4px  rgba(59,130,246,0.4)); background: #1d4ed8; }
-  50%     { filter: drop-shadow(0 0 20px rgba(147,197,253,1));  background: #bfdbfe; }
-  52%     { filter: drop-shadow(0 0 6px  rgba(59,130,246,0.5)); background: #1d4ed8; }
+  0%,100% { filter: drop-shadow(0 0 2px rgba(59,130,246,0.35)); background: #1d4ed8; }
+  15%     { filter: drop-shadow(0 0 6px rgba(147,197,253,0.5)); background: #93c5fd; }
+  17%     { filter: drop-shadow(0 0 2px rgba(59,130,246,0.25)); background: #1d4ed8; }
+  50%     { filter: drop-shadow(0 0 7px rgba(147,197,253,0.5)); background: #bfdbfe; }
+  52%     { filter: drop-shadow(0 0 3px rgba(59,130,246,0.3)); background: #1d4ed8; }
 }`,
   },
 
@@ -277,9 +277,9 @@ const FRAME_TIERS: FrameDef[] = [
     },
     animationCSS: `
 @keyframes af-sparkle {
-  0%,100% { filter: drop-shadow(0 0 6px rgba(251,191,36,0.6)) brightness(1); }
-  33%     { filter: drop-shadow(0 0 16px rgba(252,211,77,1))   brightness(1.3); }
-  66%     { filter: drop-shadow(0 0 10px rgba(251,191,36,0.8)) brightness(1.1); }
+  0%,100% { filter: drop-shadow(0 0 3px rgba(251,191,36,0.35)); }
+  33%     { filter: drop-shadow(0 0 6px rgba(252,211,77,0.5)) brightness(1.1); }
+  66%     { filter: drop-shadow(0 0 4px rgba(251,191,36,0.4)); }
 }`,
   },
 
@@ -300,7 +300,7 @@ const FRAME_TIERS: FrameDef[] = [
     styles: {
       background: 'conic-gradient(#dc2626,#ea580c,#eab308,#ea580c,#dc2626)',
       animation: 'af-fire-spin 2s linear infinite',
-      filter: 'drop-shadow(0 0 8px rgba(234,88,12,0.8))',
+      filter: 'drop-shadow(0 0 4px rgba(234,88,12,0.4))',
     },
     animationCSS: `
 @keyframes af-fire-spin { to { transform: rotate(360deg); } }`,
@@ -315,8 +315,8 @@ const FRAME_TIERS: FrameDef[] = [
     },
     animationCSS: `
 @keyframes af-gold-pulse {
-  0%,100% { box-shadow: 0 0 10px rgba(251,191,36,0.5); }
-  50%     { box-shadow: 0 0 24px rgba(251,191,36,0.9), 0 0 40px rgba(234,179,8,0.4); }
+  0%,100% { box-shadow: 0 0 4px rgba(251,191,36,0.3); }
+  50%     { box-shadow: 0 0 8px rgba(251,191,36,0.5), 0 0 4px 2px rgba(234,179,8,0.2); }
 }`,
   },
 
@@ -330,9 +330,9 @@ const FRAME_TIERS: FrameDef[] = [
     },
     animationCSS: `
 @keyframes af-blue-purple {
-  0%   { background-position: 0% 50%; box-shadow: 0 0 14px rgba(59,130,246,0.6); }
-  50%  { background-position: 100% 50%; box-shadow: 0 0 14px rgba(139,92,246,0.7); }
-  100% { background-position: 0% 50%; box-shadow: 0 0 14px rgba(59,130,246,0.6); }
+  0%   { background-position: 0% 50%; box-shadow: 0 0 5px rgba(59,130,246,0.35); }
+  50%  { background-position: 100% 50%; box-shadow: 0 0 5px rgba(139,92,246,0.4); }
+  100% { background-position: 0% 50%; box-shadow: 0 0 5px rgba(59,130,246,0.35); }
 }`,
   },
 
@@ -345,8 +345,8 @@ const FRAME_TIERS: FrameDef[] = [
     },
     animationCSS: `
 @keyframes af-blue-pulse {
-  0%,100% { box-shadow: 0 0 10px rgba(59,130,246,0.5); }
-  50%     { box-shadow: 0 0 22px rgba(59,130,246,0.95), 0 0 36px rgba(96,165,250,0.4); }
+  0%,100% { box-shadow: 0 0 4px rgba(59,130,246,0.3); }
+  50%     { box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 4px 2px rgba(96,165,250,0.2); }
 }`,
   },
 
@@ -355,7 +355,7 @@ const FRAME_TIERS: FrameDef[] = [
     minLevel: 1, title: 'Clássica', padding: 3,
     styles: {
       background: '#7c3aed',
-      boxShadow: '0 0 20px rgba(124,58,237,0.55)',
+      boxShadow: '0 0 6px rgba(124,58,237,0.35)',
     },
     animationCSS: '',
   },

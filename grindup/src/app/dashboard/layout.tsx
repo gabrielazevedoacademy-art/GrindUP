@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div
       className="flex min-h-screen"
       style={{
-        background: '#0a0a0f',
+        background: 'var(--bg-primary, #0a0a0f)',
         backgroundImage:
           'radial-gradient(ellipse at 0% 0%, rgba(124,58,237,0.08) 0%, transparent 50%), radial-gradient(ellipse at 100% 100%, rgba(79,70,229,0.06) 0%, transparent 50%)',
       }}
