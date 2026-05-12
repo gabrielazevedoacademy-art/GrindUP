@@ -19,17 +19,12 @@ function ParallaxLayers() {
   useEffect(() => {
     const c1Raw = c1Ref.current
     const c2Raw = c2Ref.current
-    const l3Raw = l3Ref.current
-    if (!c1Raw || !c2Raw || !l3Raw) return
+    if (!c1Raw || !c2Raw) return
     // Aliases so TypeScript carries the non-null narrowing into closures
     const c1: HTMLCanvasElement = c1Raw
     const c2: HTMLCanvasElement = c2Raw
-    const l3: HTMLDivElement = l3Raw
 
     let drawRaf: number
-    let scrollRafId = 0
-    let ticking = false
-    let sy = 0
 
     const ctx1 = c1.getContext('2d')!
     const ctx2 = c2.getContext('2d')!
@@ -42,7 +37,7 @@ function ParallaxLayers() {
     window.addEventListener('resize', resize)
 
     // Layer 1 — small, dim, 1px
-    const stars1 = Array.from({ length: 150 }, () => ({
+    const stars1 = Array.from({ length: 60 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       phase: Math.random() * Math.PI * 2,
@@ -50,7 +45,7 @@ function ParallaxLayers() {
     }))
 
     // Layer 2 — medium, brighter, 2px
-    const stars2 = Array.from({ length: 70 }, () => ({
+    const stars2 = Array.from({ length: 30 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       phase: Math.random() * Math.PI * 2,
@@ -80,26 +75,9 @@ function ParallaxLayers() {
     }
     drawRaf = requestAnimationFrame(drawStars)
 
-    const onScroll = () => {
-      sy = window.scrollY
-      if (!ticking) {
-        scrollRafId = requestAnimationFrame(() => {
-          const m = window.innerWidth < 768 ? 0.5 : 1
-          c1.style.transform = `translateY(${-sy * 0.1 * m}px)`
-          c2.style.transform = `translateY(${-sy * 0.25 * m}px)`
-          l3.style.transform = `translateY(${-sy * 0.4 * m}px)`
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-
     return () => {
       cancelAnimationFrame(drawRaf)
-      cancelAnimationFrame(scrollRafId)
       window.removeEventListener('resize', resize)
-      window.removeEventListener('scroll', onScroll)
     }
   }, [])
 
@@ -121,27 +99,17 @@ function ParallaxLayers() {
       >
         <div style={{
           position: 'absolute', top: '8%', left: '-12%',
-          width: 650, height: 650, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, rgba(2,2,8,0) 70%)',
+          width: 600, height: 600, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.18) 0%, rgba(2,2,8,0) 70%)',
           filter: 'blur(60px)',
-          animation: 'nebulaPulse 7s ease-in-out infinite',
-          willChange: 'transform, opacity',
+          willChange: 'auto',
         }} />
         <div style={{
           position: 'absolute', top: '45%', right: '-15%',
-          width: 700, height: 700, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, rgba(2,2,8,0) 70%)',
+          width: 640, height: 640, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(79,70,229,0.14) 0%, rgba(2,2,8,0) 70%)',
           filter: 'blur(70px)',
-          animation: 'nebulaPulse 9s ease-in-out infinite 2s',
-          willChange: 'transform, opacity',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '8%', left: '28%',
-          width: 520, height: 520, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, rgba(2,2,8,0) 70%)',
-          filter: 'blur(55px)',
-          animation: 'nebulaPulse 11s ease-in-out infinite 4s',
-          willChange: 'transform, opacity',
+          willChange: 'auto',
         }} />
       </div>
     </>

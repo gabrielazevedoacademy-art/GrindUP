@@ -27,6 +27,15 @@ export default function RootLayout({
     <html lang="pt-BR" translate="no">
       <head>
         <meta name="google" content="notranslate" />
+        <style>{`
+          @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+            }
+          }
+        `}</style>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

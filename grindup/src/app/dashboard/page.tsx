@@ -308,20 +308,13 @@ function DashboardContent({
         </div>
 
         {/* ── Gamification stat cards ── */}
-        <style>{`
-          @keyframes lc-amber-pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(245,158,11,0.15), inset 0 0 15px rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.4); }
-            50%       { box-shadow: 0 0 25px rgba(245,158,11,0.28), inset 0 0 20px rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.6); }
-          }
-        `}</style>
         <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {/* ── Level card ── */}
           <div
             className="stat-card"
             style={profile.level >= 90 ? {
-              borderColor: 'rgba(245,158,11,0.4)',
-              boxShadow: '0 0 15px rgba(245,158,11,0.15), inset 0 0 15px rgba(245,158,11,0.05)',
-              animation: 'lc-amber-pulse 2.5s ease-in-out infinite',
+              borderColor: 'rgba(245,158,11,0.5)',
+              boxShadow: '0 0 18px rgba(245,158,11,0.18), inset 0 0 15px rgba(245,158,11,0.05)',
             } : undefined}
           >
             <div style={{ color: '#a78bfa', marginBottom: 8 }}>

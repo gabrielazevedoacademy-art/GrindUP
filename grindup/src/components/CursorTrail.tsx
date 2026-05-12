@@ -11,6 +11,7 @@ export default function CursorGlow() {
 
   useEffect(() => {
     if ('ontouchstart' in window) return
+    if ('deviceMemory' in navigator && (navigator as Navigator & { deviceMemory: number }).deviceMemory < 4) return
     setIsTouch(false)
 
     const onMove = (e: MouseEvent) => {
