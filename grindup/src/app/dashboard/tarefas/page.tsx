@@ -6,6 +6,7 @@ import { getLevelFromXP } from '@/lib/levels'
 import { isLimitReached } from '@/lib/planLimits'
 import { formatDate } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
+import { checkMissionCompletion } from '@/lib/missions'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -696,6 +697,7 @@ export default function TarefasPage() {
       setTotalCount(prev => prev + 1)
       setPendingCount(prev => prev + 1)
       setShowModal(false)
+      checkMissionCompletion(userId, 'task_created').catch(() => {})
     }
   }
 
@@ -737,6 +739,14 @@ export default function TarefasPage() {
 
     const key = ++popupCounter.current
     setXpPopups(prev => [...prev, { id: task.id, amount: xpGain, key }])
+
+    checkMissionCompletion(userId!, 'task_completed').then(results => {
+      for (const r of results) {
+        const mKey = ++popupCounter.current
+        setXpPopups(prev => [...prev, { id: r.missionId, amount: r.xpAwarded, key: mKey }])
+      }
+    }).catch(() => {})
+
     setCompleting(null)
   }
 

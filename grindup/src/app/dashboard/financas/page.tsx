@@ -5,6 +5,7 @@ import { createClientSupabase } from '@/lib/supabase'
 import { isLimitReached } from '@/lib/planLimits'
 import { formatDate } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
+import { checkMissionCompletion } from '@/lib/missions'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -866,6 +867,7 @@ export default function FinancasPage() {
     )
     setSaveError(null)
     setShowModal(false)
+    checkMissionCompletion(userId!, 'transaction_added').catch(() => {})
   }
 
   // ── Delete ──────────────────────────────────────────────────

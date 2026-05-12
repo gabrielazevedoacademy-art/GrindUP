@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { formatDate, formatDateShort } from '@/lib/dateUtils'
+import { checkMissionCompletion } from '@/lib/missions'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -764,6 +765,7 @@ export default function AgendaPage() {
         (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
       ))
       setShowNewModal(false)
+      checkMissionCompletion(userId!, 'event_added').catch(() => {})
     }
   }
 

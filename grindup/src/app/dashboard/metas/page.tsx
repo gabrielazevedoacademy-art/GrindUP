@@ -6,6 +6,7 @@ import { getLevelFromXP } from '@/lib/levels'
 import { isLimitReached } from '@/lib/planLimits'
 import { formatDateShort } from '@/lib/dateUtils'
 import UpgradeModal from '@/components/UpgradeModal'
+import { checkMissionCompletion } from '@/lib/missions'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -1051,7 +1052,16 @@ export default function MetasPage() {
 
       const key = ++popupCounter.current
       setXpPopups(prev => [...prev, { id: goalId, amount: xpGain, key }])
+
+      checkMissionCompletion(userId!, 'goal_completed').then(results => {
+        for (const r of results) {
+          const mKey = ++popupCounter.current
+          setXpPopups(prev => [...prev, { id: r.missionId, amount: r.xpAwarded, key: mKey }])
+        }
+      }).catch(() => {})
     }
+
+    checkMissionCompletion(userId!, 'goal_updated').catch(() => {})
 
     setProgressing(null)
     setProgressGoal(null)

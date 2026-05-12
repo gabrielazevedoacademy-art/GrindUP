@@ -9,6 +9,8 @@ import CheckinPopup from '@/components/CheckinPopup'
 import CoverSelector from '@/components/CoverSelector'
 import AvatarFrame from '@/components/AvatarFrame'
 import { getBadgeForLevel } from '@/lib/badges'
+import { type DailyMission, checkAndGenerateMissions, checkMissionCompletion } from '@/lib/missions'
+import DailyMissions from '@/components/DailyMissions'
 
 type Profile = {
   id: string
@@ -71,11 +73,13 @@ const MAX_COVER_BYTES = 5 * 1024 * 1024
 function DashboardContent({
   profile,
   dashStats,
+  missions,
   onCoverChange,
   onAvatarChange,
 }: {
   profile: Profile
   dashStats: DashStats | null
+  missions: DailyMission[]
   onCoverChange: (url: string) => void
   onAvatarChange: (url: string) => void
 }) {
@@ -205,7 +209,7 @@ function DashboardContent({
     },
     {
       label: 'Missões hoje',
-      value: 0,
+      value: missions.filter(m => m.is_completed).length,
       color: '#fbbf24',
       icon: (
         <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
@@ -371,6 +375,11 @@ function DashboardContent({
           </div>
         </div>
 
+        {/* ── Daily missions ── */}
+        {missions.length > 0 && (
+          <DailyMissions missions={missions} plan={profile.plan} />
+        )}
+
         {/* ── Module grid 2×2 ── */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {modules.map((mod) => (
@@ -403,6 +412,7 @@ function DashboardContent({
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [dashStats, setDashStats] = useState<DashStats | null>(null)
+  const [missions, setMissions] = useState<DailyMission[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -437,6 +447,18 @@ export default function DashboardPage() {
         activeGoals:  goalsRes.count  ?? 0,
         monthBalance: income - expenses,
       })
+
+      if (profileRes.data) {
+        const plan = (profileRes.data as Profile).plan ?? 'free'
+        const generated = await checkAndGenerateMissions(user.id, plan)
+        const visitResults = await checkMissionCompletion(user.id, 'dashboard_visited')
+        const completedIds = new Set(visitResults.map(r => r.missionId))
+        setMissions(generated.map((m: DailyMission) =>
+          completedIds.has(m.id)
+            ? { ...m, is_completed: true, completed_at: new Date().toISOString() }
+            : m
+        ))
+      }
 
       setLoading(false)
     })
@@ -473,6 +495,7 @@ export default function DashboardPage() {
       <DashboardContent
         profile={profile}
         dashStats={dashStats}
+        missions={missions}
         onCoverChange={url  => setProfile(p => p ? { ...p, cover_url:  url } : p)}
         onAvatarChange={url => setProfile(p => p ? { ...p, avatar_url: url } : p)}
       />

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClientSupabase } from '@/lib/supabase'
 import { getLevelFromXP } from '@/lib/levels'
+import { checkMissionCompletion } from '@/lib/missions'
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -611,6 +612,7 @@ export default function CheckinPage() {
 
       setShowXp(true)
       setTimeout(() => setShowXp(false), 1700)
+      checkMissionCompletion(userId!, 'checkin_saved').catch(() => {})
     }
 
     setSaving(false)
