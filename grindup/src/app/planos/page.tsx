@@ -677,10 +677,10 @@ export default function PlanosPage() {
                   {/* Elite — shimmer gold border wrapper */}
                   {isElite ? (
                     <div style={{
-                      background:'linear-gradient(135deg,rgba(251,191,36,0.75),rgba(234,179,8,0.2),rgba(251,191,36,0.85),rgba(161,98,7,0.2),rgba(251,191,36,0.7))',
-                      backgroundSize:'300% 300%', animation:'goldShimmer 4s ease infinite',
+                      background:'linear-gradient(135deg,rgba(251,191,36,0.35),rgba(234,179,8,0.08),rgba(251,191,36,0.4),rgba(161,98,7,0.06),rgba(251,191,36,0.3))',
+                      backgroundSize:'200% 200%', animation:'goldShimmer 6s ease infinite',
                       borderRadius:22, padding:1,
-                      boxShadow:'0 0 48px rgba(251,191,36,0.15), 0 20px 50px rgba(0,0,0,0.45)',
+                      boxShadow:'0 0 24px rgba(234,179,8,0.2), 0 20px 50px rgba(0,0,0,0.4)',
                       height: '100%',
                     }}>
                       <PlanCardInner plan={plan} price={price} billing={billing} btn={btn} onModal={() => setShowModal(true)} />
