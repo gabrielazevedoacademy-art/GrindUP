@@ -315,7 +315,8 @@ function PlanCardInner({
       borderRadius: 22, padding: '32px 26px',
       background: plan.bgColor,
       border: plan.id === 'elite' ? 'none' : `1px solid ${plan.borderColor}`,
-      display: 'flex', flexDirection: 'column', height: '100%',
+      display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480,
+      boxSizing: 'border-box',
     }}>
       {/* Badge */}
       <div style={{ marginBottom: 18 }}>
@@ -323,6 +324,7 @@ function PlanCardInner({
           display: 'inline-block', padding: '4px 12px', borderRadius: 999,
           fontSize: '0.67rem', fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase',
           background: plan.badgeBg, color: plan.badgeColor, border: `1px solid ${plan.badgeBorder}`,
+          whiteSpace: 'nowrap',
         }}>
           {plan.badge}
         </span>
@@ -390,6 +392,7 @@ function PlanCardInner({
             <span style={{
               fontSize: '0.84rem',
               color: f.ok ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.22)',
+              wordBreak: 'break-word',
             }}>
               {f.label}
             </span>

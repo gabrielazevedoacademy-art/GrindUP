@@ -149,7 +149,7 @@ function ParallaxLayers() {
 }
 
 // ─── Reveal ───────────────────────────────────────────────────
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Reveal({ children, delay = 0, stretch = false }: { children: React.ReactNode; delay?: number; stretch?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
 
@@ -171,6 +171,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(32px)',
         transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
+        ...(stretch ? { height: '100%', display: 'flex', flexDirection: 'column' } : {}),
       }}
     >
       {children}
@@ -368,8 +369,11 @@ export default function EntryPage() {
           border-radius: 22px;
           padding: 32px 28px;
           display: flex; flex-direction: column;
+          height: 100%;
+          min-height: 480px;
           transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
           position: relative; overflow: hidden;
+          box-sizing: border-box;
         }
         .plan-card.featured {
           border-color: rgba(124,58,237,0.6);
@@ -407,6 +411,7 @@ export default function EntryPage() {
         }
         @media (max-width: 480px) {
           .numbers-grid { grid-template-columns: 1fr !important; }
+          .plan-card { padding: 24px 16px !important; min-height: 440px; }
         }
       `}</style>
 
@@ -744,7 +749,7 @@ export default function EntryPage() {
               </p>
             </div>
           </Reveal>
-          <div className="plans-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
+          <div className="plans-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, alignItems: 'stretch' }}>
             {[
               {
                 name: 'Free', price: 'R$0', period: '/mês', color: '#94a3b8',
@@ -791,7 +796,7 @@ export default function EntryPage() {
                 featured: false,
               },
             ].map((plan, i) => (
-              <Reveal key={plan.name} delay={i * 100}>
+              <Reveal key={plan.name} delay={i * 100} stretch>
                 <div className={`plan-card ${plan.featured ? 'featured' : ''}`}>
                   {plan.badge && (
                     <div style={{
@@ -801,6 +806,7 @@ export default function EntryPage() {
                       color: plan.featured ? '#fff' : '#fbbf24',
                       fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.12em',
                       padding: '4px 14px', borderRadius: '0 0 10px 10px',
+                      whiteSpace: 'nowrap',
                     }}>
                       {plan.badge}
                     </div>
@@ -808,7 +814,7 @@ export default function EntryPage() {
                   <div style={{ marginBottom: 8, marginTop: plan.badge ? 16 : 0 }}>
                     <span style={{ fontWeight: 800, fontSize: '1.1rem', color: plan.color }}>{plan.name}</span>
                   </div>
-                  <div style={{ marginBottom: 24 }}>
+                  <div style={{ marginBottom: 24, flexShrink: 0 }}>
                     <span style={{ fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-1px' }}>{plan.price}</span>
                     <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', marginLeft: 4 }}>{plan.period}</span>
                   </div>
@@ -816,7 +822,7 @@ export default function EntryPage() {
                     {plan.features.map(f => (
                       <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                         <span style={{ color: plan.color, fontSize: '0.85rem', flexShrink: 0, marginTop: 1 }}>✓</span>
-                        <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.65)' }}>{f}</span>
+                        <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.65)', wordBreak: 'break-word' }}>{f}</span>
                       </div>
                     ))}
                   </div>
@@ -834,6 +840,7 @@ export default function EntryPage() {
                       color: '#fff', fontWeight: 700, fontSize: '0.9rem',
                       textDecoration: 'none',
                       transition: 'all 0.2s ease',
+                      marginTop: 'auto',
                     }}
                   >
                     {plan.cta}
