@@ -760,7 +760,7 @@ export default function EntryPage() {
                 featured: false,
               },
               {
-                name: 'Pro', price: 'R$14,90', period: '/mês', color: '#a78bfa',
+                name: 'Pro', price: 'R$9,90', period: '/mês', color: '#a78bfa',
                 badge: 'MAIS POPULAR',
                 features: [
                   'Tarefas ilimitadas',
