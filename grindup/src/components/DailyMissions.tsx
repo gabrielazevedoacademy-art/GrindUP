@@ -10,8 +10,10 @@ export default function DailyMissions({
   missions: DailyMission[]
   plan: string
 }) {
-  const completed = missions.filter(m => m.is_completed).length
-  const total = missions.length
+  const today = new Date().toISOString().split('T')[0]
+  const todayMissions = missions.filter(m => m.date === today).slice(0, 3)
+  const completed = todayMissions.filter(m => m.is_completed).length
+  const total = todayMissions.length
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0
   const allDone = total > 0 && completed === total
   const isPro = plan === 'pro' || plan === 'elite'
@@ -53,7 +55,7 @@ export default function DailyMissions({
 
       {/* Mission list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {missions.map(m => (
+        {todayMissions.map(m => (
           <div
             key={m.id}
             style={{

@@ -41,6 +41,7 @@ type MissionDef = {
 }
 
 const PLAN_RANK: Record<string, number> = { free: 0, pro: 1, elite: 2 }
+const MAX_DAILY_MISSIONS = 3
 
 function planAllowed(userPlan: string, minPlan: string): boolean {
   return (PLAN_RANK[userPlan] ?? 0) >= (PLAN_RANK[minPlan] ?? 0)
@@ -157,12 +158,31 @@ export async function checkAndGenerateMissions(
     .eq('user_id', userId)
     .eq('date', today)
     .order('created_at', { ascending: true })
+    .limit(MAX_DAILY_MISSIONS)
 
   if (selectError) console.error('[missions] select error:', selectError)
-  if (existing && existing.length > 0) return existing as DailyMission[]
 
-  const defs = MISSION_DEFS.filter(d => planAllowed(plan, d.minPlan))
-  const rows = defs.map(d => ({
+  // Already have the right number — return as-is
+  if (existing && existing.length >= MAX_DAILY_MISSIONS) {
+    return existing as DailyMission[]
+  }
+
+  // Pick the first MAX_DAILY_MISSIONS defs for this plan
+  const defs = MISSION_DEFS
+    .filter(d => planAllowed(plan, d.minPlan))
+    .slice(0, MAX_DAILY_MISSIONS)
+
+  // Skip types already in DB to avoid UNIQUE violations
+  const existingTypes = new Set(
+    (existing ?? []).map((m: Record<string, unknown>) => m.mission_type as string)
+  )
+  const toInsert = defs.filter(d => !existingTypes.has(d.type))
+
+  if (toInsert.length === 0) {
+    return ((existing ?? []) as DailyMission[]).slice(0, MAX_DAILY_MISSIONS)
+  }
+
+  const rows = toInsert.map(d => ({
     user_id: userId,
     date: today,
     mission_type: d.type,
@@ -175,10 +195,13 @@ export async function checkAndGenerateMissions(
     .from('daily_missions')
     .insert(rows)
     .select()
-    .order('created_at', { ascending: true })
 
   if (insertError) console.error('[missions] insert error:', insertError)
-  return (inserted ?? []) as DailyMission[]
+
+  const all = [...(existing ?? []), ...(inserted ?? [])] as DailyMission[]
+  return all
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .slice(0, MAX_DAILY_MISSIONS)
 }
 
 export async function checkMissionCompletion(
