@@ -757,6 +757,7 @@ export default function EntryPage() {
                   'Dashboard simples',
                 ],
                 cta: 'Começar grátis',
+                href: '/cadastro',
                 featured: false,
               },
               {
@@ -771,6 +772,7 @@ export default function EntryPage() {
                   'Suporte prioritário',
                 ],
                 cta: 'Assinar Pro →',
+                href: '/planos',
                 featured: true,
               },
               {
@@ -785,6 +787,7 @@ export default function EntryPage() {
                   'Suporte VIP',
                 ],
                 cta: 'Assinar Elite →',
+                href: '/planos',
                 featured: false,
               },
             ].map((plan, i) => (
@@ -818,7 +821,7 @@ export default function EntryPage() {
                     ))}
                   </div>
                   <Link
-                    href="/login"
+                    href={plan.href}
                     style={{
                       display: 'block', textAlign: 'center',
                       padding: '13px 24px', borderRadius: 12,
@@ -875,7 +878,7 @@ export default function EntryPage() {
                   Grátis para sempre no plano básico.
                 </p>
                 <div className="hero-btns" style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-                  <Link href="/login" className="btn-cta" style={{ fontSize: '1.1rem', padding: '18px 44px' }}>
+                  <Link href="/cadastro" className="btn-cta" style={{ fontSize: '1.1rem', padding: '18px 44px' }}>
                     Criar conta grátis →
                   </Link>
                 </div>

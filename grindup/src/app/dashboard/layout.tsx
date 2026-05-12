@@ -186,6 +186,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           border-color: rgba(232,92,13,0.35);
           box-shadow: 0 0 12px rgba(232,92,13,0.2);
         }
+        .dash-plans-link {
+          display: flex; align-items: center; gap: 8px;
+          width: 100%; padding: 8px 12px; border-radius: 10px;
+          font-size: 0.75rem; font-weight: 600;
+          color: rgba(167,139,250,0.65);
+          background: rgba(124,58,237,0.06);
+          border: 1px solid rgba(124,58,237,0.15);
+          text-decoration: none; margin-bottom: 6px;
+          transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .dash-plans-link:hover {
+          color: #a78bfa;
+          background: rgba(124,58,237,0.12);
+          border-color: rgba(124,58,237,0.35);
+          box-shadow: 0 0 12px rgba(124,58,237,0.2);
+        }
         .module-card {
           display: block; border-radius: 16px; padding: 24px;
           background: rgba(255,255,255,0.03);
@@ -362,6 +378,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </p>
             </div>
           </div>
+
+          <div style={{ borderTop: '1px solid rgba(124,58,237,0.12)', marginBottom: 8, marginTop: 4 }} />
+          <Link href="/planos" className="dash-plans-link" onClick={() => setSidebarOpen(false)}>
+            <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            Ver planos
+          </Link>
 
           {isAdmin && (
             <>

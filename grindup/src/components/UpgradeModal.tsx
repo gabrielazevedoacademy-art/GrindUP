@@ -144,7 +144,7 @@ export default function UpgradeModal({
               }}
             >
               Pro
-              <span style={{ fontSize: '0.68rem', fontWeight: 600, opacity: 0.75 }}>R$ 14,90/mês</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, opacity: 0.75 }}>R$ 9,90/mês</span>
             </Link>
             <Link
               href="/planos"
