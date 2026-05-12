@@ -403,7 +403,7 @@ function PlanCardInner({
           display: 'block', padding: '13px 0', borderRadius: 12, textAlign: 'center',
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
           color: '#fff', fontSize: '0.9rem', fontWeight: 700, textDecoration: 'none',
-          transition: 'background 0.2s',
+          transition: 'background 0.2s', marginTop: 'auto',
         }}
           onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)' }}
           onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)' }}
@@ -422,6 +422,7 @@ function PlanCardInner({
               ? '0 0 24px rgba(251,191,36,0.25)'
               : '0 0 24px rgba(124,58,237,0.3)',
             transition: 'transform 0.18s ease, filter 0.18s ease',
+            marginTop: 'auto',
           }}
           onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.transform='translateY(-1px)'; b.style.filter='brightness(1.12)' }}
           onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.transform='translateY(0)'; b.style.filter='none' }}
@@ -431,7 +432,7 @@ function PlanCardInner({
       )}
       {btn.action === 'none' && (
         <div style={{
-          padding: '13px 0', borderRadius: 12, textAlign: 'center',
+          padding: '13px 0', borderRadius: 12, textAlign: 'center', marginTop: 'auto',
           background: btn.style === 'current'
             ? (plan.id === 'elite' ? 'rgba(251,191,36,0.1)' : plan.id === 'pro' ? 'rgba(124,58,237,0.15)' : 'rgba(255,255,255,0.06)')
             : 'rgba(255,255,255,0.02)',
@@ -531,8 +532,8 @@ export default function PlanosPage() {
         }
         .plans-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 20px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
           align-items: stretch;
         }
         @media (max-width: 860px) {
