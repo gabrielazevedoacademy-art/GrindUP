@@ -27,6 +27,7 @@ type NewEventForm = {
   endDate: string
   endTime: string
   color: string
+  eventType: 'pontual' | 'com-duracao'
 }
 
 type CalendarDay = {
@@ -112,6 +113,12 @@ function isEventEndDay(event: Event, date: Date): boolean {
   const endStr = isoDateStr(new Date(event.end_at))
   const startStr = isoDateStr(new Date(event.start_at))
   return endStr === isoDateStr(date) && endStr !== startStr
+}
+
+function isPontualEvent(event: Event): boolean {
+  if (!event.end_at) return true
+  const diff = new Date(event.end_at).getTime() - new Date(event.start_at).getTime()
+  return diff < 60_000
 }
 
 function formatDayTitle(date: Date): string {
@@ -394,11 +401,22 @@ function EventPill({ event, onClick, isEndDay }: {
   onClick: (e: React.MouseEvent) => void
   isEndDay?: boolean
 }) {
-  const label = isEndDay ? 'Fim' : 'Início'
+  const pontual = isPontualEvent(event)
+  const opacity = isEndDay ? 0.75 : 1
+
+  let content: React.ReactNode
+  if (pontual) {
+    const time = new Date(event.start_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    content = <><span style={{ fontWeight: 800 }}>{time}</span>{' '}{event.title}</>
+  } else {
+    const label = isEndDay ? 'Fim' : 'Início'
+    content = <><span style={{ fontWeight: 800 }}>{label}:</span>{' '}{event.title}</>
+  }
+
   return (
     <button
       onClick={onClick}
-      title={`${label}: ${event.title}`}
+      title={event.title}
       style={{
         width: '100%', padding: '2px 6px', borderRadius: 4,
         background: 'transparent', border: 'none',
@@ -407,12 +425,12 @@ function EventPill({ event, onClick, isEndDay }: {
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         lineHeight: 1.4, flexShrink: 0,
         transition: 'opacity 0.15s ease',
-        opacity: isEndDay ? 0.75 : 1,
+        opacity,
       }}
       onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.opacity = '0.9' }}
-      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.opacity = isEndDay ? '0.75' : '1' }}
+      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.opacity = String(opacity) }}
     >
-      <span style={{ fontWeight: 800 }}>{label}:</span>{' '}{event.title}
+      {content}
     </button>
   )
 }
@@ -546,7 +564,7 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
 }) {
   const [form, setForm] = useState<NewEventForm>({
     title: '', description: '', startDate: initialDate, startTime: '09:00',
-    endDate: initialDate, endTime: '10:00', color: '#7c3aed',
+    endDate: initialDate, endTime: '10:00', color: '#7c3aed', eventType: 'pontual',
   })
 
   async function handleSubmit(e: React.FormEvent) {
@@ -573,6 +591,30 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
           </button>
         </div>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Type toggle */}
+          <div style={{ display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--color-border)', background: 'var(--color-bg-card)' }}>
+            {([['pontual', '📅 Pontual'], ['com-duracao', '📆 Com Duração']] as const).map(([type, label]) => {
+              const active = form.eventType === type
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, eventType: type }))}
+                  style={{
+                    flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
+                    background: active ? 'linear-gradient(135deg, #7c3aed, #6d28d9)' : 'transparent',
+                    color: active ? '#fff' : 'var(--color-text-secondary)',
+                    fontSize: '0.83rem', fontWeight: active ? 700 : 500,
+                    transition: 'background 0.18s ease, color 0.18s ease',
+                    boxShadow: active ? '0 0 14px rgba(124,58,237,0.35)' : 'none',
+                  }}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+
           <div>
             <label style={labelStyle}>Título *</label>
             <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Ex: Reunião de equipe" maxLength={120} required autoFocus style={inputStyle} />
@@ -582,19 +624,21 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
             <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Detalhes do evento..." rows={2} maxLength={500} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.55 }} />
           </div>
           <div>
-            <label style={labelStyle}>Início</label>
+            <label style={labelStyle}>{form.eventType === 'pontual' ? 'Data e Horário' : 'Início'}</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
               <input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} required style={{ ...inputStyle, background: 'var(--color-bg-modal)' }} />
               <input type="time" value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)', width: 110 }} />
             </div>
           </div>
-          <div>
-            <label style={labelStyle}>Fim</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
-              <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)' }} />
-              <input type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)', width: 110 }} />
+          {form.eventType === 'com-duracao' && (
+            <div>
+              <label style={labelStyle}>Fim</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
+                <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)' }} />
+                <input type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)', width: 110 }} />
+              </div>
             </div>
-          </div>
+          )}
           <div>
             <label style={labelStyle}>Cor</label>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -782,7 +826,9 @@ export default function AgendaPage() {
         title: form.title.trim(),
         description: form.description.trim() || null,
         start_at: dateTimeToISO(form.startDate, form.startTime),
-        end_at: form.endDate ? dateTimeToISO(form.endDate, form.endTime) : null,
+        end_at: form.eventType === 'com-duracao' && form.endDate
+          ? dateTimeToISO(form.endDate, form.endTime)
+          : null,
         color: form.color,
       })
       .select().single()
