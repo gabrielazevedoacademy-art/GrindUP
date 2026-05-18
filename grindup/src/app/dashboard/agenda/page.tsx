@@ -96,9 +96,19 @@ function dateTimeToISO(date: string, time: string): string {
   return new Date(`${date}T${time || '00:00'}:00`).toISOString()
 }
 
-function eventsForDay(events: Event[], date: Date): Event[] {
+function getEventsForDay(events: Event[], date: Date): Event[] {
   const dayStr = isoDateStr(date)
-  return events.filter(e => isoDateStr(new Date(e.start_at)) === dayStr)
+  const dayStart = new Date(dayStr + 'T00:00:00')
+  const dayEnd = new Date(dayStr + 'T23:59:59')
+  return events.filter(e => {
+    const start = new Date(e.start_at)
+    const end = e.end_at ? new Date(e.end_at) : start
+    return start <= dayEnd && end >= dayStart
+  })
+}
+
+function isEventStartDay(event: Event, date: Date): boolean {
+  return isoDateStr(new Date(event.start_at)) === isoDateStr(date)
 }
 
 function formatDayTitle(date: Date): string {
@@ -125,7 +135,7 @@ function MobileCalendarCell({
     <div
       onClick={() => onClick(day.date)}
       style={{
-        height: 48,
+        height: 60,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -376,23 +386,32 @@ function DayBottomSheet({
 // ─────────────────────────────────────────────────────────────
 // DESKTOP: EVENT PILL
 // ─────────────────────────────────────────────────────────────
-function EventPill({ event, onClick }: { event: Event; onClick: (e: React.MouseEvent) => void }) {
+function EventPill({ event, onClick, isContinuation }: {
+  event: Event
+  onClick: (e: React.MouseEvent) => void
+  isContinuation?: boolean
+}) {
+  const bg = isContinuation ? event.color + '18' : event.color + '28'
+  const bgHover = isContinuation ? event.color + '30' : event.color + '45'
   return (
     <button
       onClick={onClick}
       title={event.title}
       style={{
         width: '100%', padding: '2px 6px', borderRadius: 4,
-        background: event.color + '28', border: `1px solid ${event.color}55`,
-        color: event.color, fontSize: '0.7rem', fontWeight: 700,
+        background: bg,
+        border: isContinuation ? `1px dashed ${event.color}44` : `1px solid ${event.color}55`,
+        color: event.color, fontSize: '0.7rem', fontWeight: isContinuation ? 500 : 700,
         textAlign: 'left', cursor: 'pointer',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         transition: 'background 0.15s ease', lineHeight: 1.4,
+        opacity: isContinuation ? 0.8 : 1,
+        flexShrink: 0,
       }}
-      onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = event.color + '45' }}
-      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = event.color + '28' }}
+      onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bgHover }}
+      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bg }}
     >
-      {event.title}
+      {isContinuation ? `↔ ${event.title}` : event.title}
     </button>
   )
 }
@@ -478,16 +497,18 @@ function CalendarCell({ day, events, onDayClick, onEventClick, onOverflowClick }
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        minHeight: 96, padding: '8px 6px 6px', borderRadius: 10,
+        height: 120, padding: '8px 6px 6px', borderRadius: 10,
+        overflow: 'hidden',
         border: day.isToday ? '1.5px solid rgba(124,58,237,0.7)' : '1px solid var(--color-divider)',
         background: day.isToday ? 'rgba(124,58,237,0.08)' : hovered && day.isCurrentMonth ? 'var(--color-bg-card)' : 'transparent',
         boxShadow: day.isToday ? '0 0 14px rgba(124,58,237,0.2)' : 'none',
         cursor: day.isCurrentMonth ? 'pointer' : 'default',
         transition: 'background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
         display: 'flex', flexDirection: 'column', gap: 3, position: 'relative',
+        boxSizing: 'border-box',
       }}
     >
-      <span style={{ fontSize: '0.8rem', fontWeight: day.isToday ? 900 : day.isCurrentMonth ? 600 : 400, color: day.isToday ? '#a78bfa' : day.isCurrentMonth ? 'var(--color-text-primary)' : 'var(--color-text-muted)', lineHeight: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+      <span style={{ fontSize: '0.8rem', fontWeight: day.isToday ? 900 : day.isCurrentMonth ? 600 : 400, color: day.isToday ? '#a78bfa' : day.isCurrentMonth ? 'var(--color-text-primary)' : 'var(--color-text-muted)', lineHeight: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
         {day.isToday ? (
           <span style={{ display: 'inline-block', width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a78bfa)', boxShadow: '0 0 10px rgba(124,58,237,0.7)', color: '#fff', fontSize: '0.72rem', fontWeight: 900, textAlign: 'center', lineHeight: '22px' }}>
             {day.date.getDate()}
@@ -495,12 +516,17 @@ function CalendarCell({ day, events, onDayClick, onEventClick, onOverflowClick }
         ) : day.date.getDate()}
       </span>
       {visible.map(ev => (
-        <EventPill key={ev.id} event={ev} onClick={e => { e.stopPropagation(); onEventClick(ev, e) }} />
+        <EventPill
+          key={ev.id}
+          event={ev}
+          isContinuation={!isEventStartDay(ev, day.date)}
+          onClick={e => { e.stopPropagation(); onEventClick(ev, e) }}
+        />
       ))}
       {overflow > 0 && (
         <button
           onClick={e => { e.stopPropagation(); onOverflowClick(day.date, events, e) }}
-          style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(167,139,250,0.8)', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '1px 6px', borderRadius: 4, transition: 'color 0.15s ease, background 0.15s ease' }}
+          style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(167,139,250,0.8)', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '1px 6px', borderRadius: 4, transition: 'color 0.15s ease, background 0.15s ease', flexShrink: 0, marginTop: 'auto' }}
           onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.color = '#a78bfa'; ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.14)' }}
           onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(167,139,250,0.8)'; ;(e.currentTarget as HTMLButtonElement).style.background = 'none' }}
         >
@@ -714,7 +740,7 @@ export default function AgendaPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     setUserId(user.id)
-    const from = new Date(viewYear, viewMonth - 1, 1).toISOString()
+    const from = new Date(viewYear, viewMonth - 3, 1).toISOString()
     const to   = new Date(viewYear, viewMonth + 2, 0).toISOString()
     const { data } = await supabase
       .from('events')
@@ -786,7 +812,7 @@ export default function AgendaPage() {
 
   // ── Mobile day click ────────────────────────────────────────
   function handleMobileDayClick(date: Date) {
-    setMobileSheet({ date, events: eventsForDay(events, date) })
+    setMobileSheet({ date, events: getEventsForDay(events, date) })
   }
 
   // ── Counts ──────────────────────────────────────────────────
@@ -957,12 +983,12 @@ export default function AgendaPage() {
               <div style={{ width: 28, height: 28, border: '3px solid rgba(124,58,237,0.22)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.75s linear infinite' }} />
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, padding: '4px 8px 10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '60px', gap: 1, padding: '4px 8px 10px' }}>
               {calendarDays.map((day, idx) => (
                 <MobileCalendarCell
                   key={idx}
                   day={day}
-                  events={eventsForDay(events, day.date)}
+                  events={getEventsForDay(events, day.date)}
                   onClick={handleMobileDayClick}
                 />
               ))}
@@ -1062,12 +1088,12 @@ export default function AgendaPage() {
               <div style={{ width: 36, height: 36, border: '3px solid rgba(124,58,237,0.22)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.75s linear infinite' }} />
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, padding: '8px 12px 16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '120px', gap: 2, padding: '8px 12px 16px' }}>
               {calendarDays.map((day, idx) => (
                 <CalendarCell
                   key={idx}
                   day={day}
-                  events={eventsForDay(events, day.date)}
+                  events={getEventsForDay(events, day.date)}
                   onDayClick={handleDesktopDayClick}
                   onEventClick={ev => setDetailEvent(ev)}
                   onOverflowClick={(date, evs) => setDayEventsModal({ date, events: evs })}
