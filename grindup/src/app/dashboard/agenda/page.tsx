@@ -147,7 +147,7 @@ function MobileCalendarCell({
             ? 'linear-gradient(135deg, #7c3aed, #a78bfa)'
             : 'transparent',
           boxShadow: day.isToday ? '0 0 10px rgba(124,58,237,0.7)' : 'none',
-          color: day.isToday ? '#fff' : 'rgba(255,255,255,0.85)',
+          color: day.isToday ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
           fontSize: 14,
           fontWeight: day.isToday ? 900 : 500,
           lineHeight: 1,
@@ -257,7 +257,7 @@ function DayBottomSheet({
           zIndex: 910,
           height: '62vh',
           maxHeight: '82vh',
-          background: 'linear-gradient(180deg, #13092a 0%, #0d0a1e 100%)',
+          background: 'var(--color-bg-modal)',
           borderTop: '2px solid rgba(124,58,237,0.55)',
           borderRadius: '22px 22px 0 0',
           boxShadow: '0 -8px 40px rgba(124,58,237,0.2)',
@@ -282,16 +282,16 @@ function DayBottomSheet({
           flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff', lineHeight: 1.3 }}>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--color-text-primary)', lineHeight: 1.3 }}>
             {title}
           </h2>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)',
+              border: '1px solid var(--color-divider)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -306,7 +306,7 @@ function DayBottomSheet({
           {events.length === 0 ? (
             <div style={{ textAlign: 'center', paddingTop: 40, paddingBottom: 20 }}>
               <div style={{ fontSize: '2rem', marginBottom: 10, opacity: 0.3 }}>📅</div>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.88rem', margin: 0 }}>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem', margin: 0 }}>
                 Nenhum evento neste dia
               </p>
             </div>
@@ -330,16 +330,16 @@ function DayBottomSheet({
                     background: ev.color, boxShadow: `0 0 8px ${ev.color}99`,
                   }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {ev.title}
                     </p>
                     {ev.description && (
-                      <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(255,255,255,0.38)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {ev.description}
                       </p>
                     )}
                   </div>
-                  <span style={{ flexShrink: 0, fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>
+                  <span style={{ flexShrink: 0, fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
                     {localTimeStr(ev.start_at)}
                   </span>
                 </button>
@@ -423,18 +423,18 @@ function DayEventsModal({ date, events, onClose, onEventClick }: {
     >
       <div style={{
         width: '100%', maxWidth: 400, borderRadius: 20,
-        background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
-        border: '1px solid rgba(124,58,237,0.3)',
+        background: 'var(--color-bg-modal)',
+        border: '1px solid var(--color-border-strong)',
         boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
         padding: '28px 24px', animation: 'slideUp 0.22s ease',
         maxHeight: '80vh', overflowY: 'auto',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>Eventos</h2>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>Eventos</h2>
             <p style={{ fontSize: '0.8rem', color: '#a78bfa', margin: '3px 0 0', fontWeight: 600 }}>{title}</p>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -447,10 +447,10 @@ function DayEventsModal({ date, events, onClose, onEventClick }: {
             >
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: ev.color, boxShadow: `0 0 8px ${ev.color}99`, flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</p>
-                {ev.description && <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.description}</p>}
+                <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</p>
+                {ev.description && <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.description}</p>}
               </div>
-              <span style={{ flexShrink: 0, fontSize: '0.72rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>{localTimeStr(ev.start_at)}</span>
+              <span style={{ flexShrink: 0, fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>{localTimeStr(ev.start_at)}</span>
             </button>
           ))}
         </div>
@@ -479,15 +479,15 @@ function CalendarCell({ day, events, onDayClick, onEventClick, onOverflowClick }
       onMouseLeave={() => setHovered(false)}
       style={{
         minHeight: 96, padding: '8px 6px 6px', borderRadius: 10,
-        border: day.isToday ? '1.5px solid rgba(124,58,237,0.7)' : '1px solid rgba(255,255,255,0.04)',
-        background: day.isToday ? 'rgba(124,58,237,0.08)' : hovered && day.isCurrentMonth ? 'rgba(255,255,255,0.04)' : 'transparent',
+        border: day.isToday ? '1.5px solid rgba(124,58,237,0.7)' : '1px solid var(--color-divider)',
+        background: day.isToday ? 'rgba(124,58,237,0.08)' : hovered && day.isCurrentMonth ? 'var(--color-bg-card)' : 'transparent',
         boxShadow: day.isToday ? '0 0 14px rgba(124,58,237,0.2)' : 'none',
         cursor: day.isCurrentMonth ? 'pointer' : 'default',
         transition: 'background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
         display: 'flex', flexDirection: 'column', gap: 3, position: 'relative',
       }}
     >
-      <span style={{ fontSize: '0.8rem', fontWeight: day.isToday ? 900 : day.isCurrentMonth ? 600 : 400, color: day.isToday ? '#a78bfa' : day.isCurrentMonth ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.18)', lineHeight: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+      <span style={{ fontSize: '0.8rem', fontWeight: day.isToday ? 900 : day.isCurrentMonth ? 600 : 400, color: day.isToday ? '#a78bfa' : day.isCurrentMonth ? 'var(--color-text-primary)' : 'var(--color-text-muted)', lineHeight: 1, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
         {day.isToday ? (
           <span style={{ display: 'inline-block', width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a78bfa)', boxShadow: '0 0 10px rgba(124,58,237,0.7)', color: '#fff', fontSize: '0.72rem', fontWeight: 900, textAlign: 'center', lineHeight: '22px' }}>
             {day.date.getDate()}
@@ -538,10 +538,10 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
       style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', animation: 'fadeIn 0.18s ease' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ width: '100%', maxWidth: 500, borderRadius: 20, background: 'linear-gradient(145deg, #120c22, #0d0a1e)', border: '1px solid rgba(124,58,237,0.3)', boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)', padding: '32px 28px', animation: 'slideUp 0.22s ease', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div style={{ width: '100%', maxWidth: 500, borderRadius: 20, background: 'var(--color-bg-modal)', border: '1px solid var(--color-border-strong)', boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)', padding: '32px 28px', animation: 'slideUp 0.22s ease', maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: 0 }}>Novo Evento</h2>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>Novo Evento</h2>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -557,15 +557,15 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
           <div>
             <label style={labelStyle}>Início</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
-              <input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} required style={{ ...inputStyle, colorScheme: 'dark', background: '#120c22' }} />
-              <input type="time" value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))} style={{ ...inputStyle, colorScheme: 'dark', background: '#120c22', width: 110 }} />
+              <input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} required style={{ ...inputStyle, background: 'var(--color-bg-modal)' }} />
+              <input type="time" value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)', width: 110 }} />
             </div>
           </div>
           <div>
             <label style={labelStyle}>Fim</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
-              <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} style={{ ...inputStyle, colorScheme: 'dark', background: '#120c22' }} />
-              <input type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} style={{ ...inputStyle, colorScheme: 'dark', background: '#120c22', width: 110 }} />
+              <input type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)' }} />
+              <input type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} style={{ ...inputStyle, background: 'var(--color-bg-modal)', width: 110 }} />
             </div>
           </div>
           <div>
@@ -580,7 +580,7 @@ function NewEventModal({ initialDate, onClose, onSave, saving }: {
           </div>
           <div style={{ height: 4, borderRadius: 999, background: form.color, boxShadow: `0 0 12px ${form.color}88`, transition: 'background 0.2s ease, box-shadow 0.2s ease' }} />
           <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 10, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
             <button type="submit" disabled={saving || !form.title.trim()} style={{ flex: 2, padding: 12, borderRadius: 10, border: '1px solid rgba(124,58,237,0.5)', background: saving || !form.title.trim() ? 'rgba(124,58,237,0.3)' : 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: '#fff', fontSize: '0.875rem', fontWeight: 700, cursor: saving || !form.title.trim() ? 'not-allowed' : 'pointer', boxShadow: saving || !form.title.trim() ? 'none' : '0 0 18px rgba(124,58,237,0.45)', transition: 'all 0.2s ease' }}>
               {saving ? 'Salvando...' : 'Criar Evento'}
             </button>
@@ -609,11 +609,11 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
       style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', animation: 'fadeIn 0.18s ease' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ width: '100%', maxWidth: 420, borderRadius: 20, background: 'linear-gradient(145deg, #120c22, #0d0a1e)', border: '1px solid rgba(124,58,237,0.3)', boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)', padding: '28px 24px', animation: 'slideUp 0.22s ease' }}>
+      <div style={{ width: '100%', maxWidth: 420, borderRadius: 20, background: 'var(--color-bg-modal)', border: '1px solid var(--color-border-strong)', boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)', padding: '28px 24px', animation: 'slideUp 0.22s ease' }}>
         <div style={{ height: 4, borderRadius: 999, marginBottom: 20, background: event.color, boxShadow: `0 0 14px ${event.color}88` }} />
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.3 }}>{event.title}</h2>
-          <button onClick={onClose} style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, lineHeight: 1.3 }}>{event.title}</h2>
+          <button onClick={onClose} style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 8, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -623,8 +623,8 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
               <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
             </svg>
             <div>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', margin: 0, fontWeight: 600 }}>{formatDate(event.start_at)}, {localTimeStr(event.start_at)}</p>
-              {event.end_at && <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', margin: '2px 0 0' }}>até {formatDate(event.end_at)}, {localTimeStr(event.end_at)}</p>}
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: 0, fontWeight: 600 }}>{formatDate(event.start_at)}, {localTimeStr(event.start_at)}</p>
+              {event.end_at && <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '2px 0 0' }}>até {formatDate(event.end_at)}, {localTimeStr(event.end_at)}</p>}
             </div>
           </div>
           {event.description && (
@@ -632,7 +632,7 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,0.7)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }}>
                 <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="15" y2="12" /><line x1="3" y1="18" x2="18" y2="18" />
               </svg>
-              <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.55 }}>{event.description}</p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.55 }}>{event.description}</p>
             </div>
           )}
         </div>
@@ -645,9 +645,9 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
           </button>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)', textAlign: 'center', margin: 0 }}>Tem certeza? Esta ação não pode ser desfeita.</p>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', textAlign: 'center', margin: 0 }}>Tem certeza? Esta ação não pode ser desfeita.</p>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.6)', fontSize: '0.83rem', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => setConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', fontSize: '0.83rem', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
               <button onClick={() => onDelete(event.id)} disabled={deleting} style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid rgba(239,68,68,0.4)', background: deleting ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.25)', color: '#f87171', fontSize: '0.83rem', fontWeight: 700, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.6 : 1 }}>
                 {deleting ? 'Deletando...' : 'Confirmar'}
               </button>
@@ -664,22 +664,22 @@ function EventDetailModal({ event, onClose, onDelete, deleting }: {
 // ─────────────────────────────────────────────────────────────
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: '0.78rem', fontWeight: 600,
-  color: 'rgba(255,255,255,0.55)', marginBottom: 8,
+  color: 'var(--color-text-secondary)' as string, marginBottom: 8,
   textTransform: 'uppercase', letterSpacing: '0.06em',
 }
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '11px 14px', borderRadius: 10,
-  border: '1px solid rgba(124,58,237,0.3)',
-  background: 'rgba(124,58,237,0.07)',
-  color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid var(--color-border)',
+  background: 'var(--color-accent-soft)',
+  color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
 }
 
 const navBtnStyle: React.CSSProperties = {
   width: 34, height: 34, borderRadius: 9,
-  border: '1px solid rgba(255,255,255,0.08)',
-  background: 'rgba(255,255,255,0.05)',
-  color: 'rgba(255,255,255,0.5)',
+  border: '1px solid var(--color-divider)',
+  background: 'var(--color-bg-card)',
+  color: 'var(--color-text-secondary)',
   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
   transition: 'all 0.15s ease', flexShrink: 0,
 }
@@ -866,10 +866,10 @@ export default function AgendaPage() {
       {/* ── Page header ─────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: 0, marginBottom: 4 }}>
             Agenda
           </h1>
-          <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
             {monthEventCount === 0
               ? 'Nenhum evento este mês'
               : `${monthEventCount} evento${monthEventCount !== 1 ? 's' : ''} em ${MONTH_NAMES[viewMonth]}`}
@@ -904,8 +904,8 @@ export default function AgendaPage() {
         {/* Mobile calendar card */}
         <div style={{
           borderRadius: 18,
-          background: 'rgba(255,255,255,0.025)',
-          border: '1px solid rgba(124,58,237,0.14)',
+          background: 'var(--color-bg-card)',
+          border: '1px solid var(--color-border)',
           overflow: 'hidden',
           marginBottom: 24,
         }}>
@@ -913,23 +913,23 @@ export default function AgendaPage() {
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '14px 16px',
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            borderBottom: '1px solid var(--color-divider)',
           }}>
             <button
               onClick={prevMonth}
-              style={{ width: 36, height: 36, borderRadius: 9, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ width: 36, height: 36, borderRadius: 9, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
 
-            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: 0, textAlign: 'center', flex: 1 }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, textAlign: 'center', flex: 1 }}>
               {MONTH_NAMES[viewMonth]} {viewYear}
             </h2>
 
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <button
                 onClick={nextMonth}
-                style={{ width: 36, height: 36, borderRadius: 9, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: 36, height: 36, borderRadius: 9, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', color: 'var(--color-text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
               </button>
@@ -943,9 +943,9 @@ export default function AgendaPage() {
           </div>
 
           {/* Weekday headers — single letter */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '8px 8px 4px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '8px 8px 4px', borderBottom: '1px solid var(--color-divider)' }}>
             {WEEKDAYS_MOBILE.map((d, i) => (
-              <div key={i} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.04em' }}>
+              <div key={i} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.04em' }}>
                 {d}
               </div>
             ))}
@@ -972,11 +972,11 @@ export default function AgendaPage() {
 
         {/* ── Próximos eventos (mobile) ───────────────────── */}
         <section>
-          <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 12px' }}>
+          <h3 style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 12px' }}>
             Próximos eventos
           </h3>
           {loading ? null : upcomingEvents.length === 0 ? (
-            <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem', margin: 0, textAlign: 'center', paddingTop: 16, paddingBottom: 16 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', margin: 0, textAlign: 'center', paddingTop: 16, paddingBottom: 16 }}>
               Nenhum evento próximo
             </p>
           ) : (
@@ -988,17 +988,17 @@ export default function AgendaPage() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '12px 14px', borderRadius: 12,
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    background: 'rgba(255,255,255,0.025)',
+                    border: '1px solid var(--color-divider)',
+                    background: 'var(--color-bg-card)',
                     cursor: 'pointer', textAlign: 'left', width: '100%',
                   }}
                 >
                   <div style={{ width: 10, height: 10, borderRadius: '50%', background: ev.color, boxShadow: `0 0 7px ${ev.color}99`, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {ev.title}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'rgba(255,255,255,0.38)' }}>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
                       {new Date(ev.start_at).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })} · {localTimeStr(ev.start_at)}
                     </p>
                   </div>
@@ -1015,26 +1015,26 @@ export default function AgendaPage() {
       <div className="ag-desktop-only">
         <div style={{
           borderRadius: 20,
-          background: 'rgba(255,255,255,0.025)',
-          border: '1px solid rgba(124,58,237,0.14)',
+          background: 'var(--color-bg-card)',
+          border: '1px solid var(--color-border)',
           boxShadow: '0 0 40px rgba(124,58,237,0.05)',
           overflow: 'hidden',
         }}>
           {/* Calendar header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid var(--color-divider)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <button onClick={prevMonth} style={navBtnStyle}
                 onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.18)'; ;(e.currentTarget as HTMLButtonElement).style.color = '#a78bfa' }}
-                onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'; ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.5)' }}
+                onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card)'; ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-secondary)' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
               </button>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: 0, minWidth: 180, textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, minWidth: 180, textAlign: 'center' }}>
                 {MONTH_NAMES[viewMonth]} {viewYear}
               </h2>
               <button onClick={nextMonth} style={navBtnStyle}
                 onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(124,58,237,0.18)'; ;(e.currentTarget as HTMLButtonElement).style.color = '#a78bfa' }}
-                onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'; ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.5)' }}
+                onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card)'; ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-secondary)' }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
               </button>
@@ -1048,9 +1048,9 @@ export default function AgendaPage() {
           </div>
 
           {/* Weekday headers */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '10px 16px 6px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '10px 16px 6px', borderBottom: '1px solid var(--color-divider)' }}>
             {WEEKDAYS_FULL.map(day => (
-              <div key={day} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', paddingBottom: 4 }}>
+              <div key={day} style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-muted)', paddingBottom: 4 }}>
                 {day}
               </div>
             ))}
@@ -1080,7 +1080,7 @@ export default function AgendaPage() {
         {/* Desktop: upcoming events below calendar */}
         {!loading && monthEventCount > 0 && (
           <div style={{ marginTop: 28 }}>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.45)', margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-muted)', margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Próximos eventos
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1088,20 +1088,20 @@ export default function AgendaPage() {
                 <button
                   key={ev.id}
                   onClick={() => setDetailEvent(ev)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.025)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease', width: '100%' }}
-                  onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'; ;(e.currentTarget as HTMLButtonElement).style.borderColor = `${ev.color}44` }}
-                  onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.025)'; ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.05)' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease', width: '100%' }}
+                  onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-input)'; ;(e.currentTarget as HTMLButtonElement).style.borderColor = `${ev.color}44` }}
+                  onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--color-bg-card)'; ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-divider)' }}
                 >
                   <div style={{ width: 4, alignSelf: 'stretch', minHeight: 36, borderRadius: 999, background: ev.color, boxShadow: `0 0 8px ${ev.color}88`, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</p>
-                    {ev.description && <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.description}</p>}
+                    <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</p>
+                    {ev.description && <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.description}</p>}
                   </div>
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
                       {formatDateShort(ev.start_at)}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'rgba(255,255,255,0.28)' }}>{localTimeStr(ev.start_at)}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{localTimeStr(ev.start_at)}</p>
                   </div>
                 </button>
               ))}

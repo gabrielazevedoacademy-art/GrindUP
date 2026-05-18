@@ -111,11 +111,11 @@ function TaskCard({
         borderRadius: 16,
         padding: '20px 24px',
         background: task.is_completed
-          ? 'rgba(255,255,255,0.015)'
-          : 'rgba(255,255,255,0.04)',
+          ? 'var(--color-bg-card)'
+          : 'var(--color-bg-card)',
         border: task.is_completed
-          ? '1px solid rgba(255,255,255,0.06)'
-          : '1px solid rgba(124,58,237,0.18)',
+          ? '1px solid var(--color-divider)'
+          : '1px solid var(--color-border)',
         boxShadow: task.is_completed ? 'none' : '0 0 18px rgba(124,58,237,0.07)',
         opacity: task.is_completed ? 0.55 : 1,
         transition: 'opacity 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
@@ -163,7 +163,7 @@ function TaskCard({
             style={{
               fontSize: '0.9375rem',
               fontWeight: 700,
-              color: task.is_completed ? 'rgba(255,255,255,0.4)' : '#fff',
+              color: task.is_completed ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
               textDecoration: task.is_completed ? 'line-through' : 'none',
               flex: 1,
             }}
@@ -191,7 +191,7 @@ function TaskCard({
         </div>
 
         {task.description && (
-          <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.38)', marginBottom: 10, lineHeight: 1.55 }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 10, lineHeight: 1.55 }}>
             {task.description}
           </p>
         )}
@@ -220,7 +220,7 @@ function TaskCard({
 
           {/* Due date */}
           {task.due_date && (
-            <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
@@ -337,8 +337,8 @@ function NewTaskModal({
           width: '100%',
           maxWidth: 480,
           borderRadius: 20,
-          background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
-          border: '1px solid rgba(124,58,237,0.3)',
+          background: 'var(--color-bg-modal)',
+          border: '1px solid var(--color-border-strong)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
           padding: '32px 28px',
           animation: 'slideUp 0.22s ease',
@@ -346,16 +346,16 @@ function NewTaskModal({
       >
         {/* Modal header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             Nova Tarefa
           </h2>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)',
+              border: '1px solid var(--color-divider)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -368,7 +368,7 @@ function NewTaskModal({
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Title */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Título *
             </label>
             <input
@@ -382,9 +382,9 @@ function NewTaskModal({
                 width: '100%',
                 padding: '11px 14px',
                 borderRadius: 10,
-                border: '1px solid rgba(124,58,237,0.3)',
-                background: 'rgba(124,58,237,0.07)',
-                color: '#fff',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-accent-soft)',
+                color: 'var(--color-text-primary)',
                 fontSize: '0.9rem',
                 outline: 'none',
                 boxSizing: 'border-box',
@@ -394,7 +394,7 @@ function NewTaskModal({
 
           {/* Description */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Descrição
             </label>
             <textarea
@@ -409,7 +409,7 @@ function NewTaskModal({
                 borderRadius: 10,
                 border: '1px solid rgba(124,58,237,0.3)',
                 background: 'rgba(124,58,237,0.07)',
-                color: '#fff',
+                color: 'var(--color-text-primary)',
                 fontSize: '0.875rem',
                 outline: 'none',
                 resize: 'vertical',
@@ -422,7 +422,7 @@ function NewTaskModal({
           {/* Priority + Due date row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Prioridade
               </label>
               <select
@@ -432,9 +432,9 @@ function NewTaskModal({
                   width: '100%',
                   padding: '11px 14px',
                   borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: '#120c22',
-                  color: '#fff',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-bg-modal)',
+                  color: 'var(--color-text-primary)',
                   fontSize: '0.875rem',
                   outline: 'none',
                   cursor: 'pointer',
@@ -447,7 +447,7 @@ function NewTaskModal({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Vencimento
               </label>
               <input
@@ -458,12 +458,11 @@ function NewTaskModal({
                   width: '100%',
                   padding: '11px 14px',
                   borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: '#120c22',
-                  color: '#fff',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-bg-modal)',
+                  color: 'var(--color-text-primary)',
                   fontSize: '0.875rem',
                   outline: 'none',
-                  colorScheme: 'dark',
                   boxSizing: 'border-box',
                 }}
               />
@@ -497,9 +496,9 @@ function NewTaskModal({
               onClick={onClose}
               style={{
                 flex: 1, padding: '12px', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.6)',
+                border: '1px solid var(--color-divider)',
+                background: 'var(--color-bg-card)',
+                color: 'var(--color-text-secondary)',
                 fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
               }}
             >
@@ -548,9 +547,9 @@ function FilterChip({
       style={{
         padding: '6px 14px',
         borderRadius: 999,
-        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
-        background: active ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.03)',
-        color: active ? '#a78bfa' : 'rgba(255,255,255,0.45)',
+        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid var(--color-divider)',
+        background: active ? 'rgba(124,58,237,0.18)' : 'var(--color-bg-card)',
+        color: active ? '#a78bfa' : 'var(--color-text-secondary)',
         fontSize: '0.8rem',
         fontWeight: active ? 700 : 500,
         cursor: 'pointer',
@@ -810,10 +809,10 @@ export default function TarefasPage() {
       {/* ── Page header ─────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: 0, marginBottom: 4 }}>
             Tarefas
           </h1>
-          <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
             {pendingCount > 0
               ? `${pendingCount} ${pendingCount === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`
               : totalCount === 0
@@ -858,7 +857,7 @@ export default function TarefasPage() {
             </FilterChip>
           ))}
         </div>
-        <div style={{ width: 1, height: 22, background: 'rgba(255,255,255,0.08)', margin: '0 4px' }} />
+        <div style={{ width: 1, height: 22, background: 'var(--color-divider)', margin: '0 4px' }} />
         <div style={{ display: 'flex', gap: 6 }}>
           {(['all', 'high', 'medium', 'low'] as PriorityFilter[]).map(f => (
             <FilterChip key={f} active={priorityFilter === f} onClick={() => setPriorityFilter(f)}>
@@ -894,11 +893,11 @@ export default function TarefasPage() {
                 </span>
               </div>
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
               {(userProfile.level * 1000).toLocaleString('pt-BR')} XP p/ nível {userProfile.level + 1}
             </span>
           </div>
-          <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+          <div style={{ height: 4, background: 'var(--color-bg-input)', borderRadius: 999, overflow: 'hidden' }}>
             <div style={{
               height: '100%', borderRadius: 999,
               background: 'linear-gradient(90deg, #7c3aed, #a78bfa)',
@@ -924,13 +923,13 @@ export default function TarefasPage() {
           <div style={{ fontSize: '3rem', marginBottom: 16, opacity: 0.3 }}>
             {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all' ? '📋' : '🔍'}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
             {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all'
               ? 'Nenhuma tarefa criada ainda'
               : 'Nenhuma tarefa corresponde aos filtros'}
           </p>
           {totalCount === 0 && statusFilter === 'all' && priorityFilter === 'all' && (
-            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem', margin: 0 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', margin: 0 }}>
               Crie sua primeira tarefa e comece a ganhar XP!
             </p>
           )}
@@ -953,7 +952,7 @@ export default function TarefasPage() {
 
           {/* Counter + Load more */}
           <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.25)', marginBottom: 12 }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
               Mostrando {tasks.length} de {totalCount} {totalCount === 1 ? 'tarefa' : 'tarefas'}
             </p>
             {tasks.length < totalCount && (

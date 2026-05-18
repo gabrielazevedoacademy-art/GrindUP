@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div
       className="flex min-h-screen"
       style={{
-        background: 'var(--bg-primary, #0a0a0f)',
+        background: 'var(--color-bg-primary, #0a0a0f)',
         backgroundImage:
           'radial-gradient(ellipse at 0% 0%, rgba(124,58,237,0.08) 0%, transparent 50%), radial-gradient(ellipse at 100% 100%, rgba(79,70,229,0.06) 0%, transparent 50%)',
       }}
@@ -139,12 +139,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           display: flex; align-items: center; gap: 12px;
           padding: 10px 12px; border-radius: 12px;
           font-size: 0.875rem; font-weight: 500;
-          color: rgba(255,255,255,0.5);
+          color: var(--color-text-secondary);
           transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
           text-decoration: none;
         }
         .dash-nav-link:hover {
-          color: rgba(255,255,255,0.85);
+          color: var(--color-text-primary);
           background: rgba(124,58,237,0.1);
         }
         .dash-nav-link.active {
@@ -156,25 +156,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           display: flex; align-items: center; gap: 8px;
           width: 100%; padding: 8px 12px; border-radius: 10px;
           font-size: 0.75rem; font-weight: 500;
-          color: rgba(255,255,255,0.35);
-          background: rgba(255,255,255,0.04);
+          color: var(--color-text-muted);
+          background: var(--color-bg-card);
           border: none; cursor: pointer;
           transition: color 0.2s ease, background 0.2s ease;
           min-height: 44px;
         }
-        .dash-logout-btn:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.07); }
+        .dash-logout-btn:hover { color: var(--color-text-secondary); background: var(--color-bg-card-hover); }
         .dash-logout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .dash-config-link {
           display: flex; align-items: center; gap: 8px;
           width: 100%; padding: 8px 12px; border-radius: 10px;
           font-size: 0.75rem; font-weight: 500;
-          color: rgba(255,255,255,0.45);
+          color: var(--color-text-secondary);
           background: transparent;
           border: none; cursor: pointer; text-decoration: none;
           transition: color 0.2s ease, background 0.2s ease;
           min-height: 44px; margin-bottom: 4px;
         }
-        .dash-config-link:hover { color: rgba(255,255,255,0.75); background: rgba(124,58,237,0.08); }
+        .dash-config-link:hover { color: var(--color-text-primary); background: rgba(124,58,237,0.08); }
         .dash-config-link.active { color: #a78bfa; background: rgba(124,58,237,0.12); }
         .dash-admin-link {
           display: flex; align-items: center; gap: 8px;
@@ -210,8 +210,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
         .module-card {
           display: block; border-radius: 16px; padding: 24px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(124,58,237,0.14);
+          background: var(--color-bg-card);
+          border: 1px solid var(--color-border);
           box-shadow: 0 0 20px rgba(124,58,237,0.05);
           text-decoration: none;
           transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -219,12 +219,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .module-card:hover {
           transform: translateY(-3px);
           box-shadow: 0 8px 32px rgba(124,58,237,0.22);
-          border-color: rgba(124,58,237,0.4);
+          border-color: var(--color-border-strong);
         }
         .stat-card {
           border-radius: 16px; padding: 20px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(124,58,237,0.14);
+          background: var(--color-bg-card);
+          border: 1px solid var(--color-border);
           box-shadow: 0 0 20px rgba(124,58,237,0.06);
         }
         .xp-bar-fill {
@@ -256,8 +256,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className="dash-mobile-header fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-4"
         style={{
           height: 56,
-          background: 'rgba(10,10,15,0.97)',
-          borderBottom: '1px solid rgba(124,58,237,0.18)',
+          background: 'var(--color-header-bg)',
+          borderBottom: '1px solid var(--color-border)',
         }}
       >
         <button
@@ -266,7 +266,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             width: 44, height: 44,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'none', border: 'none', cursor: 'pointer',
-            color: 'rgba(255,255,255,0.75)', fontSize: '1.4rem',
+            color: 'var(--color-text-secondary)', fontSize: '1.4rem',
             borderRadius: 8,
           }}
           aria-label="Abrir menu"
@@ -295,15 +295,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside
         className={`dash-sidebar${sidebarOpen ? ' open' : ''} fixed left-0 top-0 z-50 flex h-full flex-col`}
         style={{
-          background: 'rgba(15, 10, 30, 0.97)',
-          borderRight: '1px solid rgba(124,58,237,0.18)',
+          background: 'var(--color-sidebar-bg)',
+          borderRight: '1px solid var(--color-border)',
           boxShadow: '4px 0 24px rgba(124,58,237,0.07)',
         }}
       >
         {/* Logo */}
         <div
           className="px-6 py-5"
-          style={{ borderBottom: '1px solid rgba(124,58,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          style={{ borderBottom: '1px solid var(--color-divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           <h1 className="text-2xl font-black tracking-tight text-white">
             Grind
@@ -325,7 +325,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               width: 44, height: 44,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(255,255,255,0.6)', fontSize: '1.2rem',
+              color: 'var(--color-text-secondary)', fontSize: '1.2rem',
               borderRadius: 8,
             }}
           >
@@ -357,7 +357,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User footer */}
         <div
           className="p-4"
-          style={{ borderTop: '1px solid rgba(124,58,237,0.1)' }}
+          style={{ borderTop: '1px solid var(--color-divider)' }}
         >
           <div className="mb-3 flex items-center gap-3">
             <AvatarFrame
@@ -376,7 +376,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(124,58,237,0.12)', marginBottom: 8, marginTop: 4 }} />
+          <div style={{ borderTop: '1px solid var(--color-divider)', marginBottom: 8, marginTop: 4 }} />
           <Link href="/planos" className="dash-plans-link" onClick={() => setSidebarOpen(false)}>
             <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -384,7 +384,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Ver planos
           </Link>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginBottom: 4, marginTop: 4 }} />
+          <div style={{ borderTop: '1px solid var(--color-divider)', marginBottom: 4, marginTop: 4 }} />
           <Link
             href="/dashboard/configuracoes"
             className={`dash-config-link${pathname === '/dashboard/configuracoes' ? ' active' : ''}`}

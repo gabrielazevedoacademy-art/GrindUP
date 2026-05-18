@@ -129,9 +129,9 @@ function FilterChip({
       style={{
         padding: '6px 14px',
         borderRadius: 999,
-        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
-        background: active ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.03)',
-        color: active ? '#a78bfa' : 'rgba(255,255,255,0.45)',
+        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid var(--color-divider)',
+        background: active ? 'rgba(124,58,237,0.18)' : 'var(--color-bg-card)',
+        color: active ? '#a78bfa' : 'var(--color-text-secondary)',
         fontSize: '0.8rem',
         fontWeight: active ? 700 : 500,
         cursor: 'pointer',
@@ -153,7 +153,7 @@ function ProgressBar({ percent, completed }: { percent: number; completed: boole
     <div
       style={{
         height: 8,
-        background: 'rgba(255,255,255,0.06)',
+        background: 'var(--color-bg-input)',
         borderRadius: 999,
         overflow: 'hidden',
         position: 'relative',
@@ -203,11 +203,11 @@ function GoalCard({
         borderRadius: 16,
         padding: '22px 24px',
         background: goal.is_completed
-          ? 'rgba(74,222,128,0.03)'
-          : 'rgba(255,255,255,0.04)',
+          ? 'rgba(74,222,128,0.04)'
+          : 'var(--color-bg-card)',
         border: goal.is_completed
           ? '1px solid rgba(74,222,128,0.2)'
-          : '1px solid rgba(124,58,237,0.18)',
+          : '1px solid var(--color-border)',
         boxShadow: goal.is_completed
           ? '0 0 20px rgba(74,222,128,0.05)'
           : '0 0 18px rgba(124,58,237,0.07)',
@@ -226,7 +226,7 @@ function GoalCard({
               style={{
                 fontSize: '1rem',
                 fontWeight: 800,
-                color: goal.is_completed ? 'rgba(255,255,255,0.55)' : '#fff',
+                color: goal.is_completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)',
                 lineHeight: 1.3,
               }}
             >
@@ -256,7 +256,7 @@ function GoalCard({
             <p
               style={{
                 fontSize: '0.8rem',
-                color: 'rgba(255,255,255,0.36)',
+                color: 'var(--color-text-muted)',
                 margin: 0,
                 lineHeight: 1.55,
               }}
@@ -309,9 +309,9 @@ function GoalCard({
       {/* Progress bar */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
             {formatValue(goal.current_value, goal.unit)}{' '}
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>{' '}
+            <span style={{ color: 'var(--color-text-muted)' }}>/</span>{' '}
             {formatValue(goal.target_value, goal.unit)}
           </span>
           <span
@@ -475,8 +475,8 @@ function NewGoalModal({
           width: '100%',
           maxWidth: 'min(520px, 95vw)',
           borderRadius: 20,
-          background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
-          border: '1px solid rgba(124,58,237,0.3)',
+          background: 'var(--color-bg-modal)',
+          border: '1px solid var(--color-border-strong)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
           padding: '28px 20px',
           animation: 'slideUp 0.22s ease',
@@ -486,16 +486,16 @@ function NewGoalModal({
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             Nova Meta
           </h2>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)',
+              border: '1px solid var(--color-divider)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -508,7 +508,7 @@ function NewGoalModal({
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Title */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Título *
             </label>
             <input
@@ -520,16 +520,16 @@ function NewGoalModal({
               required
               style={{
                 width: '100%', padding: '11px 14px', borderRadius: 10,
-                border: '1px solid rgba(124,58,237,0.3)',
-                background: 'rgba(124,58,237,0.07)',
-                color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-accent-soft)',
+                color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
               }}
             />
           </div>
 
           {/* Description */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Descrição
             </label>
             <textarea
@@ -542,7 +542,7 @@ function NewGoalModal({
                 width: '100%', padding: '11px 14px', borderRadius: 10,
                 border: '1px solid rgba(124,58,237,0.3)',
                 background: 'rgba(124,58,237,0.07)',
-                color: '#fff', fontSize: '0.875rem', outline: 'none',
+                color: 'var(--color-text-primary)', fontSize: '0.875rem', outline: 'none',
                 resize: 'vertical', lineHeight: 1.55, boxSizing: 'border-box',
               }}
             />
@@ -551,7 +551,7 @@ function NewGoalModal({
           {/* Target + Current row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Valor alvo *
               </label>
               <input
@@ -564,14 +564,14 @@ function NewGoalModal({
                 required
                 style={{
                   width: '100%', padding: '11px 14px', borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: 'rgba(124,58,237,0.07)',
-                  color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-accent-soft)',
+                  color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
                 }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Valor atual
               </label>
               <input
@@ -583,9 +583,9 @@ function NewGoalModal({
                 step="any"
                 style={{
                   width: '100%', padding: '11px 14px', borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: 'rgba(124,58,237,0.07)',
-                  color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-accent-soft)',
+                  color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
                 }}
               />
             </div>
@@ -594,7 +594,7 @@ function NewGoalModal({
           {/* Unit + Deadline row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Unidade
               </label>
               <input
@@ -606,9 +606,9 @@ function NewGoalModal({
                 list="unit-suggestions"
                 style={{
                   width: '100%', padding: '11px 14px', borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: 'rgba(124,58,237,0.07)',
-                  color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-accent-soft)',
+                  color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
                 }}
               />
               <datalist id="unit-suggestions">
@@ -616,7 +616,7 @@ function NewGoalModal({
               </datalist>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Prazo
               </label>
               <input
@@ -625,10 +625,10 @@ function NewGoalModal({
                 onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
                 style={{
                   width: '100%', padding: '11px 14px', borderRadius: 10,
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: '#120c22',
-                  color: '#fff', fontSize: '0.875rem', outline: 'none',
-                  colorScheme: 'dark', boxSizing: 'border-box',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-bg-modal)',
+                  color: 'var(--color-text-primary)', fontSize: '0.875rem', outline: 'none',
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
@@ -636,7 +636,7 @@ function NewGoalModal({
 
           {/* Unit suggestions chips */}
           <div>
-            <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', margin: '0 0 8px' }}>Sugestões de unidade:</p>
+            <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: '0 0 8px' }}>Sugestões de unidade:</p>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {UNIT_SUGGESTIONS.map(u => (
                 <button
@@ -646,9 +646,9 @@ function NewGoalModal({
                   style={{
                     padding: '3px 12px',
                     borderRadius: 999,
-                    border: form.unit === u ? '1px solid rgba(124,58,237,0.6)' : '1px solid rgba(255,255,255,0.1)',
-                    background: form.unit === u ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.03)',
-                    color: form.unit === u ? '#a78bfa' : 'rgba(255,255,255,0.4)',
+                    border: form.unit === u ? '1px solid rgba(124,58,237,0.6)' : '1px solid var(--color-divider)',
+                    background: form.unit === u ? 'rgba(124,58,237,0.2)' : 'var(--color-bg-card)',
+                    color: form.unit === u ? '#a78bfa' : 'var(--color-text-secondary)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -685,9 +685,9 @@ function NewGoalModal({
               onClick={onClose}
               style={{
                 flex: 1, padding: '12px', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.6)',
+                border: '1px solid var(--color-divider)',
+                background: 'var(--color-bg-card)',
+                color: 'var(--color-text-secondary)',
                 fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
               }}
             >
@@ -770,8 +770,8 @@ function ProgressModal({
       <div
         style={{
           width: '100%', maxWidth: 'min(440px, 95vw)', borderRadius: 20,
-          background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
-          border: '1px solid rgba(124,58,237,0.3)',
+          background: 'var(--color-bg-modal)',
+          border: '1px solid var(--color-border-strong)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
           padding: '28px 20px',
           animation: 'slideUp 0.22s ease',
@@ -780,16 +780,16 @@ function ProgressModal({
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             Atualizar Progresso
           </h2>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)',
+              border: '1px solid var(--color-divider)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -799,14 +799,14 @@ function ProgressModal({
           </button>
         </div>
 
-        <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.35)', margin: '0 0 24px' }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', margin: '0 0 24px' }}>
           {goal.title}
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Mode toggle */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Modo
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -818,9 +818,9 @@ function ProgressModal({
                   style={{
                     padding: '9px',
                     borderRadius: 10,
-                    border: form.mode === mode ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
-                    background: form.mode === mode ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.03)',
-                    color: form.mode === mode ? '#a78bfa' : 'rgba(255,255,255,0.45)',
+                    border: form.mode === mode ? '1px solid rgba(124,58,237,0.55)' : '1px solid var(--color-divider)',
+                    background: form.mode === mode ? 'rgba(124,58,237,0.18)' : 'var(--color-bg-card)',
+                    color: form.mode === mode ? '#a78bfa' : 'var(--color-text-secondary)',
                     fontSize: '0.82rem',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -835,7 +835,7 @@ function ProgressModal({
 
           {/* Value input */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               {form.mode === 'add' ? 'Quanto adicionar?' : 'Novo valor atual'}
             </label>
             <input
@@ -848,9 +848,9 @@ function ProgressModal({
               autoFocus
               style={{
                 width: '100%', padding: '11px 14px', borderRadius: 10,
-                border: '1px solid rgba(124,58,237,0.3)',
-                background: 'rgba(124,58,237,0.07)',
-                color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-accent-soft)',
+                color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
               }}
             />
           </div>
@@ -860,12 +860,12 @@ function ProgressModal({
             style={{
               padding: '14px',
               borderRadius: 12,
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--color-bg-card)',
+              border: '1px solid var(--color-border)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
                 {formatValue(previewValue, goal.unit)} / {formatValue(goal.target_value, goal.unit)}
               </span>
               <span style={{ fontSize: '0.78rem', fontWeight: 800, color: previewPercent >= 100 ? '#4ade80' : '#a78bfa' }}>
@@ -887,9 +887,9 @@ function ProgressModal({
               onClick={onClose}
               style={{
                 flex: 1, padding: '12px', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.6)',
+                border: '1px solid var(--color-divider)',
+                background: 'var(--color-bg-card)',
+                color: 'var(--color-text-secondary)',
                 fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
               }}
             >
@@ -1177,10 +1177,10 @@ export default function MetasPage() {
       {/* ── Page header ─────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: 0, marginBottom: 4 }}>
             Metas
           </h1>
-          <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
             {goals.length === 0
               ? 'Nenhuma meta criada ainda'
               : `${activeCount} em andamento · ${completedCount} concluída${completedCount !== 1 ? 's' : ''}`}
@@ -1252,7 +1252,7 @@ export default function MetasPage() {
             </span>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 999, overflow: 'hidden' }}>
+            <div style={{ height: 4, background: 'var(--color-bg-input)', borderRadius: 999, overflow: 'hidden' }}>
               <div
                 style={{
                   height: '100%', borderRadius: 999,
@@ -1264,7 +1264,7 @@ export default function MetasPage() {
               />
             </div>
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
             {(userProfile.level * 1000).toLocaleString('pt-BR')} XP p/ nível {userProfile.level + 1}
           </span>
         </div>
@@ -1288,11 +1288,11 @@ export default function MetasPage() {
           <div style={{ fontSize: '3rem', marginBottom: 16, opacity: 0.3 }}>
             {goals.length === 0 ? '🎯' : '🔍'}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
             {goals.length === 0 ? 'Nenhuma meta criada ainda' : 'Nenhuma meta corresponde ao filtro'}
           </p>
           {goals.length === 0 && (
-            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem', margin: 0 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', margin: 0 }}>
               Crie sua primeira meta e ganhe 100 XP ao concluí-la!
             </p>
           )}

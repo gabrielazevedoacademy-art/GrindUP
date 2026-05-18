@@ -173,7 +173,7 @@ function CheckinModal({
       <div
         style={{
           width: '100%', maxWidth: 'min(420px, 95vw)', borderRadius: 22,
-          background: 'linear-gradient(145deg, #120c22, #0d0a1e)',
+          background: 'var(--color-bg-modal)',
           border: '1px solid rgba(124,58,237,0.3)',
           boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
           padding: '26px 20px',
@@ -186,10 +186,10 @@ function CheckinModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: '1.5rem' }}>{meta.icon}</span>
             <div>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                 Check-in da {meta.label}
               </h2>
-              <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+              <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', margin: 0 }}>
                 {meta.range}
               </p>
             </div>
@@ -198,9 +198,9 @@ function CheckinModal({
             onClick={onClose}
             style={{
               width: 30, height: 30, borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -212,7 +212,7 @@ function CheckinModal({
 
         {/* Mood */}
         <div style={{ marginBottom: 20 }}>
-          <p style={{ fontSize: '0.73rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'rgba(255,255,255,0.38)', textAlign: 'center', marginBottom: 12 }}>
+          <p style={{ fontSize: '0.73rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: 12 }}>
             Como está seu humor?
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 7 }}>
@@ -243,7 +243,7 @@ function CheckinModal({
 
         {/* Energy */}
         <div style={{ marginBottom: 20 }}>
-          <p style={{ fontSize: '0.73rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'rgba(255,255,255,0.38)', textAlign: 'center', marginBottom: 12 }}>
+          <p style={{ fontSize: '0.73rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: 12 }}>
             Nível de energia
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 7 }}>
@@ -280,9 +280,9 @@ function CheckinModal({
             maxLength={500}
             style={{
               width: '100%', padding: '10px 13px', borderRadius: 10,
-              border: '1px solid rgba(124,58,237,0.22)',
-              background: 'rgba(124,58,237,0.06)',
-              color: '#fff', fontSize: '0.85rem', outline: 'none',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-accent-soft)',
+              color: 'var(--color-text-primary)', fontSize: '0.85rem', outline: 'none',
               resize: 'none', lineHeight: 1.55, boxSizing: 'border-box',
             }}
           />
@@ -304,9 +304,9 @@ function CheckinModal({
             onClick={onClose}
             style={{
               flex: 1, padding: '11px', borderRadius: 10,
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.55)',
+              border: '1px solid var(--color-border)',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)',
               fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
             }}
           >
@@ -380,8 +380,8 @@ function PeriodCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{meta.icon}</span>
           <div>
-            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: '#fff' }}>{meta.label}</p>
-            <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)' }}>{meta.range}</p>
+            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{meta.label}</p>
+            <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{meta.range}</p>
           </div>
         </div>
 
@@ -437,7 +437,7 @@ function PeriodCard({
           {checkin.notes && (
             <p style={{
               width: '100%', margin: 0, fontSize: '0.75rem',
-              color: 'rgba(255,255,255,0.4)', lineHeight: 1.5,
+              color: 'var(--color-text-muted)', lineHeight: 1.5,
               fontStyle: 'italic',
             }}>
               &ldquo;{checkin.notes}&rdquo;
@@ -520,13 +520,13 @@ function MoodChart({ history }: { history: MoodCheckin[] }) {
       </div>
       {/* X-axis labels: only first, middle, last */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)' }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
           {formatDateLabel(days[0].dateStr)}
         </span>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)' }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
           {formatDateLabel(days[6].dateStr)}
         </span>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)' }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
           Hoje
         </span>
       </div>
@@ -694,10 +694,10 @@ export default function CheckinPage() {
 
       {/* ── Header ──────────────────────────────────────────── */}
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: 0, marginBottom: 4 }}>
           Check-in
         </h1>
-        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
           {todayCount === 0
             ? 'Nenhum check-in feito hoje ainda'
             : todayCount === 3
@@ -719,7 +719,7 @@ export default function CheckinPage() {
         <>
           {/* ── Today's periods ─────────────────────────────── */}
           <section style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 14px' }}>
+            <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 14px' }}>
               Turnos de hoje
             </h2>
             <div className="ci-periods-grid">
@@ -768,17 +768,17 @@ export default function CheckinPage() {
                   key={stat.label}
                   style={{
                     borderRadius: 14, padding: '16px',
-                    background: 'rgba(255,255,255,0.03)',
+                    background: 'var(--color-bg-card)',
                     border: '1px solid rgba(124,58,237,0.12)',
                   }}
                 >
-                  <p style={{ margin: '0 0 6px', fontSize: '0.7rem', fontWeight: 600, color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <p style={{ margin: '0 0 6px', fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     {stat.label}
                   </p>
                   <p style={{ margin: '0 0 2px', fontSize: '1.6rem', fontWeight: 900, color: stat.color, lineHeight: 1 }}>
                     {stat.value}
                   </p>
-                  <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.28)' }}>
+                  <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
                     {stat.sub}
                   </p>
                 </div>
@@ -789,12 +789,12 @@ export default function CheckinPage() {
           {/* ── Mood chart ──────────────────────────────────── */}
           {history.length > 0 && (
             <section style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
+              <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
                 Humor — últimos 14 dias
               </h2>
               <div style={{
                 borderRadius: 16, padding: '20px 20px 14px',
-                background: 'rgba(255,255,255,0.025)',
+                background: 'var(--color-bg-card)',
                 border: '1px solid rgba(124,58,237,0.12)',
               }}>
                 <MoodChart history={history} />
@@ -803,7 +803,7 @@ export default function CheckinPage() {
                   {Object.entries(MOOD_COLORS).map(([k, color]) => (
                     <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
-                      <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)' }}>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
                         {MOOD_LABELS[Number(k) - 1]}
                       </span>
                     </div>
@@ -816,7 +816,7 @@ export default function CheckinPage() {
           {/* ── History ─────────────────────────────────────── */}
           {historyByDate.length > 0 && (
             <section>
-              <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 14px' }}>
+              <h2 style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 14px' }}>
                 Histórico — últimos 30 dias
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -825,12 +825,12 @@ export default function CheckinPage() {
                     key={dateStr}
                     style={{
                       borderRadius: 14, padding: '14px 16px',
-                      background: 'rgba(255,255,255,0.025)',
-                      border: '1px solid rgba(255,255,255,0.05)',
+                      background: 'var(--color-bg-card)',
+                      border: '1px solid var(--color-divider)',
                     }}
                   >
                     {/* Date header */}
-                    <p style={{ margin: '0 0 10px', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'capitalize' }}>
+                    <p style={{ margin: '0 0 10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'capitalize' }}>
                       {formatDayFull(dateStr)}
                     </p>
 
@@ -865,7 +865,7 @@ export default function CheckinPage() {
                     {checkins.some(c => c.notes) && (
                       <div style={{ marginTop: 8 }}>
                         {checkins.filter(c => c.notes).map(c => (
-                          <p key={c.id} style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.32)', fontStyle: 'italic', lineHeight: 1.5 }}>
+                          <p key={c.id} style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic', lineHeight: 1.5 }}>
                             {PERIOD_META[c.period ?? 'morning'].icon} &ldquo;{c.notes}&rdquo;
                           </p>
                         ))}
@@ -880,10 +880,10 @@ export default function CheckinPage() {
           {history.length === 0 && (
             <div style={{ textAlign: 'center', paddingTop: 60 }}>
               <div style={{ fontSize: '3rem', marginBottom: 16, opacity: 0.3 }}>😐</div>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', margin: 0, marginBottom: 8 }}>
                 Nenhum check-in nos últimos 30 dias
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem', margin: 0 }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', margin: 0 }}>
                 Registre seu primeiro check-in e ganhe 15 XP!
               </p>
             </div>

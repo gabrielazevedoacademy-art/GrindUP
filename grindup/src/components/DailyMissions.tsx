@@ -22,8 +22,8 @@ export default function DailyMissions({
     <div
       className="mb-6 rounded-2xl p-5"
       style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(124,58,237,0.14)',
+        background: 'var(--color-bg-card)',
+        border: '1px solid var(--color-border)',
       }}
     >
       {/* Header */}
@@ -33,7 +33,7 @@ export default function DailyMissions({
             <circle cx="12" cy="8" r="6" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
           </svg>
-          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff' }}>Missões de hoje</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Missões de hoje</span>
         </div>
         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: allDone ? '#4ade80' : '#a78bfa' }}>
           {completed}/{total} concluídas
@@ -41,7 +41,7 @@ export default function DailyMissions({
       </div>
 
       {/* Progress bar */}
-      <div style={{ height: 4, background: 'rgba(255,255,255,0.07)', borderRadius: 999, overflow: 'hidden', marginBottom: 14 }}>
+      <div style={{ height: 4, background: 'var(--color-bg-input)', borderRadius: 999, overflow: 'hidden', marginBottom: 14 }}>
         <div style={{
           height: '100%',
           width: `${pct}%`,
@@ -79,7 +79,7 @@ export default function DailyMissions({
             </div>
             <span style={{
               flex: 1, fontSize: '0.8rem', fontWeight: 500,
-              color: m.is_completed ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.72)',
+              color: m.is_completed ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
               textDecoration: m.is_completed ? 'line-through' : 'none',
             }}>
               {m.title}

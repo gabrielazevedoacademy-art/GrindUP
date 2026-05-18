@@ -159,7 +159,7 @@ function SummaryCard({ label, value, icon, color, borderColor, bgColor, prefix =
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <div style={{ color, flexShrink: 0 }}>{icon}</div>
-        <span style={{ fontSize: '0.73rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <span style={{ fontSize: '0.73rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
           {label}
         </span>
       </div>
@@ -183,12 +183,12 @@ function ProportionBar({ income, expense, pending }: { income: number; expense: 
   return (
     <div style={{
       borderRadius: 16, padding: '18px 22px',
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(124,58,237,0.14)',
+      background: 'var(--color-bg-card)',
+      border: '1px solid var(--color-border)',
       marginBottom: 20,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>
+        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
           Proporção do período
         </span>
         <div style={{ display: 'flex', gap: 14 }}>
@@ -197,7 +197,7 @@ function ProportionBar({ income, expense, pending }: { income: number; expense: 
           {penPct > 0 && <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 600 }}>⏳ {penPct}%</span>}
         </div>
       </div>
-      <div style={{ height: 10, borderRadius: 999, overflow: 'hidden', background: 'rgba(255,255,255,0.06)', display: 'flex' }}>
+      <div style={{ height: 10, borderRadius: 999, overflow: 'hidden', background: 'var(--color-bg-input)', display: 'flex' }}>
         {incPct > 0 && (
           <div style={{ width: `${incPct}%`, background: 'linear-gradient(90deg,#16a34a,#4ade80)', boxShadow: '0 0 10px rgba(74,222,128,0.5)', transition: 'width 0.7s ease' }} />
         )}
@@ -235,15 +235,15 @@ function CategoryBreakdown({ transactions }: { transactions: Transaction[] }) {
   return (
     <div style={{
       borderRadius: 16, padding: '20px 22px',
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(124,58,237,0.14)',
+      background: 'var(--color-bg-card)',
+      border: '1px solid var(--color-border)',
       marginBottom: 20,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth={2} strokeLinecap="round">
           <path d="M18 20V10M12 20V4M6 20v-6" />
         </svg>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
           Resumo por categoria — despesas
         </span>
       </div>
@@ -256,14 +256,14 @@ function CategoryBreakdown({ transactions }: { transactions: Transaction[] }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, boxShadow: `0 0 8px ${color}` }} />
-                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>{cat}</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>{cat}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <span style={{ fontSize: '0.78rem', color, fontWeight: 700 }}>{pct}%</span>
-                  <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>{formatBRL(total)}</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>{formatBRL(total)}</span>
                 </div>
               </div>
-              <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: 6, borderRadius: 999, background: 'var(--color-bg-input)', overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', borderRadius: 999,
                   background: color,
@@ -305,8 +305,8 @@ function TransactionCard({
   return (
     <div style={{
       borderRadius: 14, padding: '14px 18px',
-      background: isPending ? 'rgba(251,191,36,0.03)' : 'rgba(255,255,255,0.03)',
-      border: isPending ? '1px solid rgba(251,191,36,0.15)' : '1px solid rgba(255,255,255,0.07)',
+      background: isPending ? 'rgba(251,191,36,0.05)' : 'var(--color-bg-card)',
+      border: isPending ? '1px solid rgba(251,191,36,0.18)' : '1px solid var(--color-divider)',
       display: 'flex', alignItems: 'center', gap: 14,
       transition: 'border-color 0.2s ease',
     }}>
@@ -335,7 +335,7 @@ function TransactionCard({
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff', overflow: 'hidden', wordBreak: 'break-word' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', wordBreak: 'break-word' }}>
             {transaction.title}
           </span>
           {transaction.category && (
@@ -356,7 +356,7 @@ function TransactionCard({
             </span>
           )}
         </div>
-        <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.28)' }}>
+        <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
           {formatDate(transaction.date)}
         </span>
       </div>
@@ -441,9 +441,9 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
       onClick={onClick}
       style={{
         padding: '5px 13px', borderRadius: 999,
-        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(255,255,255,0.08)',
-        background: active ? 'rgba(124,58,237,0.18)' : 'rgba(255,255,255,0.03)',
-        color: active ? '#a78bfa' : 'rgba(255,255,255,0.4)',
+        border: active ? '1px solid rgba(124,58,237,0.55)' : '1px solid var(--color-divider)',
+        background: active ? 'rgba(124,58,237,0.18)' : 'var(--color-bg-card)',
+        color: active ? '#a78bfa' : 'var(--color-text-secondary)',
         fontSize: '0.78rem', fontWeight: active ? 700 : 500, cursor: 'pointer',
         boxShadow: active ? '0 0 10px rgba(124,58,237,0.2)' : 'none',
         transition: 'all 0.2s ease', whiteSpace: 'nowrap',
@@ -478,7 +478,7 @@ function DeleteConfirmModal({ tx, onConfirm, onCancel, loading }: {
     >
       <div style={{
         width: '100%', maxWidth: 380, borderRadius: 18,
-        background: 'linear-gradient(145deg,#120c22,#0d0a1e)',
+        background: 'var(--color-bg-modal)',
         border: '1px solid rgba(239,68,68,0.3)',
         boxShadow: '0 0 40px rgba(239,68,68,0.15), 0 20px 50px rgba(0,0,0,0.6)',
         padding: '28px 24px', animation: 'slideUp 0.2s ease',
@@ -494,17 +494,17 @@ function DeleteConfirmModal({ tx, onConfirm, onCancel, loading }: {
               <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2" />
             </svg>
           </div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             Excluir transação?
           </h3>
         </div>
-        <p style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.45)', margin: '0 0 6px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '0.84rem', color: 'var(--color-text-secondary)', margin: '0 0 6px', lineHeight: 1.5 }}>
           Tem certeza que deseja excluir
         </p>
-        <p style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 700, margin: '0 0 22px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: '0.88rem', color: 'var(--color-text-primary)', fontWeight: 700, margin: '0 0 22px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           &ldquo;{tx.title}&rdquo;?
         </p>
-        <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.3)', margin: '0 0 22px' }}>
+        <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '0 0 22px' }}>
           Esta ação não pode ser desfeita.
         </p>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -512,8 +512,8 @@ function DeleteConfirmModal({ tx, onConfirm, onCancel, loading }: {
             onClick={onCancel}
             style={{
               flex: 1, padding: '10px 0', borderRadius: 10,
-              border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
+              border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
             }}
           >
             Cancelar
@@ -568,12 +568,12 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '11px 14px', borderRadius: 10,
-    border: '1px solid rgba(124,58,237,0.3)', background: 'rgba(124,58,237,0.07)',
-    color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
+    border: '1px solid var(--color-border)', background: 'var(--color-accent-soft)',
+    color: 'var(--color-text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box',
   }
   const labelStyle: React.CSSProperties = {
     display: 'block', fontSize: '0.75rem', fontWeight: 600,
-    color: 'rgba(255,255,255,0.45)', marginBottom: 7,
+    color: 'var(--color-text-secondary)', marginBottom: 7,
     textTransform: 'uppercase', letterSpacing: '0.06em',
   }
 
@@ -596,19 +596,19 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
     >
       <div style={{
         width: '100%', maxWidth: 500, borderRadius: 20,
-        background: 'linear-gradient(145deg,#120c22,#0d0a1e)',
-        border: '1px solid rgba(124,58,237,0.3)',
+        background: 'var(--color-bg-modal)',
+        border: '1px solid var(--color-border-strong)',
         boxShadow: '0 0 60px rgba(124,58,237,0.25), 0 24px 64px rgba(0,0,0,0.6)',
         padding: '30px 26px', animation: 'slideUp 0.22s ease',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: 0 }}>Nova Transação</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>Nova Transação</h2>
           <button
             onClick={onClose}
             style={{
               width: 30, height: 30, borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
-              color: 'rgba(255,255,255,0.5)', cursor: 'pointer',
+              border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)',
+              color: 'var(--color-text-secondary)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -631,9 +631,9 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
                   style={{
                     flex: 1, padding: '9px 0', borderRadius: 10, cursor: 'pointer',
                     fontSize: '0.8rem', fontWeight: 700,
-                    border: form.type === tc.key ? `1px solid ${tc.activeBdr}` : '1px solid rgba(255,255,255,0.08)',
-                    background: form.type === tc.key ? tc.activeBg : 'rgba(255,255,255,0.03)',
-                    color: form.type === tc.key ? tc.color : 'rgba(255,255,255,0.4)',
+                    border: form.type === tc.key ? `1px solid ${tc.activeBdr}` : '1px solid var(--color-divider)',
+                    background: form.type === tc.key ? tc.activeBg : 'var(--color-bg-card)',
+                    color: form.type === tc.key ? tc.color : 'var(--color-text-muted)',
                     transition: 'all 0.2s ease',
                   }}
                 >
@@ -683,7 +683,7 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
             <input
               type="date" value={form.date}
               onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-              style={{ ...inputStyle, background: '#120c22', colorScheme: 'dark' as React.CSSProperties['colorScheme'] }}
+              style={{ ...inputStyle, background: 'var(--color-bg-modal)' }}
             />
           </div>
 
@@ -693,8 +693,8 @@ function NewTransactionModal({ onClose, onSave, saving, saveError }: {
               type="button" onClick={onClose}
               style={{
                 flex: 1, padding: 11, borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
+                border: '1px solid var(--color-divider)', background: 'var(--color-bg-card)',
+                color: 'var(--color-text-secondary)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
               }}
             >
               Cancelar
@@ -924,8 +924,8 @@ export default function FinancasPage() {
 
   const inputBase: React.CSSProperties = {
     padding: '9px 13px', borderRadius: 9,
-    border: '1px solid rgba(124,58,237,0.25)', background: 'rgba(255,255,255,0.04)',
-    color: '#fff', fontSize: '0.85rem', outline: 'none', colorScheme: 'dark' as React.CSSProperties['colorScheme'],
+    border: '1px solid var(--color-border)', background: 'var(--color-bg-card)',
+    color: 'var(--color-text-primary)', fontSize: '0.85rem', outline: 'none',
   }
 
   return (
@@ -942,19 +942,19 @@ export default function FinancasPage() {
           border-color: rgba(124,58,237,0.6) !important;
           box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
         }
-        select option { background-color: #1a1a2e !important; color: #fff !important; }
+        select option { background-color: var(--color-bg-modal) !important; color: var(--color-text-primary) !important; }
         select.periodo-select {
-          background-color: #1a1a2e !important;
-          color: white !important;
-          border: 1px solid rgba(124,58,237,0.3) !important;
+          background-color: var(--color-bg-modal) !important;
+          color: var(--color-text-primary) !important;
+          border: 1px solid var(--color-border) !important;
           padding: 8px 16px !important;
           border-radius: 8px !important;
           cursor: pointer !important;
           outline: none !important;
         }
         select.periodo-select option {
-          background-color: #1a1a2e !important;
-          color: white !important;
+          background-color: var(--color-bg-modal) !important;
+          color: var(--color-text-primary) !important;
         }
         .fin-summary-grid {
           display: grid;
@@ -993,10 +993,10 @@ export default function FinancasPage() {
       {/* ── Header ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26 }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#fff', margin: 0, marginBottom: 4 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)', margin: 0, marginBottom: 4 }}>
             Finanças
           </h1>
-          <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
             {periodLabel}
           </p>
         </div>
@@ -1025,14 +1025,14 @@ export default function FinancasPage() {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
         marginBottom: 22, padding: '14px 18px', borderRadius: 14,
-        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(124,58,237,0.14)',
+        background: 'var(--color-bg-card)', border: '1px solid var(--color-border)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth={2} strokeLinecap="round">
             <rect x="3" y="4" width="18" height="18" rx="2" />
             <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
           </svg>
-          <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Período
           </span>
         </div>
@@ -1048,7 +1048,7 @@ export default function FinancasPage() {
         {period === 'custom' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>De</span>
+              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>De</span>
               <input
                 type="date" value={customFrom}
                 onChange={e => setCustomFrom(e.target.value)}
@@ -1056,7 +1056,7 @@ export default function FinancasPage() {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>Até</span>
+              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>Até</span>
               <input
                 type="date" value={customTo}
                 onChange={e => setCustomTo(e.target.value)}
@@ -1122,7 +1122,7 @@ export default function FinancasPage() {
       {/* ── Search + sort ────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 14, alignItems: 'center' }}>
         <div style={{ flex: 1, position: 'relative' }}>
-          <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
@@ -1161,7 +1161,7 @@ export default function FinancasPage() {
 
         {periodCategories.length > 0 && (
           <>
-            <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.08)', margin: '0 2px' }} />
+            <div style={{ width: 1, height: 20, background: 'var(--color-divider)', margin: '0 2px' }} />
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               <FilterChip active={categoryFilter === 'all'} onClick={() => setCategoryFilter('all')}>
                 Qualquer categoria
@@ -1186,11 +1186,11 @@ export default function FinancasPage() {
           <div style={{ fontSize: '2.8rem', marginBottom: 14, opacity: 0.25 }}>
             {transactions.length === 0 ? '💰' : '🔍'}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.9rem', margin: '0 0 6px' }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', margin: '0 0 6px' }}>
             {transactions.length === 0 ? 'Nenhuma transação registrada ainda' : 'Nenhuma transação neste período'}
           </p>
           {transactions.length === 0 && (
-            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', margin: 0 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', margin: 0 }}>
               Registre sua primeira receita ou despesa!
             </p>
           )}
@@ -1209,7 +1209,7 @@ export default function FinancasPage() {
             </div>
           ))}
           {filtered.length > 0 && (
-            <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(255,255,255,0.18)', marginTop: 8 }}>
+            <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
               Mostrando {Math.min(displayCount, filtered.length)} de {filtered.length} {filtered.length === 1 ? 'transação' : 'transações'}
             </p>
           )}

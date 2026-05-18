@@ -291,7 +291,7 @@ function DashboardContent({
 
         {/* ── Name + badges ── */}
         <div style={{ paddingLeft: isMobile ? 104 : 148, paddingBottom: 16 }}>
-          <h2 className="mb-2 font-black text-white" style={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }}>{displayName}</h2>
+          <h2 className="mb-2 font-black" style={{ fontSize: isMobile ? '1.2rem' : '1.5rem', color: 'var(--color-text-primary)' }}>{displayName}</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             {/* Plan badge */}
             <span
@@ -323,7 +323,7 @@ function DashboardContent({
               </svg>
             </div>
             <div className="text-2xl font-black" style={{ color: '#a78bfa' }}>{profile.level}</div>
-            <div className="mt-1 text-xs text-gray-500">Nível atual</div>
+            <div className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>Nível atual</div>
             <div style={{
               marginTop: 5,
               fontSize: '0.63rem',
@@ -340,7 +340,7 @@ function DashboardContent({
             <div key={s.label} className="stat-card">
               <div style={{ color: s.color, marginBottom: 8 }}>{s.icon}</div>
               <div className="text-2xl font-black" style={{ color: s.color }}>{s.value}</div>
-              <div className="mt-1 text-xs text-gray-500">{s.label}</div>
+              <div className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -349,22 +349,22 @@ function DashboardContent({
         <div
           className="mb-6 rounded-2xl p-5"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(124,58,237,0.14)',
+            background: 'var(--color-bg-card)',
+            border: '1px solid var(--color-border)',
           }}
         >
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-300">
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
               {isMaxLevel ? 'Nível máximo atingido!' : `Progresso para o Nível ${profile.level + 1}`}
             </span>
             <span className="text-sm font-bold text-violet-400">{xpPct.toFixed(0)}%</span>
           </div>
-          <div style={{ height: 8, background: 'rgba(255,255,255,0.07)', borderRadius: 999, overflow: 'hidden' }}>
+          <div style={{ height: 8, background: 'var(--color-bg-input)', borderRadius: 999, overflow: 'hidden' }}>
             <div className="xp-bar-fill" style={{ width: `${xpPct}%`, transition: 'width 0.6s ease' }} />
           </div>
           <div className="mt-2 flex justify-between">
-            <span className="text-xs text-gray-600">{xpProgress.current.toLocaleString('pt-BR')} XP</span>
-            <span className="text-xs text-gray-600">{isMaxLevel ? '—' : xpForNextLevel.toLocaleString('pt-BR') + ' XP'}</span>
+            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{xpProgress.current.toLocaleString('pt-BR')} XP</span>
+            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{isMaxLevel ? '—' : xpForNextLevel.toLocaleString('pt-BR') + ' XP'}</span>
           </div>
         </div>
 
@@ -378,9 +378,9 @@ function DashboardContent({
           {modules.map((mod) => (
             <Link key={mod.href} href={mod.href} className="module-card">
               <div style={{ color: mod.iconColor, marginBottom: 14 }}>{mod.icon}</div>
-              <h3 className="mb-1 text-base font-bold text-white">{mod.title}</h3>
-              <p className="mb-3 text-xs leading-relaxed text-gray-500">{mod.subtitle}</p>
-              <p className="mb-5 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>{mod.preview}</p>
+              <h3 className="mb-1 text-base font-bold" style={{ color: 'var(--color-text-primary)' }}>{mod.title}</h3>
+              <p className="mb-3 text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>{mod.subtitle}</p>
+              <p className="mb-5 text-xs" style={{ color: 'var(--color-text-muted)' }}>{mod.preview}</p>
               <span
                 className="rounded-lg px-3 py-1.5 text-xs font-semibold"
                 style={{

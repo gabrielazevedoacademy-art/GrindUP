@@ -13,7 +13,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       style={{
         width: 48, height: 26, borderRadius: 13,
-        background: checked ? '#7c3aed' : 'rgba(255,255,255,0.15)',
+        background: checked ? '#7c3aed' : 'var(--color-bg-input)',
         border: 'none', cursor: 'pointer',
         position: 'relative', transition: 'background 0.2s ease',
         flexShrink: 0,
@@ -35,8 +35,8 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(124,58,237,0.14)',
+      background: 'var(--color-bg-card)',
+      border: '1px solid var(--color-border)',
       borderRadius: 16, padding: 24, marginBottom: 20,
     }}>
       <h2 style={{
@@ -65,7 +65,7 @@ function PolicyModal({ title, children, onClose }: {
     >
       <div
         style={{
-          background: '#0d0a1e', border: '1px solid rgba(124,58,237,0.25)',
+          background: 'var(--color-bg-modal)', border: '1px solid var(--color-border-strong)',
           borderRadius: 16, padding: 32, maxWidth: 560, width: '100%',
           maxHeight: '80vh', overflow: 'auto',
         }}
@@ -85,7 +85,7 @@ function PolicyModal({ title, children, onClose }: {
         </div>
         <div style={{
           display: 'flex', flexDirection: 'column', gap: 14,
-          color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', lineHeight: 1.75,
+          color: 'var(--color-text-secondary)', fontSize: '0.875rem', lineHeight: 1.75,
         }}>
           {children}
         </div>
@@ -235,14 +235,14 @@ export default function ConfiguracoesPage() {
         .cfg-btn:disabled { opacity: 0.6; cursor: not-allowed; }
       `}</style>
 
-      <h1 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 800, marginBottom: 28 }}>
+      <h1 style={{ color: 'var(--color-text-primary)', fontSize: '1.5rem', fontWeight: 800, marginBottom: 28 }}>
         Configurações
       </h1>
 
       {/* ── SEÇÃO 1: Aparência ── */}
       <SectionCard title="Aparência">
         <div style={{ marginBottom: 24 }}>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Tema
           </p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -253,9 +253,9 @@ export default function ConfiguracoesPage() {
                 className="cfg-btn"
                 style={{
                   padding: '10px 14px', borderRadius: 12, cursor: 'pointer',
-                  background: theme === t.key ? 'rgba(124,58,237,0.22)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${theme === t.key ? 'rgba(124,58,237,0.55)' : 'rgba(255,255,255,0.1)'}`,
-                  color: theme === t.key ? '#a78bfa' : 'rgba(255,255,255,0.55)',
+                  background: theme === t.key ? 'rgba(124,58,237,0.22)' : 'var(--color-bg-card)',
+                  border: `1px solid ${theme === t.key ? 'rgba(124,58,237,0.55)' : 'var(--color-border)'}`,
+                  color: theme === t.key ? '#a78bfa' : 'var(--color-text-secondary)',
                   fontSize: '0.875rem', fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: 10,
                   flex: '1 1 160px',
@@ -277,7 +277,7 @@ export default function ConfiguracoesPage() {
         </div>
 
         <div>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Tamanho de fonte
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -288,9 +288,9 @@ export default function ConfiguracoesPage() {
                 className="cfg-btn"
                 style={{
                   padding: '8px 16px', borderRadius: 10, cursor: 'pointer', flex: 1,
-                  background: fontSize === f.key ? 'rgba(124,58,237,0.22)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${fontSize === f.key ? 'rgba(124,58,237,0.55)' : 'rgba(255,255,255,0.1)'}`,
-                  color: fontSize === f.key ? '#a78bfa' : 'rgba(255,255,255,0.55)',
+                  background: fontSize === f.key ? 'rgba(124,58,237,0.22)' : 'var(--color-bg-card)',
+                  border: `1px solid ${fontSize === f.key ? 'rgba(124,58,237,0.55)' : 'var(--color-border)'}`,
+                  color: fontSize === f.key ? '#a78bfa' : 'var(--color-text-secondary)',
                   fontSize: '0.875rem', fontWeight: 600,
                 }}
               >
@@ -305,7 +305,7 @@ export default function ConfiguracoesPage() {
       <SectionCard title="Conta">
         {/* Nome */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <label style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Nome completo
           </label>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -316,8 +316,8 @@ export default function ConfiguracoesPage() {
               className="cfg-input"
               style={{
                 flex: 1, padding: '10px 14px', borderRadius: 10,
-                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(124,58,237,0.2)',
-                color: '#fff', fontSize: '0.875rem',
+                background: 'var(--color-bg-input)', border: '1px solid rgba(124,58,237,0.2)',
+                color: 'var(--color-text-primary)', fontSize: '0.875rem',
               }}
               placeholder="Seu nome completo"
             />
@@ -342,8 +342,8 @@ export default function ConfiguracoesPage() {
         </div>
 
         {/* Senha */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, marginBottom: 20 }}>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 20, marginBottom: 20 }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Senha
           </p>
           <button
@@ -351,8 +351,8 @@ export default function ConfiguracoesPage() {
             className="cfg-btn"
             style={{
               padding: '10px 20px', borderRadius: 10, cursor: 'pointer',
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
-              color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: '0.875rem',
+              background: 'var(--color-bg-card)', border: '1px solid var(--color-border)',
+              color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '0.875rem',
             }}
           >
             Trocar senha
@@ -365,8 +365,8 @@ export default function ConfiguracoesPage() {
         </div>
 
         {/* Deletar */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        <div style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 20 }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Zona de perigo
           </p>
           <button
@@ -387,19 +387,19 @@ export default function ConfiguracoesPage() {
       <SectionCard title="Notificações">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, gap: 16 }}>
           <div>
-            <p style={{ color: '#fff', fontSize: '0.875rem', fontWeight: 600, marginBottom: 3 }}>Lembrete de check-in</p>
-            <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.78rem' }}>Receba um lembrete diário para fazer check-in</p>
+            <p style={{ color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: 3 }}>Lembrete de check-in</p>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>Receba um lembrete diário para fazer check-in</p>
           </div>
           <Toggle checked={checkinReminder} onChange={handleCheckinReminder} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, gap: 16 }}>
           <div>
-            <p style={{ color: '#fff', fontSize: '0.875rem', fontWeight: 600, marginBottom: 3 }}>Notificações de missões</p>
-            <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: '0.78rem' }}>Seja notificado sobre novas missões diárias</p>
+            <p style={{ color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: 600, marginBottom: 3 }}>Notificações de missões</p>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>Seja notificado sobre novas missões diárias</p>
           </div>
           <Toggle checked={missionNotifs} onChange={handleMissionNotifs} />
         </div>
-        <p style={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.75rem', fontStyle: 'italic' }}>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>
           As notificações dependem das permissões do seu navegador
         </p>
       </SectionCard>
@@ -407,7 +407,7 @@ export default function ConfiguracoesPage() {
       {/* ── SEÇÃO 4: Privacidade ── */}
       <SectionCard title="Privacidade">
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Seus dados
           </p>
           <button
@@ -422,7 +422,7 @@ export default function ConfiguracoesPage() {
           >
             {exporting ? 'Exportando…' : 'Exportar meus dados'}
           </button>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem', marginTop: 8 }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 8 }}>
             Baixa um arquivo JSON com seu perfil, tarefas, metas e transações.
           </p>
         </div>
@@ -459,7 +459,7 @@ export default function ConfiguracoesPage() {
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
         }}>
           <div style={{
-            background: '#0d0a1e', border: '1px solid rgba(239,68,68,0.3)',
+            background: 'var(--color-bg-modal)', border: '1px solid rgba(239,68,68,0.3)',
             borderRadius: 16, padding: 32, maxWidth: 440, width: '100%',
           }}>
             <h3 style={{ color: '#f87171', fontWeight: 800, fontSize: '1.1rem', marginBottom: 12 }}>
@@ -476,8 +476,8 @@ export default function ConfiguracoesPage() {
               className="cfg-input"
               style={{
                 width: '100%', padding: '10px 14px', borderRadius: 10, marginBottom: 16,
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(239,68,68,0.3)',
-                color: '#fff', fontSize: '0.875rem', boxSizing: 'border-box',
+                background: 'var(--color-bg-input)', border: '1px solid rgba(239,68,68,0.3)',
+                color: 'var(--color-text-primary)', fontSize: '0.875rem', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
@@ -486,8 +486,8 @@ export default function ConfiguracoesPage() {
                 className="cfg-btn"
                 style={{
                   flex: 1, padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: '0.875rem',
+                  background: 'var(--color-bg-card)', border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-secondary)', fontWeight: 600, fontSize: '0.875rem',
                 }}
               >
                 Cancelar
