@@ -394,27 +394,25 @@ function EventPill({ event, onClick, isEndDay }: {
   onClick: (e: React.MouseEvent) => void
   isEndDay?: boolean
 }) {
-  const bg = isEndDay ? event.color + '18' : event.color + '28'
-  const bgHover = isEndDay ? event.color + '30' : event.color + '45'
+  const label = isEndDay ? 'Fim' : 'Início'
   return (
     <button
       onClick={onClick}
-      title={isEndDay ? `Fim: ${event.title}` : event.title}
+      title={`${label}: ${event.title}`}
       style={{
         width: '100%', padding: '2px 6px', borderRadius: 4,
-        background: bg,
-        border: isEndDay ? `1px dashed ${event.color}55` : `1px solid ${event.color}55`,
-        color: event.color, fontSize: '0.7rem', fontWeight: 700,
+        background: 'transparent', border: 'none',
+        color: event.color, fontSize: '0.7rem',
         textAlign: 'left', cursor: 'pointer',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        transition: 'background 0.15s ease', lineHeight: 1.4,
-        opacity: isEndDay ? 0.7 : 1,
-        flexShrink: 0,
+        lineHeight: 1.4, flexShrink: 0,
+        transition: 'opacity 0.15s ease',
+        opacity: isEndDay ? 0.75 : 1,
       }}
-      onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bgHover }}
-      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bg }}
+      onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.opacity = '0.9' }}
+      onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.opacity = isEndDay ? '0.75' : '1' }}
     >
-      {isEndDay ? `⬛ fim: ${event.title}` : event.title}
+      <span style={{ fontWeight: 800 }}>{label}:</span>{' '}{event.title}
     </button>
   )
 }
