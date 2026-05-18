@@ -107,10 +107,6 @@ function getEventsForDay(events: Event[], date: Date): Event[] {
   })
 }
 
-function isEventStartDay(event: Event, date: Date): boolean {
-  return isoDateStr(new Date(event.start_at)) === isoDateStr(date)
-}
-
 function isEventEndDay(event: Event, date: Date): boolean {
   if (!event.end_at) return false
   const endStr = isoDateStr(new Date(event.end_at))
