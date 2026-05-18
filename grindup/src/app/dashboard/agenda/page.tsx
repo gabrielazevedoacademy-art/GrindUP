@@ -98,17 +98,24 @@ function dateTimeToISO(date: string, time: string): string {
 
 function getEventsForDay(events: Event[], date: Date): Event[] {
   const dayStr = isoDateStr(date)
-  const dayStart = new Date(dayStr + 'T00:00:00')
-  const dayEnd = new Date(dayStr + 'T23:59:59')
   return events.filter(e => {
-    const start = new Date(e.start_at)
-    const end = e.end_at ? new Date(e.end_at) : start
-    return start <= dayEnd && end >= dayStart
+    const startStr = isoDateStr(new Date(e.start_at))
+    if (startStr === dayStr) return true
+    if (!e.end_at) return false
+    const endStr = isoDateStr(new Date(e.end_at))
+    return endStr === dayStr && endStr !== startStr
   })
 }
 
 function isEventStartDay(event: Event, date: Date): boolean {
   return isoDateStr(new Date(event.start_at)) === isoDateStr(date)
+}
+
+function isEventEndDay(event: Event, date: Date): boolean {
+  if (!event.end_at) return false
+  const endStr = isoDateStr(new Date(event.end_at))
+  const startStr = isoDateStr(new Date(event.start_at))
+  return endStr === isoDateStr(date) && endStr !== startStr
 }
 
 function formatDayTitle(date: Date): string {
@@ -386,32 +393,32 @@ function DayBottomSheet({
 // ─────────────────────────────────────────────────────────────
 // DESKTOP: EVENT PILL
 // ─────────────────────────────────────────────────────────────
-function EventPill({ event, onClick, isContinuation }: {
+function EventPill({ event, onClick, isEndDay }: {
   event: Event
   onClick: (e: React.MouseEvent) => void
-  isContinuation?: boolean
+  isEndDay?: boolean
 }) {
-  const bg = isContinuation ? event.color + '18' : event.color + '28'
-  const bgHover = isContinuation ? event.color + '30' : event.color + '45'
+  const bg = isEndDay ? event.color + '18' : event.color + '28'
+  const bgHover = isEndDay ? event.color + '30' : event.color + '45'
   return (
     <button
       onClick={onClick}
-      title={event.title}
+      title={isEndDay ? `Fim: ${event.title}` : event.title}
       style={{
         width: '100%', padding: '2px 6px', borderRadius: 4,
         background: bg,
-        border: isContinuation ? `1px dashed ${event.color}44` : `1px solid ${event.color}55`,
-        color: event.color, fontSize: '0.7rem', fontWeight: isContinuation ? 500 : 700,
+        border: isEndDay ? `1px dashed ${event.color}55` : `1px solid ${event.color}55`,
+        color: event.color, fontSize: '0.7rem', fontWeight: 700,
         textAlign: 'left', cursor: 'pointer',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         transition: 'background 0.15s ease', lineHeight: 1.4,
-        opacity: isContinuation ? 0.8 : 1,
+        opacity: isEndDay ? 0.7 : 1,
         flexShrink: 0,
       }}
       onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bgHover }}
       onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.background = bg }}
     >
-      {isContinuation ? `↔ ${event.title}` : event.title}
+      {isEndDay ? `⬛ fim: ${event.title}` : event.title}
     </button>
   )
 }
@@ -519,7 +526,7 @@ function CalendarCell({ day, events, onDayClick, onEventClick, onOverflowClick }
         <EventPill
           key={ev.id}
           event={ev}
-          isContinuation={!isEventStartDay(ev, day.date)}
+          isEndDay={isEventEndDay(ev, day.date)}
           onClick={e => { e.stopPropagation(); onEventClick(ev, e) }}
         />
       ))}
